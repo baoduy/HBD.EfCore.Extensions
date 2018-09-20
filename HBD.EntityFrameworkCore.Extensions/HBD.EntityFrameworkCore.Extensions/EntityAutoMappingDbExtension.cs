@@ -17,7 +17,7 @@ namespace HBD.EntityFrameworkCore.Extensions
 
         public EntityAutoMappingDbExtension FromAssemblies(params Assembly[] entityAssemblies)
         {
-            this.EntityAssemblies = entityAssemblies;
+            this.EntityAssemblies = entityAssemblies ?? throw new ArgumentNullException(nameof(entityAssemblies));
             return this;
         }
 

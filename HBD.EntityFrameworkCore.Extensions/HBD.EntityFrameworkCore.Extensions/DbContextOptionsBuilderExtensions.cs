@@ -8,13 +8,13 @@ namespace Microsoft.EntityFrameworkCore
 {
     public static class DbContextOptionsBuilderExtensions
     {
-        public static DbContextOptionsBuilder<TContext> RegisterEntities<TContext>(this DbContextOptionsBuilder<TContext> @this, Action<EntityAutoMappingDbExtension> options) where TContext : DbContext
+        public static DbContextOptionsBuilder<TContext> RegisterEntities<TContext>(this DbContextOptionsBuilder<TContext> @this, Action<EntityAutoMappingDbExtension> options = null) where TContext : DbContext
             => (DbContextOptionsBuilder<TContext>)((DbContextOptionsBuilder)@this).RegisterEntities(options);
 
-        public static DbContextOptionsBuilder RegisterEntities(this DbContextOptionsBuilder @this, Action<EntityAutoMappingDbExtension> options)
+        public static DbContextOptionsBuilder RegisterEntities(this DbContextOptionsBuilder @this, Action<EntityAutoMappingDbExtension> options = null)
         {
             var op = @this.GetOrCreateExtension();
-            options.Invoke(op);
+            options?.Invoke(op);
             return @this;
         }
 
@@ -25,7 +25,7 @@ namespace Microsoft.EntityFrameworkCore
             if (op == null)
             {
                 op = new EntityAutoMappingDbExtension();
-                ((IDbContextOptionsBuilderInfrastructure)optionsBuilder).AddOrUpdateExtension<EntityAutoMappingDbExtension>(op);
+                ((IDbContextOptionsBuilderInfrastructure)optionsBuilder).AddOrUpdateExtension(op);
             }
 
             return op;

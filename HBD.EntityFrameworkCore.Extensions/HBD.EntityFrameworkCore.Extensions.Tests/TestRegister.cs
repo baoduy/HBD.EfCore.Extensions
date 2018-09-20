@@ -46,6 +46,38 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
         }
 
         [TestMethod]
+        public async Task Test_RegisterEntities_DefaultOptions()
+        {
+            var options = SqliteInMemory.CreateOptions<MyDbContext>();
+
+            using (var db = new MyDbContext(new DbContextOptionsBuilder(options)
+                //No Assembly provided it will scan the MyDbContext assembly.
+                .RegisterEntities()
+                .Options))
+            {
+                await db.Database.EnsureCreatedAsync();
+
+                //Create User with Address
+                await db.Set<User>().AddAsync(new User
+                {
+                    FirstName = "Duy",
+                    LastName = "Hoang",
+                    Addresses = {
+                        new Address
+                        {
+                            Street = "12"
+                        }
+                    }
+                });
+
+                await db.SaveChangesAsync();
+
+                Assert.IsTrue(await db.Set<User>().CountAsync() == 1);
+                Assert.IsTrue(await db.Set<Address>().CountAsync() == 1);
+            }
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(DbUpdateException))]
         public async Task TestCreateDb_Validate()
         {
@@ -78,8 +110,8 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
             var options = SqliteInMemory.CreateOptions<MyDbContext>();
 
             using (var db = new MyDbContext(new DbContextOptionsBuilder(options)
-                .RegisterEntities(op => op.FromAssemblies(typeof(MyDbContext).Assembly)
-                    .WithDefaultMapperType(typeof(CustomEntityMapper<>)))
+                //No Assembly provided it will scan the MyDbContext assembly.
+                .RegisterEntities(op => op.WithDefaultMapperType(typeof(CustomEntityMapper<>)))
                 .Options))
             {
                 await db.Database.EnsureCreatedAsync();
@@ -97,6 +129,8 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
                 await db.SaveChangesAsync();
             }
         }
+
+
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void TestWithCustomEntityMapper_Bad()
