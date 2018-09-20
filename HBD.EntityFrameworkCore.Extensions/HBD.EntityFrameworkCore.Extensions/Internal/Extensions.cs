@@ -9,12 +9,6 @@ namespace HBD.EntityFrameworkCore.Extensions.Internal
 {
     internal static class Extensions
     {
-        public static TypeExtractor Extract(this Assembly assembly)
-            => new TypeExtractor(assembly);
-
-        public static TypeExtractor Extract(this Assembly[] assemblies)
-            => new TypeExtractor(assemblies);
-
         public static ModelBuilder RegisterMapping<TEntity, TMapping>(this ModelBuilder builder)
             where TMapping : IEntityTypeConfiguration<TEntity>
             where TEntity : class
