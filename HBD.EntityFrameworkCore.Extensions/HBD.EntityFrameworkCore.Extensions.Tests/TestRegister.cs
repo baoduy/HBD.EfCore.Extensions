@@ -1,9 +1,9 @@
 using System;
-using System.Linq.Expressions;
 using DataLayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
+using DataLayer.Mappers;
 using HBD.EntityFrameworkCore.Extensions.Abstractions;
 using TestSupport.EfHelpers;
 
@@ -71,6 +71,32 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
             }
         }
 
+        [TestMethod]
+        [ExpectedException(typeof(DbUpdateException))]
+        public async Task TestCreateDb_CustomMapper()
+        {
+            var options = SqliteInMemory.CreateOptions<MyDbContext>();
+
+            using (var db = new MyDbContext(new DbContextOptionsBuilder(options)
+                .RegisterEntities(op => op.FromAssemblies(typeof(MyDbContext).Assembly)
+                    .WithDefaultMapperType(typeof(CustomEntityMapper<>)))
+                .Options))
+            {
+                await db.Database.EnsureCreatedAsync();
+
+                //Create User with Address
+                await db.Set<User>().AddAsync(new User
+                {
+                    FirstName = "Duy",
+                    LastName = "Hoang",
+                    Addresses = {
+                        new Address()
+                    }
+                });
+
+                await db.SaveChangesAsync();
+            }
+        }
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void TestWithCustomEntityMapper_Bad()

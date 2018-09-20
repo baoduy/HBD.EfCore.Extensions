@@ -3,6 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using HBD.EntityFrameworkCore.Extensions.Mappers;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,7 +13,7 @@ namespace HBD.EntityFrameworkCore.Extensions
     {
         internal Assembly[] EntityAssemblies { get; private set; }
         internal Expression<Func<Type, bool>> Predicate { get; private set; }
-        internal Type DefaultEntityMapperType { get; private set; } = typeof(EntityMapper<>);
+        internal Type DefaultEntityMapperType { get; private set; } = typeof(EntityTypeConfiguration<>);
 
         public EntityAutoMappingDbExtension FromAssemblies(params Assembly[] entityAssemblies)
         {
@@ -46,7 +47,7 @@ namespace HBD.EntityFrameworkCore.Extensions
             if (!this.DefaultEntityMapperType.IsGenericType)
                 throw new ArgumentException($"The {nameof(DefaultEntityMapperType)} must be a Generic Type.");
 
-            if (!this.DefaultEntityMapperType.GetInterfaces().Any(y => y.IsGenericType && y.GetGenericTypeDefinition() == typeof(IEntityMapper<>)))
+            if (!this.DefaultEntityMapperType.GetInterfaces().Any(y => y.IsGenericType && y.GetGenericTypeDefinition() == typeof(IEntityTypeConfiguration<>)))
                 throw new ArgumentException($"The {nameof(DefaultEntityMapperType)} must be a instance of IEntityMapper<>.");
         }
 

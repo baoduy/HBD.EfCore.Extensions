@@ -1,5 +1,4 @@
-﻿using HBD.EntityFrameworkCore.Extensions.Mappers;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
@@ -17,11 +16,11 @@ namespace HBD.EntityFrameworkCore.Extensions.Internal
             => new TypeExtractor(assemblies);
 
         public static ModelBuilder RegisterMapping<TEntity, TMapping>(this ModelBuilder builder)
-            where TMapping : IEntityMapper<TEntity>
+            where TMapping : IEntityTypeConfiguration<TEntity>
             where TEntity : class
         {
-            var mapper = (IEntityMapper<TEntity>)Activator.CreateInstance(typeof(TMapping));
-            mapper.Map(builder.Entity<TEntity>());
+            var mapper = (IEntityTypeConfiguration<TEntity>)Activator.CreateInstance(typeof(TMapping));
+            builder.ApplyConfiguration(mapper);
             return builder;
         }
 
@@ -31,7 +30,7 @@ namespace HBD.EntityFrameworkCore.Extensions.Internal
 
         internal static Type[] GetEntityMappingTypes(this Assembly[] assemblies)
             => assemblies.Extract().Class().NotAbstract().NotGeneric().NotInterface()
-                .IsInstanceOf(typeof(IEntityMapper<>)).ToArray();
+                .IsInstanceOf(typeof(IEntityTypeConfiguration<>)).ToArray();
 
         internal static Type GetEntityType(Type entityMappingType)
             => entityMappingType.GetInterfaces().First(a => a.IsGenericType).GetGenericArguments().First();

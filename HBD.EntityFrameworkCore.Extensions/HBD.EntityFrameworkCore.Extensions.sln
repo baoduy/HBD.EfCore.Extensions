@@ -3,11 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2026
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HBD.EntityFrameworkCore.Extensions", "HBD.EntityFrameworkCore.Extensions\HBD.EntityFrameworkCore.Extensions.csproj", "{1862FFBA-A0DC-4324-AB2D-78FC5FAE85FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HBD.EntityFrameworkCore.Extensions", "HBD.EntityFrameworkCore.Extensions\HBD.EntityFrameworkCore.Extensions.csproj", "{1862FFBA-A0DC-4324-AB2D-78FC5FAE85FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HBD.EntityFrameworkCore.Extensions.Tests", "HBD.EntityFrameworkCore.Extensions.Tests\HBD.EntityFrameworkCore.Extensions.Tests.csproj", "{1B3F84B8-7CA7-45F4-9642-3EB72F910E62}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HBD.EntityFrameworkCore.Extensions.Tests", "HBD.EntityFrameworkCore.Extensions.Tests\HBD.EntityFrameworkCore.Extensions.Tests.csproj", "{1B3F84B8-7CA7-45F4-9642-3EB72F910E62}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataLayer", "Entities\DataLayer.csproj", "{CF2CC24E-57BF-41F1-9250-CCFC133487DB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataLayer", "Entities\DataLayer.csproj", "{CF2CC24E-57BF-41F1-9250-CCFC133487DB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{42F0C97F-59AE-4BD8-8D46-A61832D6E916}"
+	ProjectSection(SolutionItems) = preProject
+		..\README.md = ..\README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

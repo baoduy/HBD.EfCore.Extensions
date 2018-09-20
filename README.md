@@ -66,12 +66,12 @@ If you want to customize the default EntityMapper you can overwrite it via the r
 var db = new MyDbContext(new DbContextOptionsBuilder()
             .RegisterEntities(op=>op.FromAssemblies("YOUR ENTITIES ASSEMBLIES")
                 .WithFilter("THE Expression to filter the type scanning")
-                .WithDefaultMapperType("YOUR custom EntityMapper type.")
+                .WithDefaultMapperType("YOUR custom IEntityTypeConfiguration<> type.")
                 ).Options)
 ```
 
 ## NOTE
 
-1. The entities MUST be a `IEntity`
-2. The Mapper type MUST be a `IEntityMapper`
+1. The entities MUST be a `IEntity<>`
+2. The Mapper type MUST be a `IEntityTypeConfiguration<>`
 3. Your DbContext MUST be from `HBD.EntityFrameworkCore.Extensions.DbContext`

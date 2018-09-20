@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DataLayer.Mappers
 {
-    internal class UserMapper : EntityMapper<User>
+    internal class UserMapper : EntityTypeConfiguration<User>
     {
-        public override void Map(EntityTypeBuilder<User> builder)
+        public override void Configure(EntityTypeBuilder<User> builder)
         {
-            base.Map(builder);
+            base.Configure(builder);
             builder.HasIndex(u => u.FirstName);
         }
     }
