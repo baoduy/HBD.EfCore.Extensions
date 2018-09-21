@@ -20,7 +20,7 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
             var options = SqliteInMemory.CreateOptions<MyDbContext>();
 
             using (var db = new MyDbContext(new DbContextOptionsBuilder(options)
-                .RegisterEntities(op=>op.FromAssemblies(typeof(MyDbContext).Assembly))
+                .RegisterEntities(op => op.FromAssemblies(typeof(MyDbContext).Assembly))
                 .Options))
             {
                 await db.Database.EnsureCreatedAsync();
@@ -40,8 +40,11 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
 
                 await db.SaveChangesAsync();
 
-                Assert.IsTrue(await db.Set<User>().CountAsync() == 1);
-                Assert.IsTrue(await db.Set<Address>().CountAsync() == 1);
+                var users = await db.Set<User>().ToListAsync();
+                var adds = await db.Set<Address>().ToListAsync();
+
+                Assert.IsTrue(users.Count == 1);
+                Assert.IsTrue(adds.Count == 1);
             }
         }
 
@@ -111,7 +114,8 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
 
             using (var db = new MyDbContext(new DbContextOptionsBuilder(options)
                 //No Assembly provided it will scan the MyDbContext assembly.
-                .RegisterEntities(op => op.WithDefaultMapperType(typeof(CustomEntityMapper<>)))
+                .RegisterEntities(op => op.FromAssemblies(typeof(MyDbContext).Assembly)
+                    .WithDefaultMapperType(typeof(CustomEntityMapper<>)))
                 .Options))
             {
                 await db.Database.EnsureCreatedAsync();
@@ -128,6 +132,19 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
 
                 await db.SaveChangesAsync();
             }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestCreateDb_NoAssembly()
+        {
+            var options = SqliteInMemory.CreateOptions<MyDbContext>();
+
+            var db = new MyDbContext(new DbContextOptionsBuilder(options)
+                //No Assembly provided it will scan the MyDbContext assembly.
+                .RegisterEntities(op => op.FromAssemblies()
+                    .WithDefaultMapperType(typeof(CustomEntityMapper<>)))
+                .Options);
         }
 
 
@@ -148,7 +165,7 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
         public void TestWithCustomEntityMapper_NullFilter_Bad()
         {
             var options = SqliteInMemory.CreateOptions<MyDbContext>();
-            
+
             var db = new MyDbContext(new DbContextOptionsBuilder(options)
                 .RegisterEntities(op =>
                     op.FromAssemblies(typeof(MyDbContext).Assembly).WithFilter(null))

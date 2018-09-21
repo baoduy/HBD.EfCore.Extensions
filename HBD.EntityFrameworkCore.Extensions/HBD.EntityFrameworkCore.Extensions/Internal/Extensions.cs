@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -40,18 +41,11 @@ namespace HBD.EntityFrameworkCore.Extensions.Internal
             md.Invoke(null, new object[] { modelBuilder });
         }
 
-        internal static void RegisterMappingFromExtension(this ModelBuilder modelBuilder, EntityAutoMappingDbExtension extension)
+        internal static void RegisterMappingFromExtension(this ModelBuilder modelBuilder, IEnumerable<RegistrationInfo> registrations)
         {
-            var mappingTypes = GetEntityMappingTypes(extension.EntityAssemblies);
-            var missingEntityTypes = GetEntityTypes(extension.EntityAssemblies, extension.Predicate).Where(t => mappingTypes.All(m => m.GetInterfaces().All(i => i.GenericTypeArguments.First() != t)));
-
-            //Register mappingTypes
-            foreach (var type in mappingTypes)
-                modelBuilder.RegisterMapping(type);
-
-            //Register missingEntityTypes
-            foreach (var type in missingEntityTypes.Select(t => extension.DefaultEntityMapperType.MakeGenericType(t)))
-                modelBuilder.RegisterMapping(type);
+            foreach (var reg in registrations)
+                foreach (var type in reg.GetMappers())
+                    modelBuilder.RegisterMapping(type);
         }
     }
 }

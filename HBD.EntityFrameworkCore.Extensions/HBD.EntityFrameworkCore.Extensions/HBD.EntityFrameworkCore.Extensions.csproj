@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.0-beta3</Version>
+    <Version>1.0.0-beta4</Version>
     <Copyright>@ HBD 2018</Copyright>
     <Description>The extensions for EntityFrameworkCore which automate the ModelBuilder registration.</Description>
     <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
@@ -11,7 +11,7 @@
     <RepositoryUrl>https://github.com/baoduy/HBD.EntityFrameworkCore.Extensions</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>EntityFramework, EntityFrameworkCore, ModelBuilder Automation</PackageTags>
-    <PackageReleaseNotes>Version 1.0.0-beta1
+    <PackageReleaseNotes>Version 1.0.0
 - The first testing version of HBD.EntityFrameworkCore.Extensions</PackageReleaseNotes>
     <PackageIconUrl>https://raw.githubusercontent.com/baoduy/Images/master/NugetLogo.PNG</PackageIconUrl>
   </PropertyGroup>

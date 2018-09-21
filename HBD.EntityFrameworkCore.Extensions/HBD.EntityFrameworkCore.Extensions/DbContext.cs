@@ -29,11 +29,11 @@ namespace HBD.EntityFrameworkCore.Extensions
             if (_options == null) return;
 
             //If there is no Assembly provided then scan the DbContext Assembly
-            if (_options.EntityAssemblies == null)
+            if (_options.Registrations.Count<=0)
                 _options.FromAssemblies(this.GetType().Assembly);
 
             //Register
-            modelBuilder.RegisterMappingFromExtension(_options);
+            modelBuilder.RegisterMappingFromExtension(_options.Registrations);
         }
     }
 }
