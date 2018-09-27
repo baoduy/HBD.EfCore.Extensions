@@ -12,8 +12,6 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
     [TestClass]
     public class TestRegister
     {
-        private const string ConnectionString = "Data Source=db.db";
-
         [TestMethod]
         public async Task TestCreateDb()
         {

@@ -5,7 +5,6 @@ using HBD.EntityFrameworkCore.Extensions;
 using HBD.EntityFrameworkCore.Extensions.Internal;
 
 // ReSharper disable CheckNamespace
-
 namespace Microsoft.EntityFrameworkCore
 {
     public static class DbContextOptionsBuilderExtensions
@@ -16,23 +15,23 @@ namespace Microsoft.EntityFrameworkCore
         public static ITypeExtractor Extract(this Assembly[] assemblies)
             => new TypeExtractor(assemblies);
 
-        public static DbContextOptionsBuilder<TContext> RegisterEntities<TContext>(this DbContextOptionsBuilder<TContext> @this, Action<EntityAutoMappingDbExtension> options = null) where TContext : DbContext
+        public static DbContextOptionsBuilder<TContext> RegisterEntities<TContext>(this DbContextOptionsBuilder<TContext> @this, Action<EntityMappingExtension> options = null) where TContext : DbContext
             => (DbContextOptionsBuilder<TContext>)((DbContextOptionsBuilder)@this).RegisterEntities(options);
 
-        public static DbContextOptionsBuilder RegisterEntities(this DbContextOptionsBuilder @this, Action<EntityAutoMappingDbExtension> options = null)
+        public static DbContextOptionsBuilder RegisterEntities(this DbContextOptionsBuilder @this, Action<EntityMappingExtension> options = null)
         {
             var op = @this.GetOrCreateExtension();
             options?.Invoke(op);
             return @this;
         }
 
-        private static EntityAutoMappingDbExtension GetOrCreateExtension(this DbContextOptionsBuilder optionsBuilder)
+        private static EntityMappingExtension GetOrCreateExtension(this DbContextOptionsBuilder optionsBuilder)
         {
-            var op = optionsBuilder.Options.FindExtension<EntityAutoMappingDbExtension>();
+            var op = optionsBuilder.Options.FindExtension<EntityMappingExtension>();
 
             if (op == null)
             {
-                op = new EntityAutoMappingDbExtension();
+                op = new EntityMappingExtension();
                 ((IDbContextOptionsBuilderInfrastructure)optionsBuilder).AddOrUpdateExtension(op);
             }
 

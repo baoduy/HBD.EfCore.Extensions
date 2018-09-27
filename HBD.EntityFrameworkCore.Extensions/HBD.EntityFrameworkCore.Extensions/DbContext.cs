@@ -5,7 +5,7 @@ namespace HBD.EntityFrameworkCore.Extensions
 {
     public abstract class DbContext : Microsoft.EntityFrameworkCore.DbContext
     {
-        private EntityAutoMappingDbExtension _options = null;
+        private EntityMappingExtension _options = null;
 
         protected DbContext()
         {
@@ -19,7 +19,7 @@ namespace HBD.EntityFrameworkCore.Extensions
         {
             base.OnConfiguring(optionsBuilder);
 
-            _options = optionsBuilder.Options.FindExtension<EntityAutoMappingDbExtension>();
+            _options = optionsBuilder.Options.FindExtension<EntityMappingExtension>();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

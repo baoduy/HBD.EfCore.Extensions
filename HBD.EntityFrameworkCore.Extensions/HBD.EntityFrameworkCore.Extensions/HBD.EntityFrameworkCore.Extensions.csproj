@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.0-beta4</Version>
+    <Version>1.0.0-beta5</Version>
     <Copyright>@ HBD 2018</Copyright>
     <Description>The extensions for EntityFrameworkCore which automate the ModelBuilder registration.</Description>
     <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
@@ -19,6 +19,8 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.3" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
+    <PackageReference Include="Z.EntityFramework.Plus.QueryDeferred.EFCore" Version="1.7.1" />
+    <PackageReference Include="Z.EntityFramework.Plus.QueryFuture.EFCore" Version="1.7.20" />
   </ItemGroup>
 
 </Project>

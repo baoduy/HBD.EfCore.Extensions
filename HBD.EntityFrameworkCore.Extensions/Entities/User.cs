@@ -1,6 +1,6 @@
-﻿using HBD.EntityFrameworkCore.Extensions.Abstractions;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using HBD.EntityFrameworkCore.Extensions.Abstractions;
 using HBD.EntityFrameworkCore.Extensions.Mappers;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace HBD.EntityFrameworkCore.Extensions
 {
-    public class EntityAutoMappingDbExtension : IDbContextOptionsExtension
+    public class EntityMappingExtension : IDbContextOptionsExtension
     {
         internal ICollection<RegistrationInfo> Registrations { get; } = new List<RegistrationInfo>();
 
@@ -18,7 +18,7 @@ namespace HBD.EntityFrameworkCore.Extensions
 
         public bool ApplyServices(IServiceCollection services) => true;
 
-        public long GetServiceProviderHashCode() => nameof(EntityAutoMappingDbExtension).GetHashCode();
+        public long GetServiceProviderHashCode() => nameof(EntityMappingExtension).GetHashCode();
 
         public void Validate(IDbContextOptions options)
         {
@@ -26,6 +26,6 @@ namespace HBD.EntityFrameworkCore.Extensions
                 info.Validate();
         }
 
-        public string LogFragment => nameof(EntityAutoMappingDbExtension);
+        public string LogFragment => nameof(EntityMappingExtension);
     }
 }
