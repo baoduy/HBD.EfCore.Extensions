@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace HBD.EntityFrameworkCore.Extensions.Internal
 {
-    internal class TypeExtractor :  ITypeExtractor
+    internal class TypeExtractor : ITypeExtractor
     {
         private IQueryable<Type> _query;
 
@@ -38,16 +38,20 @@ namespace HBD.EntityFrameworkCore.Extensions.Internal
         public ITypeExtractor NotPublic() => Where(t => !t.IsPublic);
 
         public ITypeExtractor IsInstanceOf(Type type)
-            => type.IsGenericType && type.IsInterface
-                ? Where(t => t.GetInterfaces().Any(y => y.IsGenericType && y.GetGenericTypeDefinition() == type))
-                : Where(t => type.IsAssignableFrom(t));
+        {
+            if (type.IsGenericType && type.IsInterface)
+                return Where(t => t.GetInterfaces().Any(y => y.IsGenericType && y.GetGenericTypeDefinition() == type || type.IsAssignableFrom(y)));
+            return Where(t => type.IsAssignableFrom(t));
+        }
 
         public ITypeExtractor IsInstanceOf<T>() => IsInstanceOf(typeof(T));
 
         public ITypeExtractor NotInstanceOf(Type type)
-            => type.IsGenericType && type.IsInterface
-                ? Where(t => !t.GetInterfaces().Any(y => y.IsGenericType && y.GetGenericTypeDefinition() == type))
-                : Where(t => !type.IsAssignableFrom(t));
+        {
+            if (type.IsGenericType && type.IsInterface)
+                return Where(t => !t.GetInterfaces().Any(y => y.IsGenericType && y.GetGenericTypeDefinition() == type || type.IsAssignableFrom(y)));
+                return Where(t => !type.IsAssignableFrom(t));
+        }
 
         public ITypeExtractor NotInstanceOf<T>() => NotInstanceOf(typeof(T));
 

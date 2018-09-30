@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HBD.EntityFrameworkCore.Extensions.Abstractions
 {
-    public interface IAuditEntity : IAuditEntity<long>
+    public interface IAuditEntity : IAuditEntity<long>, IEntity
     {
 
     }

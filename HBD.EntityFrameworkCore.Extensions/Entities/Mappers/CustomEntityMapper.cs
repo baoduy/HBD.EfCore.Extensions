@@ -1,10 +1,12 @@
-﻿using HBD.EntityFrameworkCore.Extensions.Abstractions;
+﻿using System.Runtime.CompilerServices;
+using HBD.EntityFrameworkCore.Extensions.Abstractions;
 using HBD.EntityFrameworkCore.Extensions.Mappers;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+[assembly:InternalsVisibleTo("HBD.EntityFrameworkCore.Extensions.Tests")]
 namespace DataLayer.Mappers
 {
-    public class CustomEntityMapper<T> : EntityTypeConfiguration<T> where T : Entity
+    internal class CustomEntityMapper<T> : EntityTypeConfiguration<T> where T : Entity
     {
         public override void Configure(EntityTypeBuilder<T> builder)
         {
