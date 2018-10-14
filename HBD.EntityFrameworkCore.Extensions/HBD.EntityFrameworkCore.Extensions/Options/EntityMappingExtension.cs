@@ -3,7 +3,7 @@ using System.Reflection;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace HBD.EntityFrameworkCore.Extensions
+namespace HBD.EntityFrameworkCore.Extensions.Options
 {
     public class EntityMappingExtension : IDbContextOptionsExtension
     {

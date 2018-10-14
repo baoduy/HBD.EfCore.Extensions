@@ -42,9 +42,9 @@ namespace HBD.EntityFrameworkCore.Extensions.Abstractions
     public abstract class AuditEntity : AuditEntity<long>, IAuditEntity
     {
         /// <inheritdoc />
-        protected AuditEntity(string createdBy):base(createdBy)
+        protected AuditEntity(string createdBy) : base(createdBy)
         {
-          
+
         }
 
         /// <inheritdoc />

@@ -1,9 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace HBD.EntityFrameworkCore.Extensions.Pageable
 {
-    public interface IPageable : IEnumerable
+    public interface IPageable
     {
         int PageIndex { get; }
         int PageSize { get; }
@@ -11,7 +10,7 @@ namespace HBD.EntityFrameworkCore.Extensions.Pageable
         int TotalPage { get; }
     }
 
-    public interface IPageable<out TEntity> : IPageable, IEnumerable<TEntity>
+    public interface IPageable<out TEntity> : IPageable
     {
         IReadOnlyCollection<TEntity> Items { get; }
     }

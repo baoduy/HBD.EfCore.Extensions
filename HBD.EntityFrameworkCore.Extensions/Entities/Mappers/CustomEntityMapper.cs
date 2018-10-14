@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 [assembly:InternalsVisibleTo("HBD.EntityFrameworkCore.Extensions.Tests")]
 namespace DataLayer.Mappers
 {
-    internal class CustomEntityMapper<T> : EntityTypeConfiguration<T> where T : Entity
+    internal class CustomEntityMapper<T> : EntityTypeConfiguration<T> where T : class,IEntity
     {
         public override void Configure(EntityTypeBuilder<T> builder)
         {

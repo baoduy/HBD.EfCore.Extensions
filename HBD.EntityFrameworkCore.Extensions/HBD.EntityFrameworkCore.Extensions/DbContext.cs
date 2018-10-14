@@ -1,4 +1,5 @@
 ﻿using HBD.EntityFrameworkCore.Extensions.Internal;
+using HBD.EntityFrameworkCore.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
 
 namespace HBD.EntityFrameworkCore.Extensions

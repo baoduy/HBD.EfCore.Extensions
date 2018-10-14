@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace HBD.EntityFrameworkCore.Extensions.Pageable
@@ -20,7 +19,5 @@ namespace HBD.EntityFrameworkCore.Extensions.Pageable
         public int TotalPage => TotalItems / PageSize + (TotalItems % PageSize > 0 ? 1 : 0);
 
         public IReadOnlyCollection<TEntity> Items { get; }
-        public IEnumerator<TEntity> GetEnumerator() => Items.GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }
