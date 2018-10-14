@@ -21,12 +21,25 @@ namespace Microsoft.EntityFrameworkCore
         /// <param name="assemblies"></param>
         /// <param name="nameContains"></param>
         /// <returns></returns>
-        public static IEnumerable<Type> ScanPublicClassesFromWithFilter(this Assembly[] assemblies, string nameContains)
+        public static IEnumerable<Type> ScanGenericClassesWithFilter(this Assembly[] assemblies, string nameContains)
+            => assemblies.Extract().Generic().Class().NotAbstract()
+                .Where(t => t.Name.Contains(nameContains));
+
+        public static IEnumerable<Type> ScanGenericClassesWithFilter(this Assembly assembly, string nameContains)
+            => new[] { assembly }.ScanGenericClassesWithFilter(nameContains);
+
+        /// <summary>
+        /// Get Public classes which name contains the nameContains
+        /// </summary>
+        /// <param name="assemblies"></param>
+        /// <param name="nameContains"></param>
+        /// <returns></returns>
+        public static IEnumerable<Type> ScanPublicClassesWithFilter(this Assembly[] assemblies, string nameContains)
             => assemblies.Extract().Public().Class().NotAbstract().NotGeneric()
             .Where(t => t.Name.Contains(nameContains));
 
-        public static IEnumerable<Type> ScanPublicClassesFromWithFilter(this Assembly assembly, string nameContains)
-            => new[] { assembly }.ScanPublicClassesFromWithFilter(nameContains);
+        public static IEnumerable<Type> ScanPublicClassesWithFilter(this Assembly assembly, string nameContains)
+            => new[] { assembly }.ScanPublicClassesWithFilter(nameContains);
 
         /// <summary>
         /// Get Public and Private classes which name contains the nameContains
@@ -34,12 +47,12 @@ namespace Microsoft.EntityFrameworkCore
         /// <param name="assemblies"></param>
         /// <param name="nameContains"></param>
         /// <returns></returns>
-        public static IEnumerable<Type> ScanClassesFromWithFilter(this Assembly[] assemblies, string nameContains)
+        public static IEnumerable<Type> ScanClassesWithFilter(this Assembly[] assemblies, string nameContains)
             => assemblies.Extract().Class().NotAbstract().NotGeneric()
                 .Where(t => t.Name.Contains(nameContains));
 
-        public static IEnumerable<Type> ScanClassesFromWithFilter(this Assembly assembly, string nameContains)
-            => new[] { assembly }.ScanClassesFromWithFilter(nameContains);
+        public static IEnumerable<Type> ScanClassesWithFilter(this Assembly assembly, string nameContains)
+            => new[] { assembly }.ScanClassesWithFilter(nameContains);
 
         /// <summary>
         /// Get Public classes which implement of T

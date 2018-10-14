@@ -18,6 +18,13 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
         }
 
         [TestMethod]
+        public void TestExtract_GenericClass()
+        {
+            var list = typeof(MyDbContext).Assembly.ScanGenericClassesWithFilter("Mapper").ToList();
+            list.Any().Should().BeTrue();
+        }
+
+        [TestMethod]
         public void TestExtract_NotInstanceOf()
         {
             var list = typeof(MyDbContext).Assembly.Extract().Class().NotInstanceOf(typeof(IEntity<long>)).ToList();
@@ -28,14 +35,14 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
         [TestMethod]
         public void TestScanPublicClassesFromWithFilter()
         {
-            typeof(MyDbContext).Assembly.ScanPublicClassesFromWithFilter("Context")
+            typeof(MyDbContext).Assembly.ScanPublicClassesWithFilter("Context")
                 .Count().Should().Be(1);
         }
 
         [TestMethod]
         public void TestScanClassesFromWithFilter()
         {
-            typeof(MyDbContext).Assembly.ScanClassesFromWithFilter("Mapper")
+            typeof(MyDbContext).Assembly.ScanClassesWithFilter("Mapper")
                 .Count().Should().BeGreaterOrEqualTo(1);
         }
 
