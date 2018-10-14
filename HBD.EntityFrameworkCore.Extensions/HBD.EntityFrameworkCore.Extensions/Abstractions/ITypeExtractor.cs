@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace HBD.EntityFrameworkCore.Extensions
+namespace HBD.EntityFrameworkCore.Extensions.Abstractions
 {
     public interface ITypeExtractor: IEnumerable<Type>
     {

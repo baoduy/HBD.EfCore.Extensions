@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using HBD.EntityFrameworkCore.Extensions.Abstractions;
 
 namespace HBD.EntityFrameworkCore.Extensions.Internal
 {
