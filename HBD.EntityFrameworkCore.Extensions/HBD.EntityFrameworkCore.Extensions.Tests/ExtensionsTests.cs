@@ -93,5 +93,22 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
                 db.IsEntityInUse(db.Set<Account>().First()).Should().BeFalse();
             }
         }
+
+        [TestMethod]
+        public void TestUpdateFrom()
+        {
+            var user = new User();
+            var user1 = new User
+            {
+                FirstName = "Duy",
+                LastName = "Hoang",
+                Account = new Account(),
+            };
+
+            user.UpdateFrom(user1);
+            user.FirstName.Should().Be("Duy");
+            user.LastName.Should().Be("Hoang");
+            user.Account.Should().Be(user1.Account);
+        }
     }
 }

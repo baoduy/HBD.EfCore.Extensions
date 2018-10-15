@@ -16,7 +16,7 @@ namespace HBD.EntityFrameworkCore.Extensions
 
         internal RegistrationInfo(params Assembly[] entityAssemblies)
         {
-            if(entityAssemblies.Length<=0)
+            if (entityAssemblies.Length <= 0)
                 throw new ArgumentNullException(nameof(entityAssemblies));
 
             EntityAssemblies = entityAssemblies;
@@ -51,9 +51,20 @@ namespace HBD.EntityFrameworkCore.Extensions
         public IEnumerable<Type> GetMappers()
         {
             var mappingTypes = Internal.Extensions.GetEntityMappingTypes(EntityAssemblies);
-            var missingEntityTypes = Internal.Extensions.GetEntityTypes(EntityAssemblies, Predicate).Where(t => mappingTypes.All(m => m.GetInterfaces().All(i => i.GenericTypeArguments.First() != t)));
+            var missingEntityTypes = Internal.Extensions.GetEntityTypes(EntityAssemblies, Predicate)
+                .Where(t => mappingTypes.All(m => m.GetInterfaces()
+                    .All(i => i.GenericTypeArguments.First() != t)));
 
-            return mappingTypes.Concat(missingEntityTypes.Select(t => DefaultEntityMapperType.MakeGenericType(t)));
+            return mappingTypes.Concat(missingEntityTypes.Select(t =>
+            {
+                var genericParams = DefaultEntityMapperType.GetGenericArguments();
+                if(genericParams.Any(c=>c.IsAssignableFrom(t)))
+                {
+                    return DefaultEntityMapperType.MakeGenericType(t);
+                }
+
+                return typeof(EntityTypeConfiguration<>).MakeGenericType(t);
+            }));
         }
     }
 }

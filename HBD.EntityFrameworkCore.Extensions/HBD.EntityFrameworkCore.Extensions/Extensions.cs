@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel;
 using System.Linq;
-using System.Text;
+using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 
@@ -9,6 +8,29 @@ namespace HBD.EntityFrameworkCore.Extensions
 {
     public static class Extensions
     {
+        /// <summary>
+        /// Update the Not ReadOnly from obj.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="this"></param>
+        /// <param name="obj"></param>
+        /// <param name="bindingFlags"></param>
+        public static T UpdateFrom<T>(this T @this, T obj, BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public) where T : class
+        {
+            foreach (var property in obj.GetType().GetProperties(bindingFlags))
+            {
+                var readOnly = property.GetCustomAttribute<ReadOnlyAttribute>();
+                if (readOnly?.IsReadOnly == true
+                    ||!property.CanRead
+                    ||!property.CanWrite) continue;
+
+                var val = property.GetValue(obj);
+                property.SetValue(@this, val);
+            }
+
+            return @this;
+        }
+
         /// <summary>
         /// Check whether the entity is referring by others.
         /// </summary>
