@@ -3,15 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HBD.EntityFrameworkCore.Extensions.Abstractions
 {
-    public abstract class Entity : Entity<long>, IEntity
-    {
-        /// <summary>
-        /// Constructor for EF Core
-        /// </summary>
-        protected Entity() { }
-    }
-
-    public abstract class Entity<TKey> : IEntity<TKey>
+    public abstract class Entity<TKey> : IConcurrencyEntity<TKey>
     {
         /// <summary>
         /// Constructor for EF Core
@@ -35,4 +27,13 @@ namespace HBD.EntityFrameworkCore.Extensions.Abstractions
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public byte[] RowVersion { get; private set; }
     }
+
+    public abstract class Entity : Entity<long>, IConcurrencyEntity
+    {
+        /// <summary>
+        /// Constructor for EF Core
+        /// </summary>
+        protected Entity() { }
+    }
+
 }
