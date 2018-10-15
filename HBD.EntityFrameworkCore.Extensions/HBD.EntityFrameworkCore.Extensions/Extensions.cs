@@ -14,17 +14,21 @@ namespace HBD.EntityFrameworkCore.Extensions
         /// <typeparam name="T"></typeparam>
         /// <param name="this"></param>
         /// <param name="obj"></param>
+        /// <param name="ignoreNull"></param>
         /// <param name="bindingFlags"></param>
-        public static T UpdateFrom<T>(this T @this, T obj, BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public) where T : class
+        public static T UpdateFrom<T>(this T @this, T obj, bool ignoreNull = false, BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public) where T : class
         {
             foreach (var property in obj.GetType().GetProperties(bindingFlags))
             {
                 var readOnly = property.GetCustomAttribute<ReadOnlyAttribute>();
                 if (readOnly?.IsReadOnly == true
-                    ||!property.CanRead
-                    ||!property.CanWrite) continue;
+                    || !property.CanRead
+                    || !property.CanWrite) continue;
 
                 var val = property.GetValue(obj);
+                if(ignoreNull && val == null)
+                    continue;
+
                 property.SetValue(@this, val);
             }
 

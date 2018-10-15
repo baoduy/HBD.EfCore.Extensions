@@ -110,5 +110,39 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
             user.LastName.Should().Be("Hoang");
             user.Account.Should().Be(user1.Account);
         }
+
+        [TestMethod]
+        public void TestUpdateFrom_NotIgnoreNull()
+        {
+            var user = new User { Account = new Account() };
+            var user1 = new User
+            {
+                FirstName = "Duy",
+                LastName = "Hoang",
+                Account = null
+            };
+
+            user.UpdateFrom(user1, ignoreNull: false);
+            user.FirstName.Should().Be("Duy");
+            user.LastName.Should().Be("Hoang");
+            user.Account.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void TestUpdateFrom_IgnoreNull()
+        {
+            var user = new User { Account = new Account() };
+            var user1 = new User
+            {
+                FirstName = "Duy",
+                LastName = "Hoang",
+                Account = null
+            };
+
+            user.UpdateFrom(user1, ignoreNull: true);
+            user.FirstName.Should().Be("Duy");
+            user.LastName.Should().Be("Hoang");
+            user.Account.Should().NotBeNull();
+        }
     }
 }
