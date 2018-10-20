@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using HBD.EntityFrameworkCore.Extensions.Attributes;
 
 namespace HBD.EntityFrameworkCore.Extensions.Abstractions
 {
@@ -7,14 +8,18 @@ namespace HBD.EntityFrameworkCore.Extensions.Abstractions
     {
         [Required]
         [MaxLength(255)]
+        [IgnoreFromUpdate]
         string CreatedBy { get; }
 
         [Required]
+        [IgnoreFromUpdate]
         DateTimeOffset CreatedOn { get; }
 
         [MaxLength(255)]
+        [IgnoreFromUpdate]
         string UpdatedBy { get; }
 
+        [IgnoreFromUpdate]
         DateTimeOffset? UpdatedOn { get; }
     }
 

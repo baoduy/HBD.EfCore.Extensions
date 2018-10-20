@@ -21,7 +21,7 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
                 await db.Database.EnsureCreatedAsync();
 
                 //Create User with Address
-                await db.Set<User>().AddAsync(new User
+                await db.Set<User>().AddAsync(new User("Duy")
                 {
                     FirstName = "Duy",
                     LastName = "Hoang",

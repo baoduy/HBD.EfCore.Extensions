@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using HBD.EntityFrameworkCore.Extensions.Abstractions;
 using HBD.EntityFrameworkCore.Extensions.Mappers;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -9,6 +8,12 @@ namespace DataLayer
 {
     public class User : AuditEntity
     {
+        public User(string userName):base(userName) { }
+
+        public User()
+        {
+        }
+
         [Required]
         [MaxLength(256)]
         public string FirstName { get; set; }
@@ -23,6 +28,8 @@ namespace DataLayer
         public virtual Account Account { get; set; }
 
         public virtual ICollection<Address> Addresses { get; } = new HashSet<Address>();
+
+        public void UpdatedByUser(string userName) => this.SetUpdatedBy(userName);
     }
 
     internal class UserMapper : EntityTypeConfiguration<User>
