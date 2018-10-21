@@ -45,7 +45,7 @@ namespace HBD.EntityFrameworkCore.Extensions
         /// </summary>
         /// <param name="modelBuilder"></param>
         /// <param name="registrations"></param>
-        public static void RegisterDataSeedingFromExtension(this ModelBuilder modelBuilder, IEnumerable<RegistrationInfo> registrations)
+        public static void RegisterDataSeedingFrom(this ModelBuilder modelBuilder, IEnumerable<RegistrationInfo> registrations)
         {
             foreach (var type in registrations.SelectMany(GetDataSeedingTypes))
                 modelBuilder.HasData(type);

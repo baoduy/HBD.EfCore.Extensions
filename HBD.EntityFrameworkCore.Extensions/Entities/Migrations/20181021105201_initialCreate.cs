@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DataLayer.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class initialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -38,6 +38,20 @@ namespace DataLayer.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AccountStatus", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EnumStatus",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(maxLength: 100, nullable: false),
+                    Value = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EnumStatus", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -98,6 +112,21 @@ namespace DataLayer.Migrations
                 columns: new[] { "Id", "Name", "RowVersion" },
                 values: new object[] { 2L, "Hoang", null });
 
+            migrationBuilder.InsertData(
+                table: "EnumStatus",
+                columns: new[] { "Id", "Name", "Value" },
+                values: new object[] { 1, "UnKnow", 0 });
+
+            migrationBuilder.InsertData(
+                table: "EnumStatus",
+                columns: new[] { "Id", "Name", "Value" },
+                values: new object[] { 2, "Active", 1 });
+
+            migrationBuilder.InsertData(
+                table: "EnumStatus",
+                columns: new[] { "Id", "Name", "Value" },
+                values: new object[] { 3, "InActive", 2 });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Address_UserId",
                 table: "Address",
@@ -128,6 +157,9 @@ namespace DataLayer.Migrations
 
             migrationBuilder.DropTable(
                 name: "Address");
+
+            migrationBuilder.DropTable(
+                name: "EnumStatus");
 
             migrationBuilder.DropTable(
                 name: "User");

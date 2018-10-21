@@ -31,11 +31,14 @@ namespace HBD.EntityFrameworkCore.Extensions
             if (_options.Registrations.Count<=0)
                 _options.FromAssemblies(this.GetType().Assembly);
 
-            //Register Entity
-            modelBuilder.RegisterMappingFromExtension(_options.Registrations);
+            //Register Entities
+            modelBuilder.RegisterMappingFrom(_options.Registrations);
+
+            //Register StaticData Of
+            modelBuilder.RegisterStaticDataFrom(_options.Registrations);
 
             //Register Data Seeding
-            modelBuilder.RegisterDataSeedingFromExtension(_options.Registrations);
+            modelBuilder.RegisterDataSeedingFrom(_options.Registrations);
         }
     }
 }

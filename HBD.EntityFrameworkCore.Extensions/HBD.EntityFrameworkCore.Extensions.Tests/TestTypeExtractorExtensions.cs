@@ -2,6 +2,7 @@
 using DataLayer;
 using FluentAssertions;
 using HBD.EntityFrameworkCore.Extensions.Abstractions;
+using HBD.EntityFrameworkCore.Extensions.Attributes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -66,6 +67,13 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
         {
             typeof(MyDbContext).Assembly.ScanClassesImplementOf<IEntity<long>>()
                 .Count().Should().BeGreaterOrEqualTo(2);
+        }
+
+        [TestMethod]
+        public void Test_HasAttribute()
+        {
+            typeof(MyDbContext).Assembly.Extract().Class().HasAttribute<StaticDataOfAttribute>()
+                .Count().Should().BeGreaterOrEqualTo(1);
         }
     }
 }

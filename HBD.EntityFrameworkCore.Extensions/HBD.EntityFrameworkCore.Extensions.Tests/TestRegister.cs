@@ -57,7 +57,21 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
                 .Options))
             {
                 await db.Database.EnsureCreatedAsync();
-                (await db.Set<AccountStatus>().AnyAsync()).Should().BeTrue();
+                (await db.Set<AccountStatus>().CountAsync()).Should().BeGreaterOrEqualTo(2);
+            }
+        }
+
+        [TestMethod]
+        public async Task TestEnumStatusDataSeeding()
+        {
+            var options = SqliteInMemory.CreateOptions<MyDbContext>();
+            using (var db = new MyDbContext(new DbContextOptionsBuilder(options)
+                //No Assembly provided it will scan the MyDbContext assembly.
+                .RegisterEntities()
+                .Options))
+            {
+                await db.Database.EnsureCreatedAsync();
+                (await db.Set<EnumStatusTable>().CountAsync()).Should().Be(3);
             }
         }
 

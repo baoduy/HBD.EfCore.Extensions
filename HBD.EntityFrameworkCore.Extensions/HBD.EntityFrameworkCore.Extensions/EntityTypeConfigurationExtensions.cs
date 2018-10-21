@@ -75,7 +75,7 @@ namespace HBD.EntityFrameworkCore.Extensions
         /// </summary>
         /// <param name="modelBuilder"></param>
         /// <param name="registrations"></param>
-        public static void RegisterMappingFromExtension(this ModelBuilder modelBuilder, IEnumerable<RegistrationInfo> registrations)
+        public static void RegisterMappingFrom(this ModelBuilder modelBuilder, IEnumerable<RegistrationInfo> registrations)
         {
             foreach (var type in registrations.SelectMany(GetMappers))
                 modelBuilder.RegisterMappingFromType(type);

@@ -89,6 +89,28 @@ namespace DataLayer.Migrations
                     b.ToTable("Address");
                 });
 
+            modelBuilder.Entity("DataLayer.EnumStatusTable", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100);
+
+                    b.Property<int>("Value");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EnumStatus");
+
+                    b.HasData(
+                        new { Id = 1, Name = "UnKnow", Value = 0 },
+                        new { Id = 2, Name = "Active", Value = 1 },
+                        new { Id = 3, Name = "InActive", Value = 2 }
+                    );
+                });
+
             modelBuilder.Entity("DataLayer.User", b =>
                 {
                     b.Property<long>("Id")

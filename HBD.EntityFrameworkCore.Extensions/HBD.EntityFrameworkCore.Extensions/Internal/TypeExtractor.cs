@@ -35,6 +35,15 @@ namespace HBD.EntityFrameworkCore.Extensions.Internal
         public ITypeExtractor Interface() => Where(t => t.IsInterface);
         public ITypeExtractor NotInterface() => Where(t => !t.IsInterface);
 
+        public ITypeExtractor Enum() => Where(t => t.IsEnum);
+        public ITypeExtractor NotEnum() => Where(t => !t.IsEnum);
+
+        public ITypeExtractor HasAttribute<TAttribute>() where TAttribute : Attribute
+            => HasAttribute(typeof(TAttribute));
+
+        public ITypeExtractor HasAttribute(Type attributeType)
+            => Where(t => t.GetCustomAttribute(attributeType) != null);
+
         public ITypeExtractor Public() => Where(t => t.IsPublic);
         public ITypeExtractor NotPublic() => Where(t => !t.IsPublic);
 
@@ -51,7 +60,7 @@ namespace HBD.EntityFrameworkCore.Extensions.Internal
         {
             if (type.IsGenericType && type.IsInterface)
                 return Where(t => !t.GetInterfaces().Any(y => y.IsGenericType && y.GetGenericTypeDefinition() == type || type.IsAssignableFrom(y)));
-                return Where(t => !type.IsAssignableFrom(t));
+            return Where(t => !type.IsAssignableFrom(t));
         }
 
         public ITypeExtractor NotInstanceOf<T>() => NotInstanceOf(typeof(T));
