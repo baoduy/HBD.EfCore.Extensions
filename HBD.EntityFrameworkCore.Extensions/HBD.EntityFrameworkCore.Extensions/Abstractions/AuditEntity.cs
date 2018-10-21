@@ -5,7 +5,10 @@ namespace HBD.EntityFrameworkCore.Extensions.Abstractions
     public abstract class AuditEntity<TKey> : Entity<TKey>, IAuditEntity<TKey>
     {
         /// <inheritdoc />
-        protected AuditEntity(string createdBy)
+        protected AuditEntity(string createdBy) : this(default(TKey), createdBy) { }
+
+        /// <inheritdoc />
+        protected AuditEntity(TKey id, string createdBy) : base(id)
         {
             CreatedBy = createdBy ?? throw new ArgumentNullException(nameof(createdBy));
             CreatedOn = DateTimeOffset.Now;
@@ -44,7 +47,10 @@ namespace HBD.EntityFrameworkCore.Extensions.Abstractions
         /// <inheritdoc />
         protected AuditEntity(string createdBy) : base(createdBy)
         {
+        }
 
+        protected AuditEntity(long id, string createdBy) : base(id, createdBy)
+        {
         }
 
         /// <inheritdoc />

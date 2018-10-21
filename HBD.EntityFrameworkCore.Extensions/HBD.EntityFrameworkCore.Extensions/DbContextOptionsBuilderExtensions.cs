@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Infrastructure;
 using System;
-using HBD.EntityFrameworkCore.Extensions;
 using HBD.EntityFrameworkCore.Extensions.Options;
 
 // ReSharper disable CheckNamespace

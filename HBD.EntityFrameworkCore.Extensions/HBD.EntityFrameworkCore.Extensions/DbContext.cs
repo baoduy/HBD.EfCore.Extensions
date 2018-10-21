@@ -1,5 +1,4 @@
-﻿using HBD.EntityFrameworkCore.Extensions.Internal;
-using HBD.EntityFrameworkCore.Extensions.Options;
+﻿using HBD.EntityFrameworkCore.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
 
 namespace HBD.EntityFrameworkCore.Extensions
@@ -19,7 +18,6 @@ namespace HBD.EntityFrameworkCore.Extensions
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
-
             _options = optionsBuilder.Options.FindExtension<EntityMappingExtension>();
         }
 
@@ -33,8 +31,11 @@ namespace HBD.EntityFrameworkCore.Extensions
             if (_options.Registrations.Count<=0)
                 _options.FromAssemblies(this.GetType().Assembly);
 
-            //Register
+            //Register Entity
             modelBuilder.RegisterMappingFromExtension(_options.Registrations);
+
+            //Register Data Seeding
+            modelBuilder.RegisterDataSeedingFromExtension(_options.Registrations);
         }
     }
 }

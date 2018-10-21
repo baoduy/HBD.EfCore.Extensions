@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace HBD.EntityFrameworkCore.Extensions.Mappers
+namespace HBD.EntityFrameworkCore.Extensions.Configurations
 {
     public class EntityTypeConfiguration<TEntity> : IEntityTypeConfiguration<TEntity>
         where TEntity : class

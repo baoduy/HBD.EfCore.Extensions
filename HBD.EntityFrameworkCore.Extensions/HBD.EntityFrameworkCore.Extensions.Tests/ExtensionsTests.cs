@@ -1,11 +1,7 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using DataLayer;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Xunit.Extensions.AssertExtensions;
 
 namespace HBD.EntityFrameworkCore.Extensions.Tests
 {

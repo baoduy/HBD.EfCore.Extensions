@@ -1,16 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using HBD.EntityFrameworkCore.Extensions.Mappers;
+using HBD.EntityFrameworkCore.Extensions.Configurations;
 using Microsoft.EntityFrameworkCore;
 
-namespace HBD.EntityFrameworkCore.Extensions
+namespace HBD.EntityFrameworkCore.Extensions.Options
 {
     public sealed class RegistrationInfo
     {
-        internal Assembly[] EntityAssemblies { get; }
+        public Assembly[] EntityAssemblies { get; }
         internal Expression<Func<Type, bool>> Predicate { get; private set; }
         internal Type DefaultEntityMapperType { get; private set; } = typeof(EntityTypeConfiguration<>);
 
@@ -46,25 +45,6 @@ namespace HBD.EntityFrameworkCore.Extensions
 
             if (!this.DefaultEntityMapperType.GetInterfaces().Any(y => y.IsGenericType && y.GetGenericTypeDefinition() == typeof(IEntityTypeConfiguration<>)))
                 throw new ArgumentException($"The {nameof(DefaultEntityMapperType)} must be a instance of IEntityMapper<>.");
-        }
-
-        public IEnumerable<Type> GetMappers()
-        {
-            var mappingTypes = Internal.Extensions.GetEntityMappingTypes(EntityAssemblies);
-            var missingEntityTypes = Internal.Extensions.GetEntityTypes(EntityAssemblies, Predicate)
-                .Where(t => mappingTypes.All(m => m.GetInterfaces()
-                    .All(i => i.GenericTypeArguments.First() != t)));
-
-            return mappingTypes.Concat(missingEntityTypes.Select(t =>
-            {
-                var genericParams = DefaultEntityMapperType.GetGenericArguments();
-                if(genericParams.Any(c=>c.IsAssignableFrom(t)))
-                {
-                    return DefaultEntityMapperType.MakeGenericType(t);
-                }
-
-                return typeof(EntityTypeConfiguration<>).MakeGenericType(t);
-            }));
         }
     }
 }

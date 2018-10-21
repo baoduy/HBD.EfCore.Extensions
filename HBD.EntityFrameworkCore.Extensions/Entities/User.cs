@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using HBD.EntityFrameworkCore.Extensions.Abstractions;
-using HBD.EntityFrameworkCore.Extensions.Mappers;
+using HBD.EntityFrameworkCore.Extensions.Configurations;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DataLayer

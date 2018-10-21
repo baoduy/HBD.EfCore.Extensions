@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
 using DataLayer.Mappers;
+using FluentAssertions;
 using HBD.EntityFrameworkCore.Extensions.Abstractions;
 using TestSupport.EfHelpers;
 
@@ -43,6 +44,20 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
 
                 Assert.IsTrue(users.Count == 1);
                 Assert.IsTrue(adds.Count == 1);
+            }
+        }
+
+        [TestMethod]
+        public async Task TestAccountStatusDataSeeding()
+        {
+            var options = SqliteInMemory.CreateOptions<MyDbContext>();
+            using (var db = new MyDbContext(new DbContextOptionsBuilder(options)
+                //No Assembly provided it will scan the MyDbContext assembly.
+                .RegisterEntities()
+                .Options))
+            {
+                await db.Database.EnsureCreatedAsync();
+                (await db.Set<AccountStatus>().AnyAsync()).Should().BeTrue();
             }
         }
 

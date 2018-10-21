@@ -1,7 +1,6 @@
 ﻿using FluentAssertions;
 using HBD.EntityFrameworkCore.Extensions.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Xunit.Sdk;
 
 namespace HBD.EntityFrameworkCore.Extensions.Tests
 {

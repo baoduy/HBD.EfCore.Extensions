@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 using HBD.EntityFrameworkCore.Extensions.Attributes;
 
@@ -6,6 +8,9 @@ namespace HBD.EntityFrameworkCore.Extensions
 {
     public static class Extensions
     {
+        internal static Type GetEntityType(Type entityMappingType)
+            => entityMappingType.GetInterfaces().First(a => a.IsGenericType).GetGenericArguments().First();
+
         /// <summary>
         /// Update the values from obj.
         /// Those properties marked as [ReadOnly(true)] or 

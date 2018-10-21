@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using HBD.EntityFrameworkCore.Extensions.Abstractions;
-using HBD.EntityFrameworkCore.Extensions.Mappers;
+using HBD.EntityFrameworkCore.Extensions.Configurations;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 [assembly:InternalsVisibleTo("HBD.EntityFrameworkCore.Extensions.Tests")]
