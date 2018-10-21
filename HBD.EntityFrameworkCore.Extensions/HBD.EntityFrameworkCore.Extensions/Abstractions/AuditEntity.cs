@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace HBD.EntityFrameworkCore.Extensions.Abstractions
 {
@@ -30,11 +31,16 @@ namespace HBD.EntityFrameworkCore.Extensions.Abstractions
 
         #region Actions
         /// <summary>
-        /// Update Audit info.
+        /// Update UpdatedBy UserName info.
         /// </summary>
         /// <param name="userName"></param>
         protected virtual void SetUpdatedBy(string userName)
         {
+            //If ID is default means the entity is not saved yet.
+            //Only Set the value if Id >=0
+            if (EqualityComparer<TKey>.Default.Equals(Id, default(TKey)))
+                return;
+
             this.UpdatedBy = userName ?? throw new ArgumentNullException(nameof(userName));
             this.UpdatedOn = DateTimeOffset.Now;
         }

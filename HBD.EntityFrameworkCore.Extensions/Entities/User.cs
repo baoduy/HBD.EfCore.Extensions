@@ -10,6 +10,8 @@ namespace DataLayer
     {
         public User(string userName):base(userName) { }
 
+        public User(long id, string userName) : base(id, userName) { }
+
         public User()
         {
         }
