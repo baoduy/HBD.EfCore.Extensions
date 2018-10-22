@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20181021105201_initialCreate")]
+    [Migration("20181022015159_initialCreate")]
     partial class initialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -91,28 +91,6 @@ namespace DataLayer.Migrations
                     b.ToTable("Address");
                 });
 
-            modelBuilder.Entity("DataLayer.EnumStatusTable", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100);
-
-                    b.Property<int>("Value");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("EnumStatus");
-
-                    b.HasData(
-                        new { Id = 1, Name = "UnKnow", Value = 0 },
-                        new { Id = 2, Name = "Active", Value = 1 },
-                        new { Id = 3, Name = "InActive", Value = 2 }
-                    );
-                });
-
             modelBuilder.Entity("DataLayer.User", b =>
                 {
                     b.Property<long>("Id")
@@ -153,6 +131,28 @@ namespace DataLayer.Migrations
                         .IsUnique();
 
                     b.ToTable("User");
+                });
+
+            modelBuilder.Entity("HBD.EntityFrameworkCore.Extensions.Abstractions.EnumTables<DataLayer.EnumStatus>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("Key");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EnumStatus");
+
+                    b.HasData(
+                        new { Id = 1, Key = 0, Name = "UnKnow" },
+                        new { Id = 2, Key = 1, Name = "Active" },
+                        new { Id = 3, Key = 2, Name = "InActive" }
+                    );
                 });
 
             modelBuilder.Entity("DataLayer.Address", b =>

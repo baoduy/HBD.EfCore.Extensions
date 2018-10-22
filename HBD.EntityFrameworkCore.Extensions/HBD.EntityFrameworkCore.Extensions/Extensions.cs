@@ -26,7 +26,7 @@ namespace HBD.EntityFrameworkCore.Extensions
             foreach (var property in obj.GetType().GetProperties(bindingFlags))
             {
                 var readOnly = property.GetCustomAttribute<ReadOnlyAttribute>();
-                var ignored = property.GetCustomAttribute<IgnoreFromUpdate>();
+                var ignored = property.GetCustomAttribute<IgnoreFromUpdateAttribute>();
 
                 if (ignored!=null 
                     ||readOnly?.IsReadOnly == true

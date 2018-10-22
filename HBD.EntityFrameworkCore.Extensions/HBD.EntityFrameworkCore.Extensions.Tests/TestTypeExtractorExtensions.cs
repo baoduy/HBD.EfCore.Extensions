@@ -72,7 +72,7 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
         [TestMethod]
         public void Test_HasAttribute()
         {
-            typeof(MyDbContext).Assembly.Extract().Class().HasAttribute<StaticDataOfAttribute>()
+            typeof(MyDbContext).Assembly.Extract().HasAttribute<StaticDataAttribute>()
                 .Count().Should().BeGreaterOrEqualTo(1);
         }
     }

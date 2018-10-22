@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using DataLayer.Mappers;
 using FluentAssertions;
 using HBD.EntityFrameworkCore.Extensions.Abstractions;
+using HBD.EntityFrameworkCore.Extensions.Internal;
 using TestSupport.EfHelpers;
 
 namespace HBD.EntityFrameworkCore.Extensions.Tests
@@ -71,7 +72,7 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
                 .Options))
             {
                 await db.Database.EnsureCreatedAsync();
-                (await db.Set<EnumStatusTable>().CountAsync()).Should().Be(3);
+                (await db.Set<EnumTables<EnumStatus>>().CountAsync()).Should().Be(3);
             }
         }
 

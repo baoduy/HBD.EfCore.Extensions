@@ -46,8 +46,8 @@ namespace DataLayer.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(maxLength: 100, nullable: false),
-                    Value = table.Column<int>(nullable: false)
+                    Key = table.Column<int>(nullable: false),
+                    Name = table.Column<string>(maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -114,18 +114,18 @@ namespace DataLayer.Migrations
 
             migrationBuilder.InsertData(
                 table: "EnumStatus",
-                columns: new[] { "Id", "Name", "Value" },
-                values: new object[] { 1, "UnKnow", 0 });
+                columns: new[] { "Id", "Key", "Name" },
+                values: new object[] { 1, 0, "UnKnow" });
 
             migrationBuilder.InsertData(
                 table: "EnumStatus",
-                columns: new[] { "Id", "Name", "Value" },
-                values: new object[] { 2, "Active", 1 });
+                columns: new[] { "Id", "Key", "Name" },
+                values: new object[] { 2, 1, "Active" });
 
             migrationBuilder.InsertData(
                 table: "EnumStatus",
-                columns: new[] { "Id", "Name", "Value" },
-                values: new object[] { 3, "InActive", 2 });
+                columns: new[] { "Id", "Key", "Name" },
+                values: new object[] { 3, 2, "InActive" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Address_UserId",
