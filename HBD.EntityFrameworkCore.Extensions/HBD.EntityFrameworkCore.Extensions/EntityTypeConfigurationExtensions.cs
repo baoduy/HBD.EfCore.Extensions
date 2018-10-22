@@ -62,11 +62,13 @@ namespace HBD.EntityFrameworkCore.Extensions
 
             return mappingTypes.Concat(missingEntityTypes.Select(t =>
             {
-                var genericParams = registration.DefaultEntityMapperType.GetGenericArguments();
+                return registration.DefaultEntityMapperType.MakeGenericType(t);
 
-                return genericParams.Any(c => c.IsAssignableFrom(t))
-                    ? registration.DefaultEntityMapperType.MakeGenericType(t)
-                    : typeof(EntityTypeConfiguration<>).MakeGenericType(t);
+                //var genericParams = registration.DefaultEntityMapperType.GetGenericArguments();
+
+                //return genericParams.Any(c => c.IsAssignableFrom(t))
+                //    ? registration.DefaultEntityMapperType.MakeGenericType(t)
+                //    : typeof(EntityTypeConfiguration<>).MakeGenericType(t);
             }));
         }
 

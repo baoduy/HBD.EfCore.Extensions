@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.0-beta17</Version>
+    <Version>1.0.0-beta18</Version>
     <Copyright>@ HBD 2018</Copyright>
     <Description>The extensions for EntityFrameworkCore which automate the ModelBuilder registration for Relational Database</Description>
     <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
@@ -14,8 +14,8 @@
     <PackageReleaseNotes>Version 1.0.0
 - The first testing version of HBD.EntityFrameworkCore.Extensions</PackageReleaseNotes>
     <PackageIconUrl>https://raw.githubusercontent.com/baoduy/Images/master/NugetLogo.PNG</PackageIconUrl>
-    <AssemblyVersion>1.0.0.15</AssemblyVersion>
-    <FileVersion>1.0.0.15</FileVersion>
+    <AssemblyVersion>1.0.0.18</AssemblyVersion>
+    <FileVersion>1.0.0.18</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
