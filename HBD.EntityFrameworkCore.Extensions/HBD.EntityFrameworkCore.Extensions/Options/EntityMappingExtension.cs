@@ -5,10 +5,15 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace HBD.EntityFrameworkCore.Extensions.Options
 {
-    public class EntityMappingExtension : IDbContextOptionsExtension
+    public class EntityMappingExtension : IDbContextOptionsExtension, IEntityMappingExtension
     {
         internal ICollection<RegistrationInfo> Registrations { get; } = new List<RegistrationInfo>();
 
+        /// <summary>
+        /// The Assemblies will be scan
+        /// </summary>
+        /// <param name="entityAssemblies"></param>
+        /// <returns></returns>
         public RegistrationInfo FromAssemblies(params Assembly[] entityAssemblies)
         {
             var register = new RegistrationInfo(entityAssemblies);

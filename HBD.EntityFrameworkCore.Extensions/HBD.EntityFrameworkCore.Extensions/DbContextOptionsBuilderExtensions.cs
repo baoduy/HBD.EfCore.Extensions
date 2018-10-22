@@ -7,10 +7,10 @@ namespace Microsoft.EntityFrameworkCore
 {
     public static class DbContextOptionsBuilderExtensions
     {
-        public static DbContextOptionsBuilder<TContext> RegisterEntities<TContext>(this DbContextOptionsBuilder<TContext> @this, Action<EntityMappingExtension> options = null) where TContext : DbContext
+        public static DbContextOptionsBuilder<TContext> RegisterEntities<TContext>(this DbContextOptionsBuilder<TContext> @this, Action<IEntityMappingExtension> options = null) where TContext : DbContext
             => (DbContextOptionsBuilder<TContext>)((DbContextOptionsBuilder)@this).RegisterEntities(options);
 
-        public static DbContextOptionsBuilder RegisterEntities(this DbContextOptionsBuilder @this, Action<EntityMappingExtension> options = null)
+        public static DbContextOptionsBuilder RegisterEntities(this DbContextOptionsBuilder @this, Action<IEntityMappingExtension> options = null)
         {
             var op = @this.GetOrCreateExtension();
             options?.Invoke(op);

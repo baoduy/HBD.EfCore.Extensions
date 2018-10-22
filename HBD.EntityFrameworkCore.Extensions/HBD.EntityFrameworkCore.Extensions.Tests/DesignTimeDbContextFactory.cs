@@ -1,4 +1,5 @@
 ﻿using DataLayer;
+using DataLayer.Mappers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
@@ -9,7 +10,8 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
         public MyDbContext CreateDbContext(string[] args) 
             => new MyDbContext(new DbContextOptionsBuilder()
             .UseSqliteMemory()
-            .RegisterEntities(op => op.FromAssemblies(typeof(MyDbContext).Assembly))
+            .RegisterEntities(op => op.FromAssemblies(typeof(MyDbContext).Assembly)
+                    .WithDefaultMappersType(typeof(AuditEntityEntityMapper<>)))
             .Options);
     }
 }

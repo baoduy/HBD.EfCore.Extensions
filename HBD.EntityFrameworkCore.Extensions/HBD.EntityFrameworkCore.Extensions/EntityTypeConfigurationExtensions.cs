@@ -7,6 +7,7 @@ using System.Reflection;
 using HBD.EntityFrameworkCore.Extensions.Abstractions;
 using HBD.EntityFrameworkCore.Extensions.Configurations;
 using HBD.EntityFrameworkCore.Extensions.Options;
+using Microsoft.EntityFrameworkCore.Scaffolding.Metadata.Internal;
 
 namespace HBD.EntityFrameworkCore.Extensions
 {
@@ -49,27 +50,43 @@ namespace HBD.EntityFrameworkCore.Extensions
             md.Invoke(null, new object[] { modelBuilder });
         }
 
+        internal static Type GetGenericMapper(Type entityType, Type[] mapperTypes)
+        {
+            foreach (var mapperType in mapperTypes)
+            {
+                //The generic type should have 1 GenericTypeParameters only
+                var gtype = mapperType.GetTypeInfo().GenericTypeParameters.First();
+
+                if (gtype.GetGenericParameterConstraints().Any(c => c.IsAssignableFrom(entityType))
+                    || gtype.IsAssignableFrom(entityType)
+                    || gtype.BaseType?.IsAssignableFrom(entityType) == true)
+                    return mapperType.MakeGenericType(entityType);
+            }
+
+            throw new ArgumentException($"There is no {typeof(IEntityTypeConfiguration<>).Name} found for {entityType.Name}");
+        }
+
         /// <summary>
         /// Scan and Load IEntityTypeConfiguration <see cref="IEntityTypeConfiguration{TEntity}"/> from Assemblies
         /// </summary>
         /// <returns></returns>
         public static IEnumerable<Type> GetMappers(this RegistrationInfo registration)
         {
+            var genericMapperFromAssemblies = registration.EntityAssemblies.Extract().Generic().Class()
+                .IsInstanceOf(typeof(IEntityTypeConfiguration<>)).ToArray();
+
+            //There is no DefaultEntityMapperTypes then use the default one.
+            if (registration.DefaultEntityMapperTypes == null || !registration.DefaultEntityMapperTypes.Any())
+            {
+                registration.WithDefaultMappersType(typeof(EntityTypeConfiguration<>));
+            }
+
             var mappingTypes = registration.EntityAssemblies.GetEntityMappingTypes();
             var missingEntityTypes = registration.EntityAssemblies.GetEntityTypes(registration.Predicate)
                 .Where(t => mappingTypes.All(m => m.GetInterfaces()
                     .All(i => i.GenericTypeArguments.First() != t)));
 
-            return mappingTypes.Concat(missingEntityTypes.Select(t =>
-            {
-                return registration.DefaultEntityMapperType.MakeGenericType(t);
-
-                //var genericParams = registration.DefaultEntityMapperType.GetGenericArguments();
-
-                //return genericParams.Any(c => c.IsAssignableFrom(t))
-                //    ? registration.DefaultEntityMapperType.MakeGenericType(t)
-                //    : typeof(EntityTypeConfiguration<>).MakeGenericType(t);
-            }));
+            return mappingTypes.Concat(missingEntityTypes.Select(t => GetGenericMapper(t, genericMapperFromAssemblies.Union(registration.DefaultEntityMapperTypes).ToArray())));
         }
 
         /// <summary>

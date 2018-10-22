@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DataLayer
 {
-    public class User : AuditEntity
+    public class User : BaseEntity
     {
         public User(string userName):base(userName) { }
 
