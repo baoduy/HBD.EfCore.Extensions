@@ -1,12 +1,20 @@
 # HBD.EntityFrameworkCore.Extensions
+
 [![Build Status](https://steven2412.visualstudio.com/HBD/_apis/build/status/HBD.EntityFrameworkCore.Extensions-GitSync)](https://steven2412.visualstudio.com/HBD/_build/latest?definitionId=81)
+
+Nuget package
+
+```cmd
+PM> Install-Package HBD.EntityFrameworkCore.Extensions -Version 1.0.0
+```
 
 ## Introduction
 
-As you know Entity Framework (EF) Core is a lightweight, extensible, and cross-platform version of the popular Entity Framework data access technology. 
+As you know Entity Framework (EF) Core is a lightweight, extensible, and cross-platform version of the popular Entity Framework data access technology.
 However, in order to make the EF work, We need to define, config a few things below:
 
 1. Define the Entities
+
 ```csharp
 public class User
 {
@@ -25,7 +33,9 @@ public class User
     public string LastName { get; set; }
 }
 ```
+
 2. Define Mappers
+
 ```csharp
 internal class UserMapper : IEntityTypeConfiguration<User>
 {
@@ -35,7 +45,9 @@ internal class UserMapper : IEntityTypeConfiguration<User>
     }
 }
 ```
+
 3. Define DbContext and add the Mapper in.
+
 ```csharp
 public partial class MyContext : Microsoft.EntityFrameworkCore.DbContext
 {
@@ -52,7 +64,8 @@ To speed up the development process and cut down the manual works, I developed t
 ## How HBD.EntityFrameworkCore.Extensions Works.
 
 ### 1. Generic Entity Type Configuration
-Let see, if we are 2 numbers of entities which have the same Entity Type Configuration as almost of configuration can be done via DataAnnotations. However, we still need to define a class from `IEntityTypeConfiguration` for every entity and add into `OnModelCreating` of DbContext. 
+
+Let see, if we are 2 numbers of entities which have the same Entity Type Configuration as almost of configuration can be done via DataAnnotations. However, we still need to define a class from `IEntityTypeConfiguration` for every entity and add into `OnModelCreating` of DbContext.
 However, if using this extension you can define a generic EntityTypeConfiguration that define the configuration for all basic entities which extension will scan it from the Assembly and add into `OnModelCreating` automatically.
 
 Sample code: Define a generic Entity Type Configuration
@@ -84,6 +97,7 @@ Run the application and show the result, All the entities had been mapped to the
 Now, you want to add new entities? Only entity classes need to be added no more Entity Type Configuration, no more OnModelCreating mapping both had been automated.
 
 ### 2. Specific Entity Type Configuration
+
 But, The life is not easy and for some special entities, the generic my not able to adopt all the requirement of the entities, in this case, it requires a specific Entity Type Configuration to be defined.
 
 ```csharp
@@ -93,11 +107,13 @@ internal class UserTypeConfiguration : EntityTypeConfiguration<User>
     public void Map(EntityTypeBuilder<User> builder){ /*Apply the configuration here for the User entity*/ }
 }
 ```
+
 That's all, You just need to define the specific EntityTypeConfiguration for those special entities. The extension is smart enough to scan and all them to the DbContext and obviously, it will apply the Generic Entity Type Configuration to those others entities.
 
 ### 3. Static Data Loading
+
 Usually, In the application, We also have some static data tables which shall be initialized when creating the database. EF Core proved a `HasData` method allow us to define the static data for particular entities. But, again the static data need to be provided during `OnModelCreating`.
-Instead of combined to together with  Entity Type Configuration, This extension provides a new generic interface named `IDataSeedingConfiguration<>` allow you to define the Static Data for an entity and this definition will be scan and applied to the DbContext at runtime automatically.
+Instead of combined to together with Entity Type Configuration, This extension provides a new generic interface named `IDataSeedingConfiguration<>` allow you to define the Static Data for an entity and this definition will be scan and applied to the DbContext at runtime automatically.
 
 ```csharp
 //1. Define the Data Seeding
@@ -113,6 +129,10 @@ internal class AccountDataSeeding: IDataSeedingConfiguration<Account>{
 1. The entities SHOULD be an implemente of `IEntity<>`
 2. The Mapper type SHOULD be an implemente of `IEntityTypeConfiguration<>`
 3. Your DbContext SHOULD be from implemente of `HBD.EntityFrameworkCore.Extensions.DbContext`
+
+## Source Code
+
+[HBD.EntityFrameworkCore.Extensions](https://github.com/baoduy/HBD.EntityFrameworkCore.Extensions)
 
 Hope the library useful.
 [drunkcoding.net](http://drunkcoding.net)
