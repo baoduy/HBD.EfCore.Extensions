@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20181022032649_initialCreater")]
-    partial class initialCreater
+    [Migration("20181028033555_initialCreate")]
+    partial class initialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -71,7 +71,7 @@ namespace DataLayer.Migrations
 
             modelBuilder.Entity("DataLayer.Address", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<byte[]>("RowVersion")
@@ -84,16 +84,18 @@ namespace DataLayer.Migrations
 
                     b.Property<long>("UserId");
 
+                    b.Property<int?>("UserId1");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId1");
 
                     b.ToTable("Address");
                 });
 
             modelBuilder.Entity("DataLayer.User", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<long>("AccountId");
@@ -159,8 +161,7 @@ namespace DataLayer.Migrations
                 {
                     b.HasOne("DataLayer.User", "User")
                         .WithMany("Addresses")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("UserId1");
                 });
 
             modelBuilder.Entity("DataLayer.User", b =>

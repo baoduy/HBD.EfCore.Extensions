@@ -4,7 +4,7 @@ using HBD.EntityFrameworkCore.Extensions.Abstractions;
 
 namespace DataLayer
 {
-    public class Address: Entity
+    public class Address: Entity<int>
     {
         [Required]
         [MaxLength(256)]

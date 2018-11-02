@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using DataLayer.Mappers;
 using FluentAssertions;
 using HBD.EntityFrameworkCore.Extensions.Abstractions;
-using HBD.EntityFrameworkCore.Extensions.Internal;
 using TestSupport.EfHelpers;
 
 namespace HBD.EntityFrameworkCore.Extensions.Tests
@@ -143,7 +142,7 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
             using (var db = new MyDbContext(new DbContextOptionsBuilder(options)
                 //No Assembly provided it will scan the MyDbContext assembly.
                 .RegisterEntities(op => op.FromAssemblies(typeof(MyDbContext).Assembly)
-                    .WithDefaultMappersType(typeof(AuditEntityEntityMapper<>)))
+                    .WithDefaultMappersType(typeof(AuditEntityMapper<>)))
                 .Options))
             {
                 await db.Database.EnsureCreatedAsync();
@@ -173,7 +172,7 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
             var db = new MyDbContext(new DbContextOptionsBuilder(options)
                 //No Assembly provided it will scan the MyDbContext assembly.
                 .RegisterEntities(op => op.FromAssemblies()
-                    .WithDefaultMappersType(typeof(AuditEntityEntityMapper<>)))
+                    .WithDefaultMappersType(typeof(AuditEntityMapper<>)))
                 .Options);
         }
 

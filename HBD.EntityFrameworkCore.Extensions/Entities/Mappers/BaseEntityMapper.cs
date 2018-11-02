@@ -1,12 +1,11 @@
 ﻿using System.Runtime.CompilerServices;
-using HBD.EntityFrameworkCore.Extensions.Abstractions;
 using HBD.EntityFrameworkCore.Extensions.Configurations;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 [assembly: InternalsVisibleTo("HBD.EntityFrameworkCore.Extensions.Tests")]
 namespace DataLayer.Mappers
 {
-    internal class AuditEntityEntityMapper<T> : EntityTypeConfiguration<T> where T : AuditEntity
+    internal class BaseEntityMapper<T> : EntityTypeConfiguration<T> where T : BaseEntity
     {
         public static bool Called { get; private set; } = false;
 

@@ -28,7 +28,7 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
         [TestMethod]
         public void TestExtract_NotInstanceOf()
         {
-            var list = typeof(MyDbContext).Assembly.Extract().Class().NotInstanceOf(typeof(IEntity<long>)).ToList();
+            var list = typeof(MyDbContext).Assembly.Extract().Class().NotInstanceOf(typeof(IEntity<>)).ToList();
             list.Contains(typeof(User)).Should().BeFalse();
             list.Contains(typeof(Address)).Should().BeFalse();
         }

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DataLayer.Migrations
 {
-    public partial class initialCreater : Migration
+    public partial class initialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -58,7 +58,7 @@ namespace DataLayer.Migrations
                 name: "User",
                 columns: table => new
                 {
-                    Id = table.Column<long>(nullable: false)
+                    Id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     RowVersion = table.Column<byte[]>(rowVersion: true, nullable: true),
                     CreatedBy = table.Column<string>(nullable: true),
@@ -85,21 +85,22 @@ namespace DataLayer.Migrations
                 name: "Address",
                 columns: table => new
                 {
-                    Id = table.Column<long>(nullable: false)
+                    Id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     RowVersion = table.Column<byte[]>(rowVersion: true, nullable: true),
                     Street = table.Column<string>(maxLength: 256, nullable: false),
-                    UserId = table.Column<long>(nullable: false)
+                    UserId = table.Column<long>(nullable: false),
+                    UserId1 = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Address", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Address_User_UserId",
-                        column: x => x.UserId,
+                        name: "FK_Address_User_UserId1",
+                        column: x => x.UserId1,
                         principalTable: "User",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.InsertData(
@@ -128,9 +129,9 @@ namespace DataLayer.Migrations
                 values: new object[] { 3, 2, "InActive" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Address_UserId",
+                name: "IX_Address_UserId1",
                 table: "Address",
-                column: "UserId");
+                column: "UserId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_User_AccountId1",

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using HBD.EntityFrameworkCore.Extensions.Abstractions;
 using HBD.EntityFrameworkCore.Extensions.Configurations;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,11 +9,13 @@ namespace DataLayer
     {
         public User(string userName):base(userName) { }
 
-        public User(long id, string userName) : base(id, userName) { }
+        public User(int id, string userName) : base(id, userName) { }
 
         public User()
         {
         }
+
+        public string FullName => $"{FirstName} {LastName}";
 
         [Required]
         [MaxLength(256)]

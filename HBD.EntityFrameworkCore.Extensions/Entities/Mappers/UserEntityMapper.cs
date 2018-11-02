@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DataLayer.Mappers
 {
-    internal class UserEntityMapper: AuditEntityEntityMapper<User>
+    internal class UserEntityMapper: AuditEntityMapper<User>
     {
         public override void Configure(EntityTypeBuilder<User> builder)
         {

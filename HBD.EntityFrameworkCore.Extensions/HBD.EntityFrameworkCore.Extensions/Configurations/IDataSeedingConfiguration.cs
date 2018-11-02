@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
-namespace HBD.EntityFrameworkCore.Extensions.Configurations
+﻿namespace HBD.EntityFrameworkCore.Extensions.Configurations
 {
     public interface IDataSeedingConfiguration<TEntity> where TEntity:class
     {

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 [assembly: InternalsVisibleTo("HBD.EntityFrameworkCore.Extensions.Tests")]
 namespace DataLayer.Mappers
 {
-    internal class BaseEntityEntityEntityMapper<T> : EntityTypeConfiguration<T> where T : BaseEntity
+    internal class AuditEntityMapper<T> : EntityTypeConfiguration<T> where T : BaseEntity
     {
         public static bool Called { get; private set; } = false;
 

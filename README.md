@@ -3,81 +3,116 @@
 
 ## Introduction
 
-If working with EntityFrameworkCore code fist We need:
+As you know Entity Framework (EF) Core is a lightweight, extensible, and cross-platform version of the popular Entity Framework data access technology. 
+However, in order to make the EF work, We need to define, config a few things below:
 
 1. Define the Entities
-2. Apply the mapping of the entities to DbContext.
-
-So in case, we have so many entities that may cause an issue that some entities has not added the mapper properly. So I develop this extension to automap the Entities to a DbContext
-
-Ex:
-I have User entity and User entity mapping as below
-
-```Csharp
-public class User : AuditEntity
+```csharp
+public class User
 {
-        [Required]
-        [MaxLength(256)]
-        public string FirstName { get; set; }
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id{get;set;}
 
-        [Required]
-        [MaxLength(256)]
-        public string LastName { get; set; }
+    public string FullName => $"{FirstName} {LastName}";
 
-        public virtual ICollection<Address> Addresses { get; } = new HashSet<Address>();
+    [Required]
+    [MaxLength(256)]
+    public string FirstName { get; set; }
+
+    [Required]
+    [MaxLength(256)]
+    public string LastName { get; set; }
 }
-
-internal class UserMapper : EntityTypeConfiguration<User>
+```
+2. Define Mappers
+```csharp
+internal class UserMapper : IEntityTypeConfiguration<User>
 {
-    public override void Map(EntityTypeBuilder<User> builder)
+    public void Configure(EntityTypeBuilder<User> builder)
     {
-        base.Map(builder);
         builder.HasIndex(u => u.FirstName);
     }
 }
 ```
-
-When register to a DbContext, it will scan all EntityTypeConfiguration types and map to DbContext accordingly.
-
+3. Define DbContext and add the Mapper in.
 ```csharp
-var db = new MyDbContext(new DbContextOptionsBuilder()
-            .RegisterEntities(op=>op.FromAssemblies(typeof(MyDbContext).Assembly))
-            .Options)
-```
-
-However, if I define an Address entity without provided a mapper. This entity still being mapped to the DbContext as the Extension will scan all the Entities which is a class of `IEntity<TKey>` and mapped to the DbContext by using the default `EntityTypeConfiguration<>` type.
-
-```csharp
-public class Address: Entity<int>
+public partial class MyContext : Microsoft.EntityFrameworkCore.DbContext
 {
-    [Required]
-    [MaxLength(256)]
-    public string Street { get; set; }
-
-    [ForeignKey("Address_User")]
-    public long UserId { get; set; }
-
-    public virtual User User { get; set; }
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfiguration(new UserMapper());
+    }
 }
 ```
 
-If you want to customize the default EntityMapper you can overwrite it via the register option.
+Let see, if we have a hundred Entities, we need to do all steps above a hundred times and the third step is an important step as without applying the configuration to the DbContext we are not able to use those entities.
+To speed up the development process and cut down the manual works, I developed this extension for EF Core which allows to scan and apply the IEntityTypeConfiguration from assemblies to DbContext automatically.
+
+## How HBD.EntityFrameworkCore.Extensions Works.
+
+### 1. Generic Entity Type Configuration
+Let see, if we are 2 numbers of entities which have the same Entity Type Configuration as almost of configuration can be done via DataAnnotations. However, we still need to define a class from `IEntityTypeConfiguration` for every entity and add into `OnModelCreating` of DbContext. 
+However, if using this extension you can define a generic EntityTypeConfiguration that define the configuration for all basic entities which extension will scan it from the Assembly and add into `OnModelCreating` automatically.
+
+Sample code: Define a generic Entity Type Configuration
 
 ```csharp
-var db = new MyDbContext(new DbContextOptionsBuilder()
-            .RegisterEntities(op=>op.FromAssemblies("YOUR ENTITIES ASSEMBLIES")
-                .WithFilter("The addition filter will be applied when scan the entities from  ASSEMBLIES")
-                .WithDefaultMapperType("YOUR custom IEntityTypeConfiguration<> type.")
-                ).Options)
+//1. Define BaseEntity
+//The recommendation, you should define a BaseEntity on your project which includes all basic properties which will be applied for all entities on the project.
+//The Extension provides a few generic class which help you to do the things faster.
+public abstract class BaseEntity: Entity {}
+
+//2. Define Generic Entity Type Configuration
+internal class MyEntityTypeConfiguration<TEntity> : EntityTypeConfiguration<TEntity> where TEntity: BaseEntity
+{
+    public void Map(EntityTypeBuilder<TEntity> builder){ /*Apply the configuration here for generic entities*/ }
+}
+
+//3. Switch from Microsoft.EntityFrameworkCore.DbContext to  HBD.EntityFrameworkCore.Extensions.DbContext
+public partial class MyContext : Microsoft.EntityFrameworkCore.DbContext
+{
+   //No need to override the OnModelCreating(ModelBuilder modelBuilder)
+}
+
+//4. Apply the configuration when App Start
+//Normally, the DbContext will be registered with Dependency Injection when App start. So below is a sample code to register the assembles to the extensions as well
+var db = new MyDbContext(new DbContextOptionsBuilder().RegisterEntities(op=>op.FromAssemblies(typeof(MyDbContext).Assembly)).Options)
 ```
 
-## NOTES
+Run the application and show the result, All the entities had been mapped to the DbContext automatically with any further codes.
+Now, you want to add new entities? Only entity classes need to be added no more Entity Type Configuration, no more OnModelCreating mapping both had been automated.
 
-1. The entities MUST be an `IEntity<>`
-2. The Mapper type MUST be an `IEntityTypeConfiguration<>`
-3. Your DbContext MUST be from `HBD.EntityFrameworkCore.Extensions.DbContext`
+### 2. Specific Entity Type Configuration
+But, The life is not easy and for some special entities, the generic my not able to adopt all the requirement of the entities, in this case, it requires a specific Entity Type Configuration to be defined.
 
-## CONCLUSIONS
+```csharp
+//1. Specific Configuration for User Entity
+internal class UserTypeConfiguration : EntityTypeConfiguration<User>
+{
+    public void Map(EntityTypeBuilder<User> builder){ /*Apply the configuration here for the User entity*/ }
+}
+```
+That's all, You just need to define the specific EntityTypeConfiguration for those special entities. The extension is smart enough to scan and all them to the DbContext and obviously, it will apply the Generic Entity Type Configuration to those others entities.
 
-By using this library you just need to define your Entities and register to DbContextOptionsBuilder they will be mapped automatically.
-If some Db configuration is not possible to be done via DataAnnotations, just define an internal (private) `EntityTypeConfiguration` class for that entity they will be mapped either
+### 3. Static Data Loading
+Usually, In the application, We also have some static data tables which shall be initialized when creating the database. EF Core proved a `HasData` method allow us to define the static data for particular entities. But, again the static data need to be provided during `OnModelCreating`.
+Instead of combined to together with  Entity Type Configuration, This extension provides a new generic interface named `IDataSeedingConfiguration<>` allow you to define the Static Data for an entity and this definition will be scan and applied to the DbContext at runtime automatically.
+
+```csharp
+//1. Define the Data Seeding
+internal class AccountDataSeeding: IDataSeedingConfiguration<Account>{
+    public TEntity[] Data => new [
+        new Account {UserName = "admin", Password="123"}
+    ];
+}
+```
+
+## RECOMMENDATION
+
+1. The entities SHOULD be an implemente of `IEntity<>`
+2. The Mapper type SHOULD be an implemente of `IEntityTypeConfiguration<>`
+3. Your DbContext SHOULD be from implemente of `HBD.EntityFrameworkCore.Extensions.DbContext`
+
+Hope the library useful.
+[drunkcoding.net](http://drunkcoding.net)

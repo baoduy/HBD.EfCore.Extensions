@@ -7,7 +7,6 @@ using System.Reflection;
 using HBD.EntityFrameworkCore.Extensions.Abstractions;
 using HBD.EntityFrameworkCore.Extensions.Configurations;
 using HBD.EntityFrameworkCore.Extensions.Options;
-using Microsoft.EntityFrameworkCore.Scaffolding.Metadata.Internal;
 
 namespace HBD.EntityFrameworkCore.Extensions
 {

@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using HBD.EntityFrameworkCore.Extensions.Attributes;
+﻿using HBD.EntityFrameworkCore.Extensions.Attributes;
 
 namespace DataLayer
 {
