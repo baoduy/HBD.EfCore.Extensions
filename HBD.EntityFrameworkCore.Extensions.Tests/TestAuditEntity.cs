@@ -7,6 +7,8 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
     [TestClass]
     public class TestAuditEntity
     {
+        #region Public Methods
+
         [TestMethod]
         public void TestCreatingEntity()
         {
@@ -20,11 +22,13 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
         [TestMethod]
         public void TestUpdatingEntity()
         {
-            var user = new User(1,"Duy");
+            var user = new User(1, "Duy");
             user.UpdatedByUser("Hoang");
 
             user.UpdatedBy.Should().Be("Hoang");
             user.UpdatedOn.Should().NotBeNull();
         }
+
+        #endregion Public Methods
     }
 }

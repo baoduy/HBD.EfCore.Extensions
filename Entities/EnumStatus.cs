@@ -7,6 +7,6 @@ namespace DataLayer
     {
         UnKnow,
         Active,
-        InActive,
+        InActive
     }
 }

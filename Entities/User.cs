@@ -1,46 +1,54 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using HBD.EntityFrameworkCore.Extensions.Configurations;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using HBD.EntityFrameworkCore.Extensions.Abstractions;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataLayer
 {
-    public class User : BaseEntity
+    public class User : BaseEntity, ISavingAwareness
     {
-        public User(string userName):base(userName) { }
+        #region Public Constructors
 
-        public User(int id, string userName) : base(id, userName) { }
+        public User(string userName) : base(userName)
+        {
+        }
+
+        public User(int id, string userName) : base(id, userName)
+        {
+        }
 
         public User()
         {
         }
 
-        public string FullName => $"{FirstName} {LastName}";
+        #endregion Public Constructors
 
-        [Required]
-        [MaxLength(256)]
-        public string FirstName { get; set; }
-
-        [Required]
-        [MaxLength(256)]
-        public string LastName { get; set; }
-
-        //[ForeignKey("User_Account")]
-        public long AccountId { get; set; }
+        #region Public Properties
 
         public virtual Account Account { get; set; }
 
-        public virtual ICollection<Address> Addresses { get; } = new HashSet<Address>();
+        /// <summary>
+        /// Private Set for Data Seeding purpose.
+        /// </summary>
+        public virtual ICollection<Address> Addresses { get; private set; } = new HashSet<Address>();
 
-        public void UpdatedByUser(string userName) => this.SetUpdatedBy(userName);
-    }
+        [Required] [MaxLength(256)] public string FirstName { get; set; }
+        public string FullName => $"{FirstName} {LastName}";
+        [Required] [MaxLength(256)] public string LastName { get; set; }
 
-    internal class UserMapper : EntityTypeConfiguration<User>
-    {
-        public override void Configure(EntityTypeBuilder<User> builder)
+        #endregion Public Properties
+
+        #region Public Methods
+
+        public void UpdatedByUser(string userName) => SetUpdatedBy(userName);
+
+        #endregion Public Methods
+
+        public int SavingCalled { get; private set; }
+
+        public void OnSaving(EntityState state, DbContext dbContext)
         {
-            base.Configure(builder);
-            builder.HasIndex(u => u.FirstName);
+            SavingCalled += 1;
         }
     }
 }

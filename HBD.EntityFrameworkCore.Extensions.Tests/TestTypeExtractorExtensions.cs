@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using BenchmarkDotNet.Attributes;
 using DataLayer;
 using FluentAssertions;
 using HBD.EntityFrameworkCore.Extensions.Abstractions;
@@ -11,7 +12,58 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
     [TestClass]
     public class TestTypeExtractorExtensions
     {
+        #region Public Methods
+
         [TestMethod]
+        [Benchmark]
+        public void Test_Abstract()
+        {
+            typeof(MyDbContext).Assembly.Extract().Abstract()
+                .Should().HaveCountGreaterOrEqualTo(1);
+        }
+
+        [TestMethod]
+        [Benchmark]
+        public void Test_HasAttribute()
+        {
+            typeof(MyDbContext).Assembly.Extract().HasAttribute<StaticDataAttribute>()
+                .Count().Should().BeGreaterOrEqualTo(1);
+        }
+
+        [TestMethod]
+        [Benchmark]
+        public void Test_Interface()
+        {
+            typeof(MyDbContext).Assembly.Extract().IsInstanceOf<BaseEntity>()
+                .Count().Should().BeGreaterOrEqualTo(1);
+        }
+
+        [TestMethod]
+        [Benchmark]
+        public void Test_Nested()
+        {
+            typeof(MyDbContext).Assembly.Extract().Nested()
+                .Should().HaveCountGreaterOrEqualTo(1);
+        }
+
+        [TestMethod]
+        [Benchmark]
+        public void Test_NotClass()
+        {
+            typeof(MyDbContext).Assembly.Extract().NotClass()
+                .Should().HaveCountGreaterOrEqualTo(1);
+        }
+
+        [TestMethod]
+        [Benchmark]
+        public void Test_NotEnum()
+        {
+            typeof(MyDbContext).Assembly.Extract().NotEnum()
+                .Should().HaveCountGreaterOrEqualTo(1);
+        }
+
+        [TestMethod]
+        [Benchmark]
         public void TestExtract()
         {
             typeof(MyDbContext).Assembly.Extract().Public().Class().Count()
@@ -19,6 +71,7 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
         }
 
         [TestMethod]
+        [Benchmark]
         public void TestExtract_GenericClass()
         {
             var list = typeof(MyDbContext).Assembly.ScanGenericClassesWithFilter("Mapper").ToList();
@@ -26,6 +79,7 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
         }
 
         [TestMethod]
+        [Benchmark]
         public void TestExtract_NotInstanceOf()
         {
             var list = typeof(MyDbContext).Assembly.Extract().Class().NotInstanceOf(typeof(IEntity<>)).ToList();
@@ -34,28 +88,15 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
         }
 
         [TestMethod]
-        public void TestScanPublicClassesFromWithFilter()
-        {
-            typeof(MyDbContext).Assembly.ScanPublicClassesWithFilter("Context")
-                .Count().Should().Be(1);
-        }
-
-        [TestMethod]
+        [Benchmark]
         public void TestScanClassesFromWithFilter()
         {
             typeof(MyDbContext).Assembly.ScanClassesWithFilter("Mapper")
                 .Count().Should().BeGreaterOrEqualTo(1);
         }
 
-
         [TestMethod]
-        public void TestScanPublicClassesImplementOf()
-        {
-            typeof(MyDbContext).Assembly.ScanPublicClassesImplementOf<AuditEntity>()
-                .Count().Should().BeGreaterOrEqualTo(1);
-        }
-
-        [TestMethod]
+        [Benchmark]
         public void TestScanClassesImplementOf()
         {
             typeof(MyDbContext).Assembly.ScanClassesImplementOf(typeof(Entity))
@@ -63,17 +104,29 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
         }
 
         [TestMethod]
+        [Benchmark]
         public void TestScanClassesImplementOf_Generic()
         {
-            typeof(MyDbContext).Assembly.ScanClassesImplementOf<IEntity<long>>()
+            typeof(MyDbContext).Assembly.ScanClassesImplementOf<IEntity<int>>()
                 .Count().Should().BeGreaterOrEqualTo(2);
         }
 
         [TestMethod]
-        public void Test_HasAttribute()
+        [Benchmark]
+        public void TestScanPublicClassesFromWithFilter()
         {
-            typeof(MyDbContext).Assembly.Extract().HasAttribute<StaticDataAttribute>()
+            typeof(MyDbContext).Assembly.ScanPublicClassesWithFilter("Context")
+                .Count().Should().Be(1);
+        }
+
+        [TestMethod]
+        [Benchmark]
+        public void TestScanPublicClassesImplementOf()
+        {
+            typeof(MyDbContext).Assembly.ScanPublicClassesImplementOf<AuditEntity>()
                 .Count().Should().BeGreaterOrEqualTo(1);
         }
+
+        #endregion Public Methods
     }
 }

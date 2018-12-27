@@ -6,36 +6,50 @@ namespace HBD.EntityFrameworkCore.Extensions.Abstractions
 {
     public interface ITypeExtractor : IEnumerable<Type>
     {
+        #region Public Methods
+
         ITypeExtractor Abstract();
-        ITypeExtractor NotAbstract();
 
         ITypeExtractor Class();
-        ITypeExtractor NotClass();
+
+        ITypeExtractor Enum();
 
         ITypeExtractor Generic();
-        ITypeExtractor NotGeneric();
+
+        ITypeExtractor HasAttribute<TAttribute>() where TAttribute : Attribute;
+
+        ITypeExtractor HasAttribute(Type attributeType);
 
         ITypeExtractor Interface();
-        ITypeExtractor NotInterface();
 
         ITypeExtractor IsInstanceOf(Type type);
-        ITypeExtractor NotInstanceOf(Type type);
 
         ITypeExtractor IsInstanceOf<T>();
-        ITypeExtractor NotInstanceOf<T>();
 
         ITypeExtractor Nested();
+
+        ITypeExtractor NotAbstract();
+
+        ITypeExtractor NotClass();
+
+        ITypeExtractor NotEnum();
+
+        ITypeExtractor NotGeneric();
+
+        ITypeExtractor NotInstanceOf(Type type);
+
+        ITypeExtractor NotInstanceOf<T>();
+
+        ITypeExtractor NotInterface();
+
         ITypeExtractor NotNested();
 
         ITypeExtractor NotPublic();
+
         ITypeExtractor Public();
 
-        ITypeExtractor Enum();
-        ITypeExtractor NotEnum();
-
-        ITypeExtractor HasAttribute<TAttribute>() where TAttribute : Attribute;
-        ITypeExtractor HasAttribute(Type attributeType);
-
         ITypeExtractor Where(Expression<Func<Type, bool>> predicate);
+
+        #endregion Public Methods
     }
 }

@@ -4,12 +4,14 @@ namespace HBD.EntityFrameworkCore.Extensions.Abstractions
 {
     public interface IConcurrencyEntity<out TKey> : IEntity<TKey>
     {
-        [Timestamp]
-        [ConcurrencyCheck]
-        byte[] RowVersion { get; }
+        #region Public Properties
+
+        [Timestamp] [ConcurrencyCheck] byte[] RowVersion { get; }
+
+        #endregion Public Properties
     }
 
-    public interface IConcurrencyEntity : IConcurrencyEntity<long>, IEntity
+    public interface IConcurrencyEntity : IConcurrencyEntity<int>, IEntity
     {
     }
 }

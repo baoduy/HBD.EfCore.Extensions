@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using DataLayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -8,10 +9,17 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
     [TestClass]
     public class TestWithSqlDb
     {
-        private const string ConnectionString = "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=TestDb;Integrated Security=True;Connect Timeout=30;";
+        #region Private Fields
+
+        private const string ConnectionString =
+            "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=TestDb;Integrated Security=True;Connect Timeout=30;";
+
+        #endregion Private Fields
+
+        #region Public Methods
 
         [TestMethod]
-        public async System.Threading.Tasks.Task TestAsync()
+        public async Task TestAsync()
         {
             using (var db = new MyDbContext(new DbContextOptionsBuilder()
                 .UseSqlServer(ConnectionString)
@@ -25,7 +33,8 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
                 {
                     FirstName = "Duy",
                     LastName = "Hoang",
-                    Addresses = {
+                    Addresses =
+                    {
                         new Address
                         {
                             Street = "12"
@@ -44,5 +53,7 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
                 Assert.IsTrue(users.All(u => u.RowVersion != null));
             }
         }
+
+        #endregion Public Methods
     }
 }

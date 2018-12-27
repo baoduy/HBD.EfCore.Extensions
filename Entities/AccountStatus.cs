@@ -5,11 +5,22 @@ namespace DataLayer
 {
     public class AccountStatus : Entity
     {
-        public AccountStatus() { }
-        public AccountStatus(long id):base(id) { }
+        #region Public Constructors
 
-        [Required]
-        [MaxLength(100)]
-        public string Name { get; set; }
+        public AccountStatus()
+        {
+        }
+
+        public AccountStatus(int id) : base(id)
+        {
+        }
+
+        #endregion Public Constructors
+
+        #region Public Properties
+
+        [Required] [MaxLength(100)] public string Name { get; set; }
+
+        #endregion Public Properties
     }
 }

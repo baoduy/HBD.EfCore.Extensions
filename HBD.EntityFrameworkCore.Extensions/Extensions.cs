@@ -3,17 +3,17 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using HBD.EntityFrameworkCore.Extensions.Attributes;
+using Microsoft.EntityFrameworkCore;
 
 namespace HBD.EntityFrameworkCore.Extensions
 {
     public static class Extensions
     {
-        internal static Type GetEntityType(Type entityMappingType)
-            => entityMappingType.GetInterfaces().First(a => a.IsGenericType).GetGenericArguments().First();
+        #region Public Methods
 
         /// <summary>
-        /// Update the values from obj.
-        /// Those properties marked as [ReadOnly(true)] or 
+        /// Update the values from obj for Owned type ONLY. Those properties marked as
+        /// [ReadOnly(true)] or
         /// TODO: Should improve the performance.
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -21,27 +21,51 @@ namespace HBD.EntityFrameworkCore.Extensions
         /// <param name="obj"></param>
         /// <param name="ignoreNull"></param>
         /// <param name="bindingFlags"></param>
-        public static T UpdateFrom<T>(this T @this, T obj, bool ignoreNull = false, BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public) where T : class
+        public static T UpdateFrom<T>(this T @this, T obj, bool ignoreNull = false,
+            BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public) where T : class
         {
+            if (@this == null)
+                throw new ArgumentNullException(nameof(@this));
+            if (obj == null) throw new ArgumentNullException(nameof(obj));
+
+            if (typeof(T).GetCustomAttribute<OwnedAttribute>() == null)
+                throw new ArgumentException("Only Owned Type is accepted");
+
             foreach (var property in obj.GetType().GetProperties(bindingFlags))
             {
                 var readOnly = property.GetCustomAttribute<ReadOnlyAttribute>();
                 var ignored = property.GetCustomAttribute<IgnoreFromUpdateAttribute>();
 
-                if (ignored!=null 
-                    ||readOnly?.IsReadOnly == true
+                if (ignored != null
+                    || readOnly?.IsReadOnly == true
                     || !property.CanRead
                     || !property.CanWrite) continue;
 
                 var val = property.GetValue(obj);
-                if(ignoreNull && val == null)
+
+                if (val == null)
+                {
+                    if (ignoreNull)
+                        continue;
+
+                    property.SetValue(@this, null);
                     continue;
+                }
 
                 property.SetValue(@this, val);
             }
 
             return @this;
         }
+
+        #endregion Public Methods
+
+        #region Internal Methods
+
+        internal static Type GetEntityType(Type entityMappingType)
+                    => entityMappingType.GetInterfaces().First(a => a.IsGenericType).GetGenericArguments().First();
+
+        #endregion Internal Methods
 
         /// <summary>
         /// Check whether the entity is referring by others.

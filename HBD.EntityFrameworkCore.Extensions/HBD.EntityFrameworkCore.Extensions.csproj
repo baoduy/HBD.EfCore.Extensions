@@ -1,26 +1,45 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.0</Version>
-    <Copyright>@ HBD 2018</Copyright>
+    <Version>1.0.2</Version>
+    <Copyright>@drunkcoding.net 2019</Copyright>
     <Description>The extensions for EntityFrameworkCore which automate the ModelBuilder registration for Relational Database</Description>
-    <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <PackageLicense>https://opensource.org/licenses/MIT</PackageLicense>
     <PackageProjectUrl>https://github.com/baoduy/HBD.EntityFrameworkCore.Extensions</PackageProjectUrl>
     <RepositoryUrl>https://github.com/baoduy/HBD.EntityFrameworkCore.Extensions</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>EntityFramework, EntityFrameworkCore, ModelBuilder Automation</PackageTags>
-    <PackageReleaseNotes>Version 1.0.0
+    <PackageReleaseNotes>Version 1.0.2
+- Add ISavingAwareness interface allows Entity handling the calulation properties before saving to Db.
+- Add more extension method for Specs.
+- Changes Includes method to receive a Iqueryable instead return array of expression.
+- Add ForSpec extension method for a DbContext.
+- Add Equals operator for Entity.
+- Chnage default Id type from long to int
+- Add Specification for DDD pattern.
+- Add check null for UpdateFrom method.
+- Hotfix
+- Add MaxLength for CreatedBy and UpdatedBy
+- Fixing UpdateFrom logic, only update the nested properties of Owned type.
+- Allow to set Global Delete behaviour.
+- Update Enum static data logic.
+- Fixing the UpdateForm issue with nested properties.
+Version 1.0.0
 - The first testing version of HBD.EntityFrameworkCore.Extensions</PackageReleaseNotes>
     <PackageIconUrl>https://raw.githubusercontent.com/baoduy/Images/master/NugetLogo.PNG</PackageIconUrl>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
+    <LangVersion>default</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.1.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.2.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
     <PackageReference Include="Z.EntityFramework.Plus.QueryDeferred.EFCore" Version="1.7.1" />
     <PackageReference Include="Z.EntityFramework.Plus.QueryFuture.EFCore" Version="1.7.20" />

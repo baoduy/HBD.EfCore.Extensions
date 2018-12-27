@@ -4,15 +4,22 @@ using HBD.EntityFrameworkCore.Extensions.Abstractions;
 
 namespace DataLayer
 {
-    public class Address: Entity<int>
+    public class Address : Entity<int>
     {
-        [Required]
-        [MaxLength(256)]
-        public string Street { get; set; }
+        #region Public Constructors
 
-        [ForeignKey("Address_User")]
-        public long UserId { get; set; }
+        public Address():base(0) => OwnedEntity = new OwnedEntity();
+
+        #endregion Public Constructors
+
+        #region Public Properties
+
+        public OwnedEntity OwnedEntity { get; set; }
+        [Required] [MaxLength(256)] public string Street { get; set; }
 
         public virtual User User { get; set; }
+        [ForeignKey("Address_User")] public long UserId { get; set; }
+
+        #endregion Public Properties
     }
 }

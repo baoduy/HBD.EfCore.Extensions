@@ -3,153 +3,9 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DataLayer.Migrations
 {
-    public partial class initialCreate : Migration
+    public partial class InitialCreate : Migration
     {
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.CreateTable(
-                name: "Account",
-                columns: table => new
-                {
-                    Id = table.Column<long>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    RowVersion = table.Column<byte[]>(rowVersion: true, nullable: true),
-                    CreatedBy = table.Column<string>(nullable: true),
-                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
-                    UpdatedBy = table.Column<string>(nullable: true),
-                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
-                    UserName = table.Column<string>(nullable: false),
-                    Password = table.Column<string>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Account", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "AccountStatus",
-                columns: table => new
-                {
-                    Id = table.Column<long>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    RowVersion = table.Column<byte[]>(rowVersion: true, nullable: true),
-                    Name = table.Column<string>(maxLength: 100, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AccountStatus", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "EnumStatus",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Key = table.Column<int>(nullable: false),
-                    Name = table.Column<string>(maxLength: 100, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_EnumStatus", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "User",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    RowVersion = table.Column<byte[]>(rowVersion: true, nullable: true),
-                    CreatedBy = table.Column<string>(nullable: true),
-                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
-                    UpdatedBy = table.Column<string>(nullable: true),
-                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
-                    FirstName = table.Column<string>(maxLength: 256, nullable: false),
-                    LastName = table.Column<string>(maxLength: 256, nullable: false),
-                    AccountId = table.Column<long>(nullable: false),
-                    AccountId1 = table.Column<long>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_User", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_User_Account_AccountId1",
-                        column: x => x.AccountId1,
-                        principalTable: "Account",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Address",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    RowVersion = table.Column<byte[]>(rowVersion: true, nullable: true),
-                    Street = table.Column<string>(maxLength: 256, nullable: false),
-                    UserId = table.Column<long>(nullable: false),
-                    UserId1 = table.Column<int>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Address", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Address_User_UserId1",
-                        column: x => x.UserId1,
-                        principalTable: "User",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.InsertData(
-                table: "AccountStatus",
-                columns: new[] { "Id", "Name", "RowVersion" },
-                values: new object[] { 1L, "Duy", null });
-
-            migrationBuilder.InsertData(
-                table: "AccountStatus",
-                columns: new[] { "Id", "Name", "RowVersion" },
-                values: new object[] { 2L, "Hoang", null });
-
-            migrationBuilder.InsertData(
-                table: "EnumStatus",
-                columns: new[] { "Id", "Key", "Name" },
-                values: new object[] { 1, 0, "UnKnow" });
-
-            migrationBuilder.InsertData(
-                table: "EnumStatus",
-                columns: new[] { "Id", "Key", "Name" },
-                values: new object[] { 2, 1, "Active" });
-
-            migrationBuilder.InsertData(
-                table: "EnumStatus",
-                columns: new[] { "Id", "Key", "Name" },
-                values: new object[] { 3, 2, "InActive" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Address_UserId1",
-                table: "Address",
-                column: "UserId1");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_User_AccountId1",
-                table: "User",
-                column: "AccountId1",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_User_FirstName",
-                table: "User",
-                column: "FirstName");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_User_Id",
-                table: "User",
-                column: "Id",
-                unique: true);
-        }
+        #region Protected Methods
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
@@ -168,5 +24,147 @@ namespace DataLayer.Migrations
             migrationBuilder.DropTable(
                 name: "Account");
         }
+
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.CreateTable(
+                name: "Account",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    RowVersion = table.Column<byte[]>(rowVersion: true, nullable: true),
+                    CreatedBy = table.Column<string>(maxLength: 256, nullable: true),
+                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
+                    UpdatedBy = table.Column<string>(maxLength: 256, nullable: true),
+                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
+                    UserName = table.Column<string>(nullable: false),
+                    Password = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Account", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AccountStatus",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    RowVersion = table.Column<byte[]>(rowVersion: true, nullable: true),
+                    Name = table.Column<string>(maxLength: 100, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AccountStatus", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EnumStatus",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false),
+                    Name = table.Column<string>(maxLength: 100, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EnumStatus", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "User",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    RowVersion = table.Column<byte[]>(rowVersion: true, nullable: true),
+                    CreatedBy = table.Column<string>(maxLength: 256, nullable: true),
+                    CreatedOn = table.Column<DateTimeOffset>(nullable: false),
+                    UpdatedBy = table.Column<string>(maxLength: 256, nullable: true),
+                    UpdatedOn = table.Column<DateTimeOffset>(nullable: true),
+                    FirstName = table.Column<string>(maxLength: 256, nullable: false),
+                    LastName = table.Column<string>(maxLength: 256, nullable: false),
+                    AccountId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_User", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_User_Account_AccountId",
+                        column: x => x.AccountId,
+                        principalTable: "Account",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Address",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    RowVersion = table.Column<byte[]>(rowVersion: true, nullable: true),
+                    Street = table.Column<string>(maxLength: 256, nullable: false),
+                    UserId = table.Column<long>(nullable: false),
+                    OwnedEntity_Name = table.Column<string>(nullable: true),
+                    OwnedEntity_ReadOnly = table.Column<string>(nullable: true),
+                    OwnedEntity_NotReadOnly = table.Column<string>(nullable: true),
+                    UserId1 = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Address", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Address_User_UserId1",
+                        column: x => x.UserId1,
+                        principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.InsertData(
+                table: "AccountStatus",
+                columns: new[] { "Id", "Name" },
+                values: new object[] { 1, "Duy" });
+
+            migrationBuilder.InsertData(
+                table: "AccountStatus",
+                columns: new[] { "Id", "Name" },
+                values: new object[] { 2, "Hoang" });
+
+            migrationBuilder.InsertData(
+                table: "EnumStatus",
+                columns: new[] { "Id", "Name" },
+                values: new object[] { 0, "UnKnow" });
+
+            migrationBuilder.InsertData(
+                table: "EnumStatus",
+                columns: new[] { "Id", "Name" },
+                values: new object[] { 1, "Active" });
+
+            migrationBuilder.InsertData(
+                table: "EnumStatus",
+                columns: new[] { "Id", "Name" },
+                values: new object[] { 2, "InActive" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Address_UserId1",
+                table: "Address",
+                column: "UserId1");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_User_AccountId",
+                table: "User",
+                column: "AccountId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_User_Id",
+                table: "User",
+                column: "Id",
+                unique: true);
+        }
+
+        #endregion Protected Methods
     }
 }

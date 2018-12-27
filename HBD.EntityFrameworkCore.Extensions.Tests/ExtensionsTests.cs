@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+﻿using System;
 using DataLayer;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -8,142 +8,73 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
     [TestClass]
     public class ExtensionsTests
     {
-        private async Task AddData(DbContext dbContext)
+        #region Public Methods
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestNUll_UpdateFrom()
         {
-            await dbContext.Database.EnsureCreatedAsync();
-
-            //Create User with Address
-            await dbContext.Set<User>().AddAsync(new User("Duy")
-            {
-                FirstName = "Duy",
-                LastName = "Hoang",
-                Addresses = {
-                    new Address
-                    {
-                        Street = "12"
-                    }
-                }
-            });
-
-            await dbContext.SaveChangesAsync();
+            ((object)null).UpdateFrom("A");
         }
-
-        //[TestMethod]
-        //public async Task Address_Is_InUse()
-        //{
-        //    using (var db = new MyDbContext(new DbContextOptionsBuilder()
-        //        .UseSqliteMemory()
-        //        .RegisterEntities(op => op.FromAssemblies(typeof(MyDbContext).Assembly))
-        //        .Options))
-        //    {
-        //        db.LogToConsole();
-        //        await AddData(db);
-
-        //        var address = db.Set<Address>().First();
-        //        //Referencing by User
-        //        db.IsEntityReferenceByOthers(address).Should().BeTrue();
-        //    }
-        //}
-
-        //[TestMethod]
-        //public async Task User_IsNot_InUse()
-        //{
-        //    using (var db = new MyDbContext(new DbContextOptionsBuilder()
-        //        .UseSqliteMemory()
-        //        .RegisterEntities(op => op.FromAssemblies(typeof(MyDbContext).Assembly))
-        //        .Options))
-        //    {
-        //        db.LogToConsole();
-        //        await AddData(db);
-
-        //        var u = db.Set<User>().First();
-        //        //User is not referencing by Address
-        //        db.IsEntityReferenceByOthers(u).Should().BeFalse();
-        //    }
-        //}
-
-        //[TestMethod]
-        //public async Task User_IsNot_InUse_WithOneToOne()
-        //{
-        //    using (var db = new MyDbContext(new DbContextOptionsBuilder()
-        //        .UseSqliteMemory()
-        //        .RegisterEntities(op => op.FromAssemblies(typeof(MyDbContext).Assembly))
-        //        .Options))
-        //    {
-        //        db.LogToConsole();
-        //        await AddData(db);
-
-        //        var u = db.Set<User>().First();
-        //        var account = new Account { UserName = "1", Password = "1" };
-        //        u.Account = account;
-        //        account.User = u;
-
-        //        await db.SaveChangesAsync();
-
-        //        db.Set<Account>().Any().Should().BeTrue();
-        //        db.IsEntityReferenceByOthers(db.Set<Account>().First()).Should().BeTrue();
-
-        //        db.Set<User>().Remove(u);
-        //        await db.SaveChangesAsync();
-
-        //        db.Set<Account>().Any().Should().BeTrue();
-        //        db.IsEntityReferenceByOthers(db.Set<Account>().First()).Should().BeFalse();
-        //    }
-        //}
 
         [TestMethod]
         public void TestUpdateFrom()
+        {
+            var user = new OwnedEntity { Name = "Duy" };
+            var user1 = new OwnedEntity { Name = "Steven" };
+
+            user.UpdateFrom(user1);
+
+            user.Name.Should().Be(user1.Name);
+        }
+
+        [TestMethod]
+        public void TestUpdateFrom_IgnoreNull()
+        {
+            var user = new OwnedEntity { Name = "Duy" };
+            var user1 = new OwnedEntity { Name = null };
+
+            user1.UpdateFrom(user1, true);
+
+            user.Name.Should().Be("Duy");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void TestUpdateFrom_NotOwnedType()
         {
             var user = new User("Duy");
             var user1 = new User("Steven")
             {
                 FirstName = "Duy",
                 LastName = "Hoang",
-                Account = new Account(),
+                Account = new Account()
             };
-
-            user1.UpdatedByUser("Hoang");
 
             user.UpdateFrom(user1);
-            user.FirstName.Should().Be("Duy");
-            user.LastName.Should().Be("Hoang");
-            user.Account.Should().Be(user1.Account);
-            user.CreatedBy.Should().Be("Duy");
-            user.UpdatedBy.Should().BeNullOrEmpty();
         }
 
         [TestMethod]
-        public void TestUpdateFrom_NotIgnoreNull()
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestUpdateFrom_Null()
         {
-            var user = new User("Duy") { Account = new Account() };
-            var user1 = new User("Duy")
-            {
-                FirstName = "Duy",
-                LastName = "Hoang",
-                Account = null
-            };
-
-            user.UpdateFrom(user1, ignoreNull: false);
-            user.FirstName.Should().Be("Duy");
-            user.LastName.Should().Be("Hoang");
-            user.Account.Should().BeNull();
+            var user = new User("Duy");
+            user.UpdateFrom(null);
         }
 
         [TestMethod]
-        public void TestUpdateFrom_IgnoreNull()
+        public void TestUpdateFrom_ReadOnly()
         {
-            var user = new User("Duy") { Account = new Account() };
-            var user1 = new User("Duy")
-            {
-                FirstName = "Duy",
-                LastName = "Hoang",
-                Account = null
-            };
+            var user = new OwnedEntity { Name = "Duy", ReadOnly = "A", NotReadOnly = "B" };
+            var user1 = new OwnedEntity { Name = "Steven", ReadOnly = "B", NotReadOnly = "C" };
 
-            user.UpdateFrom(user1, ignoreNull: true);
-            user.FirstName.Should().Be("Duy");
-            user.LastName.Should().Be("Hoang");
-            user.Account.Should().NotBeNull();
+            user.UpdateFrom(user1);
+
+            user.Name.Should().Be(user1.Name);
+            user.ReadOnly.Should().Be("A");
+            user.NotReadOnly.Should().Be(user1.NotReadOnly);
         }
+
+        #endregion Public Methods
     }
 }

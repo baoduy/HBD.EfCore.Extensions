@@ -1,11 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using DbContext = HBD.EntityFrameworkCore.Extensions.DbContext;
 
 namespace DataLayer
 {
-    public class MyDbContext : HBD.EntityFrameworkCore.Extensions.DbContext
+    public class MyDbContext : DbContext
     {
+        #region Public Constructors
+
         public MyDbContext(DbContextOptions options) : base(options)
         {
         }
+
+        #endregion Public Constructors
     }
 }

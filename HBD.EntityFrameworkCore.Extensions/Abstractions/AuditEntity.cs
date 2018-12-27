@@ -1,35 +1,47 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace HBD.EntityFrameworkCore.Extensions.Abstractions
 {
     public abstract class AuditEntity<TKey> : Entity<TKey>, IAuditEntity<TKey>
     {
-        /// <inheritdoc />
-        protected AuditEntity(string createdBy) : this(default(TKey), createdBy) { }
+        #region Protected Constructors
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
+        protected AuditEntity(string createdBy) : this(default(TKey), createdBy)
+        {
+        }
+
+        /// <inheritdoc/>
         protected AuditEntity(TKey id, string createdBy) : base(id)
         {
             CreatedBy = createdBy ?? throw new ArgumentNullException(nameof(createdBy));
             CreatedOn = DateTimeOffset.Now;
         }
 
-        /// <inheritdoc />
-        protected AuditEntity()
+        /// <inheritdoc/>
+        protected AuditEntity(TKey id) : base(id)
         {
         }
 
+        #endregion Protected Constructors
 
+        #region Public Properties
+
+        [MaxLength(256)]
         public string CreatedBy { get; private set; }
 
         public DateTimeOffset CreatedOn { get; private set; }
 
+        [MaxLength(256)]
         public string UpdatedBy { get; private set; }
 
         public DateTimeOffset? UpdatedOn { get; private set; }
 
-        #region Actions
+        #endregion Public Properties
+
+        #region Protected Methods
+
         /// <summary>
         /// Update UpdatedBy UserName info.
         /// </summary>
@@ -38,28 +50,34 @@ namespace HBD.EntityFrameworkCore.Extensions.Abstractions
         {
             //If ID is default means the entity is not saved yet.
             //Only Set the value if Id >=0
-            if (EqualityComparer<TKey>.Default.Equals(Id, default(TKey)))
+            if (KeyComparer.Equals(Id, default(TKey)))
                 return;
 
-            this.UpdatedBy = userName ?? throw new ArgumentNullException(nameof(userName));
-            this.UpdatedOn = DateTimeOffset.Now;
+            UpdatedBy = userName ?? throw new ArgumentNullException(nameof(userName));
+            UpdatedOn = DateTimeOffset.Now;
         }
 
-        #endregion
+        #endregion Protected Methods
     }
 
-    public abstract class AuditEntity : AuditEntity<long>, IAuditEntity
+    public abstract class AuditEntity : AuditEntity<int>, IAuditEntity
     {
-        /// <inheritdoc />
+        #region Protected Constructors
+
+        /// <inheritdoc/>
         protected AuditEntity(string createdBy) : base(createdBy)
         {
         }
 
-        protected AuditEntity(long id, string createdBy) : base(id, createdBy)
+        protected AuditEntity(int id, string createdBy) : base(id, createdBy)
         {
         }
 
-        /// <inheritdoc />
-        protected AuditEntity() { }
+        /// <inheritdoc/>
+        protected AuditEntity() : base(0)
+        {
+        }
+
+        #endregion Protected Constructors
     }
 }

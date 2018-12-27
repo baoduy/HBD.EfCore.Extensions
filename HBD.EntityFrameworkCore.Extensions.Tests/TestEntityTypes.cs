@@ -7,27 +7,28 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
     [TestClass]
     public class TestEntityTypes
     {
-        [TestMethod]
-        public void TestIEntity_IEntityGeneric()
-        {
-            typeof(IEntity<long>).IsAssignableFrom(typeof(IEntity))
-                .Should().BeTrue();
-        }
+        #region Public Methods
 
         [TestMethod]
-        public void TestIEntity_Entity()
+        public void TestEntity_Audit()
         {
-            typeof(IEntity<long>).IsAssignableFrom(typeof(Entity))
+            typeof(Entity<int>).IsAssignableFrom(typeof(AuditEntity<int>))
                 .Should().BeTrue();
 
-            typeof(IEntity).IsAssignableFrom(typeof(Entity))
+            typeof(Entity<int>).IsAssignableFrom(typeof(AuditEntity))
+                .Should().BeTrue();
+
+            typeof(IEntity<int>).IsAssignableFrom(typeof(AuditEntity<int>))
+                .Should().BeTrue();
+
+            typeof(IEntity<int>).IsAssignableFrom(typeof(AuditEntity))
                 .Should().BeTrue();
         }
 
         [TestMethod]
         public void TestEntity_AuditEntityGeneric()
         {
-            typeof(IEntity<long>).IsAssignableFrom(typeof(IAuditEntity<long>))
+            typeof(IEntity<int>).IsAssignableFrom(typeof(IAuditEntity<int>))
                 .Should().BeTrue();
         }
 
@@ -41,14 +42,14 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
         [TestMethod]
         public void TestEntityGeneric_AuditGeneric()
         {
-            typeof(IEntity<long>).IsAssignableFrom(typeof(IAuditEntity))
+            typeof(IEntity<int>).IsAssignableFrom(typeof(IAuditEntity))
                 .Should().BeTrue();
         }
 
         [TestMethod]
         public void TestIAudit_Audit()
         {
-            typeof(IAuditEntity<long>).IsAssignableFrom(typeof(AuditEntity))
+            typeof(IAuditEntity<int>).IsAssignableFrom(typeof(AuditEntity))
                 .Should().BeTrue();
 
             typeof(IAuditEntity).IsAssignableFrom(typeof(AuditEntity))
@@ -56,19 +57,22 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
         }
 
         [TestMethod]
-        public void TestEntity_Audit()
+        public void TestIEntity_Entity()
         {
-            typeof(Entity<long>).IsAssignableFrom(typeof(AuditEntity<long>))
+            typeof(IEntity<int>).IsAssignableFrom(typeof(Entity))
                 .Should().BeTrue();
 
-            typeof(Entity<long>).IsAssignableFrom(typeof(AuditEntity))
-                .Should().BeTrue();
-
-            typeof(IEntity<long>).IsAssignableFrom(typeof(AuditEntity<long>))
-                .Should().BeTrue();
-
-            typeof(IEntity<long>).IsAssignableFrom(typeof(AuditEntity))
+            typeof(IEntity).IsAssignableFrom(typeof(Entity))
                 .Should().BeTrue();
         }
+
+        [TestMethod]
+        public void TestIEntity_IEntityGeneric()
+        {
+            typeof(IEntity<int>).IsAssignableFrom(typeof(IEntity))
+                .Should().BeTrue();
+        }
+
+        #endregion Public Methods
     }
 }

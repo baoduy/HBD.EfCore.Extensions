@@ -5,17 +5,14 @@ namespace HBD.EntityFrameworkCore.Extensions.Abstractions
 {
     public interface IEntity<out TKey>
     {
-        [Key]
-        [IgnoreFromUpdate]
-        TKey Id { get; }
-       
+        #region Public Properties
+
+        [Key] [IgnoreFromUpdate] TKey Id { get; }
+
+        #endregion Public Properties
     }
 
-    public interface IEntity : IEntity<long>
+    public interface IEntity : IEntity<int>
     {
-
     }
-
-
-    
 }

@@ -7,7 +7,21 @@ namespace HBD.EntityFrameworkCore.Extensions.Options
 {
     public class EntityMappingExtension : IDbContextOptionsExtension, IEntityMappingExtension
     {
+        #region Public Properties
+
+        public string LogFragment => nameof(EntityMappingExtension);
+
+        #endregion Public Properties
+
+        #region Internal Properties
+
         internal ICollection<RegistrationInfo> Registrations { get; } = new List<RegistrationInfo>();
+
+        #endregion Internal Properties
+
+        #region Public Methods
+
+        public bool ApplyServices(IServiceCollection services) => true;
 
         /// <summary>
         /// The Assemblies will be scan
@@ -21,8 +35,6 @@ namespace HBD.EntityFrameworkCore.Extensions.Options
             return register;
         }
 
-        public bool ApplyServices(IServiceCollection services) => true;
-
         public long GetServiceProviderHashCode() => nameof(EntityMappingExtension).GetHashCode();
 
         public void Validate(IDbContextOptions options)
@@ -31,6 +43,6 @@ namespace HBD.EntityFrameworkCore.Extensions.Options
                 info.Validate();
         }
 
-        public string LogFragment => nameof(EntityMappingExtension);
+        #endregion Public Methods
     }
 }

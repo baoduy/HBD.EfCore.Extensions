@@ -1,21 +1,30 @@
-﻿using Microsoft.EntityFrameworkCore.Infrastructure;
-using System;
+﻿using System;
 using HBD.EntityFrameworkCore.Extensions.Options;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 // ReSharper disable CheckNamespace
 namespace Microsoft.EntityFrameworkCore
 {
     public static class DbContextOptionsBuilderExtensions
     {
-        public static DbContextOptionsBuilder<TContext> RegisterEntities<TContext>(this DbContextOptionsBuilder<TContext> @this, Action<IEntityMappingExtension> options = null) where TContext : DbContext
+        #region Public Methods
+
+        public static DbContextOptionsBuilder<TContext> RegisterEntities<TContext>(
+            this DbContextOptionsBuilder<TContext> @this, Action<IEntityMappingExtension> options = null)
+            where TContext : DbContext
             => (DbContextOptionsBuilder<TContext>)((DbContextOptionsBuilder)@this).RegisterEntities(options);
 
-        public static DbContextOptionsBuilder RegisterEntities(this DbContextOptionsBuilder @this, Action<IEntityMappingExtension> options = null)
+        public static DbContextOptionsBuilder RegisterEntities(this DbContextOptionsBuilder @this,
+            Action<IEntityMappingExtension> options = null)
         {
             var op = @this.GetOrCreateExtension();
             options?.Invoke(op);
             return @this;
         }
+
+        #endregion Public Methods
+
+        #region Private Methods
 
         private static EntityMappingExtension GetOrCreateExtension(this DbContextOptionsBuilder optionsBuilder)
         {
@@ -29,5 +38,7 @@ namespace Microsoft.EntityFrameworkCore
 
             return op;
         }
+
+        #endregion Private Methods
     }
 }

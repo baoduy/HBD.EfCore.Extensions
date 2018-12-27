@@ -1,16 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DataLayer.Mappers
 {
-    internal class UserEntityMapper: AuditEntityMapper<User>
+    internal class UserEntityMapper : AuditEntityMapper<User>
     {
+        #region Public Methods
+
         public override void Configure(EntityTypeBuilder<User> builder)
         {
             base.Configure(builder);
-            builder.HasOne(c => c.Account).WithOne(c => c.User)
-                .IsRequired(false)
-                .OnDelete(DeleteBehavior.SetNull);
         }
+
+        #endregion Public Methods
     }
 }
