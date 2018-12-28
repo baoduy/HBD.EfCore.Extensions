@@ -1,16 +1,21 @@
 # HBD.EntityFrameworkCore.Extensions
 
-<https://steven2412.visualstudio.com/HBD/_build/latest?definitionId=81>
+[![Build Status](https://dev.azure.com/steven2412/HBD/_apis/build/status/HBD.EntityFrameworkCore.Extensions-GitSync?branchName=master)](https://dev.azure.com/steven2412/HBD/_build/latest?definitionId=81?branchName=master)
 
 Nuget package
 
 ```cmd
-PM> Install-Package HBD.EntityFrameworkCore.Extensions -Version 1.0.0
+PM> Install-Package HBD.EntityFrameworkCore.Extensions
 ```
+
+## Quick Startup
+1. Change inheritten of your DbContext from  `Microsoft.EntityFrameworkCore.DbContext` to `HBD.EntityFrameworkCore.Extensions.DbContext`.
+2. Implement your `EntityTypeConfiguration<TEntity>` by following the instruction below.
+3. Add Configuration to your Startup class.
 
 ## Introduction
 
-As you know Entity Framework (EF) Core is a lightweight, extensible, and
+As you know the Entity Framework (EF) Core is a lightweight, extensible, and
 cross-platform version of the popular Entity Framework data access technology.
 However, in order to make the EF work, We need to define, config a few things
 below:
@@ -61,7 +66,7 @@ public partial class MyContext : Microsoft.EntityFrameworkCore.DbContext
 ```
 
 Let see, if we have a hundred Entities, we need to do all steps above a hundred
-times and the third step is an important step as without applying the
+times and the third step is an important step without applying the
 configuration to the DbContext we are not able to use those entities. To speed
 up the development process and cut down the manual works, I developed this
 extension for EF Core which allows to scan and apply the
@@ -69,15 +74,15 @@ IEntityTypeConfiguration from assemblies to DbContext automatically.
 
 ## How HBD.EntityFrameworkCore.Extensions Works.
 
-### 1. Generic Entity Type Configuration
+### 1. The Generic of Entity Type Configuration
 
 Let see, if we are 2 numbers of entities which have the same Entity Type
 Configuration as almost of configuration can be done via DataAnnotations.
 However, we still need to define a class from `IEntityTypeConfiguration` for
 every entity and add into `OnModelCreating` of DbContext. However, if using this
-extension you can define a generic EntityTypeConfiguration that define the
+the extension you can define a generic EntityTypeConfiguration that define the
 configuration for all basic entities which extension will scan it from the
-Assembly and add into `OnModelCreating` automatically.
+Assembly and add to `OnModelCreating` automatically.
 
 Sample code: Define a generic Entity Type Configuration
 
@@ -155,40 +160,40 @@ internal class AccountDataSeeding: IDataSeedingConfiguration<Account>{
 
 # Domain Driven Design Support
 
-If you are following the DDD design with your EF Core. For each business action we may need to load all relevant data of a Navigation root, that can be done via include all relevant navigation properties into a Queryable.
+If you are following the DDD design with your EF Core. For each business activity, we may need to load all relevant data of a Navigation root, that can be done via include all relevant navigation properties into a Queryable.
 
-```c#
+```csharp
 //Get all diabled users including their addesses.
 var users = dbContext.Set<User>()
-			.Include(u => u.Addresses)
-    		.Where(u => u.IsDisabled)
-    		.ToList();
+            .Include(u => u.Addresses)
+            .Where(u => u.IsDisabled)
+            .ToList();
 ```
 
-By doing that you might facing a few common problem below:  
+By doing that you might face a few common problems below:  
 
 1. The including code for a query are duplicated between the Biz actions.
-2.  Need to write difference code to validate a business condition for a query and In-memory entities.
+2.  Need to write different code to validate a business condition for a query and In-memory entities.
 
-To resolve above problems,  I would like to share Specification implementation for DDD entities as below.​                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+To resolve the above problems,  I would like to share Specification implementation for DDD entities as below.​                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
 
-### I. Spec\<T\> generic abstract class
+### I. Spec<T> generic abstract class
 
 This interface had been added allow to define a specification for an entity not only for Db querying but also for in-memory validation.
 
-Which this implementation also help to have a bester biz knowledge organization for an application.
+Which this implementation also helps to have a better biz knowledge organization for an application.
 
-### II. How is Spec\<T\> work.
+### II. How is Spec<T> work?
 
 Which sample above, Re-write it with Spec pattern as below.
 
 1. **Define Disabled Users Spec which including Address.**
 
-   ```c#
+   ```csharp
    public class DisabledUserWithAddress : Spec<User>
    {
-   	public override IQueryable<User> Includes(IQueryable<User> query) 
-   		=> query.Include(u => u.Addresses);
+       public override IQueryable<User> Includes(IQueryable<User> query) 
+           => query.Include(u => u.Addresses);
            
        public override Expression<Func<User, bool>> ToExpression()
                => u => u.IsDisabled;
@@ -197,70 +202,112 @@ Which sample above, Re-write it with Spec pattern as below.
 
 2. **Query data for a Spec**
 
-   ```c#
+   ```csharp
    //Get all diabled users including their addesses.
    var users = dbContext.ForSpec(new DisabledUserWithAddress()).ToList();
    ```
 
 3. **Verify in memory user whether that user is matched `DisabledUserWithAddress` condition or not.**
 
-   ```c#
+   ```csharp
    var isDisabled = new DisabledUserWithAddress().IsSatisfied(user);
    ```
 
-   4. **Spec combinations**
+4. **Spec combinations**
 
-      The Spec is also supporting a few combination below:
+The Spec is also supporting a few combinations below:
 
-      **NotMe**
+**NotMe**
 
-      Let's say if you want to get all active users in Db? You don't need to create a new one instead just call the `NotMe` method:
+Let's say if you want to get all active users in Db? You don't need to create a new one instead just call the `NotMe` method:
 
-      ```c#
-      //Get all diabled users including their addesses.
-      var users = dbContext.ForSpec(new DisabledUserWithAddress().NotMe()).ToList();
-      ```
+```csharp
+    //Get all diabled users including their addesses.
+    var users = dbContext.ForSpec(new DisabledUserWithAddress().NotMe()).ToList();
+```
 
-      **And**
+**And**
 
-      ```c#
-      //Active user Spec
-      var activeSpec = new DisabledUserWithAddress().NotMe();
-      //Have Login Name is "Duy"
-      var loginNameIsDuy = new LoginNameSpec("Duy");
-      //Combine 2 sepc:Active users AND LoginName == "Duy"
-      var users = dbContext.ForSpec(activeSpec.And(loginNameIsDuy)).ToList();
-      ```
+```csharp
+    //Active user Spec
+    var activeSpec = new DisabledUserWithAddress().NotMe();
+    //Have Login Name is "Duy"
+    var loginNameIsDuy = new LoginNameSpec("Duy");
+    //Combine 2 sepc:Active users AND LoginName == "Duy"
+    var users = dbContext.ForSpec(activeSpec.And(loginNameIsDuy)).ToList();
+```
 
-      **Or**
+**Or**
 
-      ```c#
-      //Active user Spec
-      var activeSpec = new DisabledUserWithAddress().NotMe();
-      //Have Login Name is "Duy"
-      var loginNameIsDuy = new LoginNameSpec("Duy");
-      //Combine 2 sepc: Active Users OR LoginName == "Duy"
-      var users = dbContext.ForSpec(activeSpec.Or(loginNameIsDuy)).ToList();
-      ```
+```csharp
+    //Active user Spec
+    var activeSpec = new DisabledUserWithAddress().NotMe();
+    //Have Login Name is "Duy"
+    var loginNameIsDuy = new LoginNameSpec("Duy");
+    //Combine 2 sepc: Active Users OR LoginName == "Duy"
+    var users = dbContext.ForSpec(activeSpec.Or(loginNameIsDuy)).ToList();
+```
 
-      **ButNot**
+**ButNot**
 
-      ```c#
-      //Active user Spec
-      var activeSpec = new DisabledUserWithAddress().NotMe();
-      //Have Login Name is "Duy"
-      var loginNameIsDuy = new LoginNameSpec("Duy");
-      //Combine 2 sepc: Active Users AND LoginName != "Duy"
-      var users = dbContext.ForSpec(activeSpec.ButNot(loginNameIsDuy)).ToList();
-      ```
+```csharp
+    //Active user Spec
+    var activeSpec = new DisabledUserWithAddress().NotMe();
+    //Have Login Name is "Duy"
+    var loginNameIsDuy = new LoginNameSpec("Duy");
+    //Combine 2 sepc: Active Users AND LoginName != "Duy"
+    var users = dbContext.ForSpec(activeSpec.ButNot(loginNameIsDuy)).ToList();
+```
+
+## Lifecycle Hooks Handling
+There are a few interfaces had added that allow entity aware when it is saved to Db.
+
+1. **`ISavingAwareness` interface**
+
+By Implement this interface to an Entity, the method `OnSaving` will be called right before the entity being saved to Db.
+The use case of this feature allows you to perform all calculation for all computed properties in one place.
+This method will be called before the validation.
+
+Sample:
+
+```csharp
+public class User: BaseEntity, ISavingAwareness
+{
+    #region Public Properties
+    public DateTime BirthDay {get;set;}
+    public int Age {get;private set;}
+     ...
+    #endregion Public Properties
+
+    public void OnSaving(EntityState state, DbContext dbContext)
+    {
+        if(state == EntityState.Delete)
+        {
+            //Do some other validation for deleting.
+            return;
+        }
+
+        //Calculate Age for Insert and Update
+        var today = DateTime.Today;
+        var birthdate = new DateTime(1996, 01, 01);
+        // Calculate the age.
+        var age = today.Year - birthdate.Year;
+        // Go back to the year the person was born in case of a leap year
+        if (birthdate > today.AddYears(-age)) 
+            age--;
+        //Assgin the value to Property
+        Age = age;
+    }
+}
+```
 
 ## Recommendation
 
-1.  The entities SHOULD be an implemented of `IEntity<>`
+1.  The entities SHOULD be implemented of `IEntity<>`
 
-2.  The Mapper type SHOULD be an implemented of `IEntityTypeConfiguration<>`
+2.  The Mapper type SHOULD be implemented of `IEntityTypeConfiguration<>`
 
-3.  Your DbContext SHOULD be from implemented of
+3.  Your DbContext SHOULD be implemented of
     `HBD.EntityFrameworkCore.Extensions.DbContext`
 
 ## Source Code
