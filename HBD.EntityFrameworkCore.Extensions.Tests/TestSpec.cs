@@ -5,6 +5,7 @@ using BenchmarkDotNet.Attributes;
 using DataLayer;
 using FluentAssertions;
 using HBD.EntityFrameworkCore.Extensions.Specification;
+using HBD.EntityFrameworkCore.Extensions.Tests.Helpers;
 using HBD.EntityFrameworkCore.Extensions.Tests.TestClasses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -87,6 +88,8 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
         [Benchmark]
         public async Task TestUser_NotMeSpec()
         {
+            await UnitTestSetup.Db.SeedData();
+
             var list = await UnitTestSetup.Db.ForSpec(new UserAccountStartWithDSpec().NotMe())
                 .AsNoTracking()
                 .ToListAsync();
@@ -111,6 +114,7 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
         [TestMethod]
         public async Task TestUserSpecAsync_IncludingAccount()
         {
+            await UnitTestSetup.Db.SeedData();
             var list = await UnitTestSetup.Db.ForSpec(new UserIncludeAccountSpec()).Where(u => u.Id < 5).ToListAsync();
 
             list.Should().NotBeEmpty();

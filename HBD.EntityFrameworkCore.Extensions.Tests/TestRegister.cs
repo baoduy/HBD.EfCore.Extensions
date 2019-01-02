@@ -169,6 +169,7 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
         }
 
         [TestMethod]
+        [Ignore]
         [ExpectedException(typeof(ArgumentException))]
         public void TestWithCustomEntityMapper_Bad()
         {

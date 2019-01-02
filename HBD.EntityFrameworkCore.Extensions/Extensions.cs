@@ -1,9 +1,12 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
+using HBD.EntityFrameworkCore.Extensions.Abstractions;
 using HBD.EntityFrameworkCore.Extensions.Attributes;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace HBD.EntityFrameworkCore.Extensions
 {
@@ -68,20 +71,73 @@ namespace HBD.EntityFrameworkCore.Extensions
         #endregion Internal Methods
 
         /// <summary>
-        /// Check whether the entity is referring by others.
-        /// TODO: Need to improve the check.
+        /// Get Property Name of expression
         /// </summary>
-        /// <typeparam name="TEntity"></typeparam>
-        /// <param name="context"></param>
-        /// <param name="entity"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TProp"></typeparam>
+        /// <param name="action"></param>
         /// <returns></returns>
-        //public static bool IsEntityReferenceByOthers<TEntity>(this DbContext context, TEntity entity) where TEntity : class
-        //{
-        //    var entry = context.Entry(entity);
+        public static string GetPropName<T, TProp>(this Expression<Func<T, TProp>> action) where T : class
+        {
+            var expression = GetMemberInfo(action);
+            return expression.Member.Name;
+        }
 
-        //    return entry.Navigations.Any(navigation =>
-        //        !navigation.Metadata.IsCollection()
-        //        && navigation.Query().Any());
-        //}
+        /// <summary>
+        /// Get Expression member
+        /// </summary>
+        /// <param name="method"></param>
+        /// <returns></returns>
+        private static MemberExpression GetMemberInfo(Expression method)
+        {
+            if (!(method is LambdaExpression lambda))
+                throw new ArgumentNullException(nameof(method));
+
+            MemberExpression memberExpr = null;
+
+            switch (lambda.Body.NodeType)
+            {
+                case ExpressionType.Convert:
+                    memberExpr =
+                        ((UnaryExpression)lambda.Body).Operand as MemberExpression;
+                    break;
+                case ExpressionType.MemberAccess:
+                    memberExpr = lambda.Body as MemberExpression;
+                    break;
+            }
+
+            if (memberExpr == null)
+                throw new ArgumentException(nameof(method));
+
+            return memberExpr;
+        }
+
+        /// <summary>
+        /// Check whether the property value had been Add or Updated
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="this"></param>
+        /// <param name="props"></param>
+        /// <returns></returns>
+        public static bool HasChangeOn<T>(this EntityEntry<T> @this, Expression<Func<T, object>> props) where T : class
+        {
+            var name = props.GetPropName();
+            var prop = @this.Properties.FirstOrDefault(i => i.Metadata.Name == name);
+
+            if (prop != null) return prop.IsModified || @this.State == EntityState.Added;
+
+            var navi = @this.Navigations.FirstOrDefault(n => n.Metadata.Name == name);
+
+            if (navi != null)
+            {
+                if (navi.EntityEntry.State == EntityState.Added)
+                    return true;
+
+                if (!navi.IsLoaded) return false;
+                return navi.IsModified;
+            }
+
+            return @this.State == EntityState.Added;
+        }
     }
 }

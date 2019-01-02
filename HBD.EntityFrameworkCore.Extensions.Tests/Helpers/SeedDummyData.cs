@@ -12,7 +12,7 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests.Helpers
 
         public static async Task SeedData(this MyDbContext @this, int number = 100)
         {
-            if (@this.Set<User>().Any()) return;
+            if (@this.Set<User>().Count() >= number) return;
 
             await @this.Set<User>().AddRangeAsync(GenerateUsers(number));
             await @this.SaveChangesAsync();

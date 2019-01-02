@@ -1,7 +1,5 @@
 # HBD.EntityFrameworkCore.Extensions
 
-[![Build Status](https://dev.azure.com/steven2412/HBD/_apis/build/status/HBD.EntityFrameworkCore.Extensions-GitSync?branchName=master)](https://dev.azure.com/steven2412/HBD/_build/latest?definitionId=81?branchName=master)
-
 Nuget package
 
 ```cmd
@@ -9,9 +7,15 @@ PM> Install-Package HBD.EntityFrameworkCore.Extensions
 ```
 
 ## Quick Startup
-1. Change inheritten of your DbContext from  `Microsoft.EntityFrameworkCore.DbContext` to `HBD.EntityFrameworkCore.Extensions.DbContext`.
-2. Implement your `EntityTypeConfiguration<TEntity>` by following the instruction below.
-3. Add Configuration to your Startup class.
+
+1.  Change inherited of your DbContext from
+    `Microsoft.EntityFrameworkCore.DbContext` to
+    `HBD.EntityFrameworkCore.Extensions.DbContext`.
+
+2.  Implement your `EntityTypeConfiguration<TEntity>` by following the
+    instruction below.
+
+3.  Add Configuration to your Startup class.
 
 ## Introduction
 
@@ -66,11 +70,11 @@ public partial class MyContext : Microsoft.EntityFrameworkCore.DbContext
 ```
 
 Let see, if we have a hundred Entities, we need to do all steps above a hundred
-times and the third step is an important step without applying the
-configuration to the DbContext we are not able to use those entities. To speed
-up the development process and cut down the manual works, I developed this
-extension for EF Core which allows to scan and apply the
-IEntityTypeConfiguration from assemblies to DbContext automatically.
+times and the third step is an important step without applying the configuration
+to the DbContext, we are not able to use those entities. To speed up the
+development process and cut down the manual works, I developed this extension
+for EF Core which allows to scan and apply the IEntityTypeConfiguration from
+assemblies to DbContext automatically.
 
 ## How HBD.EntityFrameworkCore.Extensions Works.
 
@@ -88,25 +92,28 @@ Sample code: Define a generic Entity Type Configuration
 
 ```csharp
 //1. Define BaseEntity
-//The recommendation, you should define a BaseEntity on your project which includes all basic properties which will be applied for all entities on the project.
+//The recommendation, you should define a BaseEntity on your project
+//which include all basic properties which will be applied for all entities on the project.
 //The Extension provides a few generic class which help you to do the things faster.
 public abstract class BaseEntity: Entity { }
 
 //2. Define Generic Entity Type Configuration
-internal class MyEntityTypeConfiguration<TEntity> : EntityTypeConfiguration<TEntity> where TEntity: BaseEntity
+internal class MyEntityTypeConfiguration<TEntity> : EntityTypeConfiguration<TEntity>
+    where TEntity: BaseEntity
 {
     public void Map(EntityTypeBuilder<TEntity> builder)
     { /*Apply the configuration here for generic entities*/ }
 }
 
-//3. Switch from Microsoft.EntityFrameworkCore.DbContext to  HBD.EntityFrameworkCore.Extensions.DbContext
+//3. Switch from Microsoft.EntityFrameworkCore.DbContext to HBD.EntityFrameworkCore.Extensions.DbContext
 public partial class MyContext : Microsoft.EntityFrameworkCore.DbContext
 {
    //No need to override the OnModelCreating(ModelBuilder modelBuilder)
 }
 
 //4. Apply the configuration when App Start
-//Normally, the DbContext will be registered with Dependency Injection when App start. So below is a sample code to register the assembles to the extensions as well
+//Normally, the DbContext will be registered with Dependency Injection when App start.
+//So below is a sample code to register the assembles to the extensions as well
 var db = new MyDbContext(new DbContextOptionsBuilder()
     .RegisterEntities(op=>op.FromAssemblies(typeof(MyDbContext).Assembly))
     .Options)
@@ -160,7 +167,9 @@ internal class AccountDataSeeding: IDataSeedingConfiguration<Account>{
 
 # Domain Driven Design Support
 
-If you are following the DDD design with your EF Core. For each business activity, we may need to load all relevant data of a Navigation root, that can be done via include all relevant navigation properties into a Queryable.
+If you are following the DDD design with your EF Core. For each business
+activity, we may need to load all relevant data of a Navigation root, that can
+be done via include all relevant navigation properties into a Queryable.
 
 ```csharp
 //Get all diabled users including their addesses.
@@ -170,56 +179,64 @@ var users = dbContext.Set<User>()
             .ToList();
 ```
 
-By doing that you might face a few common problems below:  
+By doing that you might face a few common problems below:
 
-1. The including code for a query are duplicated between the Biz actions.
-2.  Need to write different code to validate a business condition for a query and In-memory entities.
+1.  The including code for a query are duplicated between the Biz actions.
 
-To resolve the above problems,  I would like to share Specification implementation for DDD entities as below.​                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+2.  Need to write different code to validate a business condition for a query
+    and In-memory entities.
 
-### I. Spec<T> generic abstract class
+To resolve the above problems, I would like to share Specification
+implementation for DDD entities as below.​
 
-This interface had been added allow to define a specification for an entity not only for Db querying but also for in-memory validation.
+### I. Spec generic abstract class
 
-Which this implementation also helps to have a better biz knowledge organization for an application.
+This interface had been added allow to define a specification for an entity not
+only for Db querying but also for in-memory validation.
 
-### II. How is Spec<T> work?
+Which this implementation also helps to have a better biz knowledge organization
+for an application.
+
+### II. How is Spec work?
 
 Which sample above, Re-write it with Spec pattern as below.
 
-1. **Define Disabled Users Spec which including Address.**
+1.  **Define Disabled Users Spec which including Address.**
 
-   ```csharp
-   public class DisabledUserWithAddress : Spec<User>
-   {
-       public override IQueryable<User> Includes(IQueryable<User> query) 
-           => query.Include(u => u.Addresses);
-           
-       public override Expression<Func<User, bool>> ToExpression()
-               => u => u.IsDisabled;
-   }
-   ```
+    ```csharp
+    public class DisabledUserWithAddress : Spec<User>
+    {
+        public override IQueryable<User> Includes(IQueryable<User> query)
+            => query.Include(u => u.Addresses);
 
-2. **Query data for a Spec**
+        public override Expression<Func<User, bool>> ToExpression()
+                => u => u.IsDisabled;
+    }
+    ```
 
-   ```csharp
-   //Get all diabled users including their addesses.
-   var users = dbContext.ForSpec(new DisabledUserWithAddress()).ToList();
-   ```
+2.  **Query data for a Spec**
 
-3. **Verify in memory user whether that user is matched `DisabledUserWithAddress` condition or not.**
+    ```csharp
+    //Get all diabled users including their addesses.
+    var users = dbContext.ForSpec(new DisabledUserWithAddress()).ToList();
+    ```
 
-   ```csharp
-   var isDisabled = new DisabledUserWithAddress().IsSatisfied(user);
-   ```
+3.  **Verify in memory user whether that user is matched**
 
-4. **Spec combinations**
+    `DisabledUserWithAddress` **condition or not.**
+
+    ```csharp
+    var isDisabled = new DisabledUserWithAddress().IsSatisfied(user);
+    ```
+
+4.  **Spec combinations**
 
 The Spec is also supporting a few combinations below:
 
 **NotMe**
 
-Let's say if you want to get all active users in Db? You don't need to create a new one instead just call the `NotMe` method:
+Let's say if you want to get all active users in Db? You don't need to create a
+new one instead just call the `NotMe` method:
 
 ```csharp
     //Get all diabled users including their addesses.
@@ -260,28 +277,31 @@ Let's say if you want to get all active users in Db? You don't need to create a 
 ```
 
 ## Lifecycle Hooks Handling
-There are a few interfaces had added that allow entity aware when it is saved to Db.
 
-1. **`ISavingAwareness` interface**
+There are a few interfaces had added that allow entity aware when it is saved to
+Db.
 
-By Implement this interface to an Entity, the method `OnSaving` will be called right before the entity being saved to Db.
-The use case of this feature allows you to perform all calculation for all computed properties in one place.
-This method will be called before the validation.
+1.  `ISavingAwareness` **interface**
 
-Sample:
+By Implement this interface to an Entity, the method `OnSaving` will be called
+right before the entity being saved to Db. The use case of this feature allows
+you to perform all calculation for all computed properties in one place. This
+method will be called before the validation.
+
+**Use-case 1**: Calculate Age of User when Birthday set
 
 ```csharp
 public class User: BaseEntity, ISavingAwareness
 {
     #region Public Properties
-    public DateTime BirthDay {get;set;}
+    public DateTime? Birthday {get;set;}
     public int Age {get;private set;}
      ...
     #endregion Public Properties
 
     public void OnSaving(EntityState state, DbContext dbContext)
     {
-        if(state == EntityState.Delete)
+        if(state == EntityState.Delete || BirthDay == null)
         {
             //Do some other validation for deleting.
             return;
@@ -289,17 +309,61 @@ public class User: BaseEntity, ISavingAwareness
 
         //Calculate Age for Insert and Update
         var today = DateTime.Today;
-        var birthdate = new DateTime(1996, 01, 01);
         // Calculate the age.
-        var age = today.Year - birthdate.Year;
+        var age = today.Year - Birthday.Value.Year;
         // Go back to the year the person was born in case of a leap year
-        if (birthdate > today.AddYears(-age)) 
+        if (Birthday > today.AddYears(-age))
             age--;
         //Assgin the value to Property
         Age = age;
     }
 }
 ```
+
+**Use-case 2:** Re-Calculate only when property got changed.
+
+In use case 1 the Age property got updated whenever User got changed even
+Birthday is not changed. If the calculation property depends on navigation
+properties the calculation may wrong as the data of the navigation
+properties were not loaded propriety.
+
+In this use case, I would like to propose the other way to calculate the computed
+the property when the related got changed.
+
+Let review the `Payments` and `TotalPayment` of the User as below.
+
+```c#
+ public class User: ISavingAwareness
+ {
+        public virtual HashSet<Payment> Payments { get; private set; }
+
+          [Column(TypeName = "Money")]
+        public decimal TotalPayment { get; private set; }
+
+        public void OnSaving(EntityState state, DbContext dbContext)
+        {
+            if (state == EntityState.Deleted) return;
+
+            if (dbContext.Entry(this).HasChangeOn(i => i.Payments))
+            {
+                TotalPayment = Payments.Any() ? Payments.Sum(i => i.Amount) : 0;
+            }
+        }
+  }
+```
+
+The Total payment property got re-calculated whenever Payments collection has changed. However, we need to ensure the Payments is loaded along with User when making changes. **If not the total amount won't be calculated.**
+
+```c#
+ var user = Db.Set<User>().Include(u => u.Payments).Last();
+
+ //Update user Payment
+ user.Payments.Add(new Payment { Amount = 100 });
+ //Save changes
+ await Db.SaveChangesAsync();
+```
+
+> **Instead of loading all the navigation properties for every Biz action, you should use Spec<T> to load required navigation properties based on the need of the Biz action in order to improve the performance of the application.**
 
 ## Recommendation
 

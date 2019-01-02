@@ -20,7 +20,6 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
                  .Options);
 
             Db.Database.EnsureCreated();
-            UnitTestSetup.Db.SeedData().GetAwaiter().GetResult();
         }
 
         [AssemblyCleanup]

@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using HBD.EntityFrameworkCore.Extensions.Pageable;
 using HBD.EntityFrameworkCore.Extensions.Specification;
 using Remotion.Linq.Clauses;
-using Z.EntityFramework.Plus;
 
 // ReSharper disable CheckNamespace
 namespace Microsoft.EntityFrameworkCore
@@ -19,12 +18,12 @@ namespace Microsoft.EntityFrameworkCore
             Validate(pageIndex, pageSize);
 
             //Catch to improve the performance
-            var totalItems = query.DeferredCount().FutureValue();
+            var totalItems = query.Count();
 
             var itemIndex = pageIndex * pageSize;
             if (itemIndex >= totalItems) itemIndex = totalItems - pageSize; //Get last page.
 
-            var items = pageSize >= totalItems ? query.Future() : query.Skip(itemIndex).Take(pageSize).Future();
+            var items = pageSize >= totalItems ? query : query.Skip(itemIndex).Take(pageSize);
 
             return new Pageable<TEntity>(pageIndex, pageSize, totalItems, items.ToList());
         }
@@ -37,12 +36,12 @@ namespace Microsoft.EntityFrameworkCore
             var oQuery = query.ForPageableSpec(spec);
 
             //Catch to improve the performance
-            var totalItems = oQuery.DeferredCount().FutureValue();
+            var totalItems = oQuery.Count();
 
             var itemIndex = spec.PageIndex * spec.PageSize;
             if (itemIndex >= totalItems) itemIndex = totalItems - spec.PageSize; //Get last page.
 
-            var items = spec.PageSize >= totalItems ? oQuery.Future() : oQuery.Skip(itemIndex).Take(spec.PageSize).Future();
+            var items = spec.PageSize >= totalItems ? oQuery : oQuery.Skip(itemIndex).Take(spec.PageSize);
 
             return new Pageable<TEntity>(spec.PageIndex, spec.PageSize, totalItems, items.ToList());
         }
@@ -53,13 +52,13 @@ namespace Microsoft.EntityFrameworkCore
             Validate(pageIndex, pageSize);
 
             //Catch to improve the performance
-            var totalItems = query.DeferredCount().FutureValue();
+            var totalItems = await query.CountAsync();
 
             var itemIndex = pageIndex * pageSize;
             if (itemIndex < 0) itemIndex = 0; //Get first Page
             if (itemIndex >= totalItems) itemIndex = totalItems - pageSize; //Get last page.
 
-            var items = pageSize >= totalItems ? query.Future() : query.Skip(itemIndex).Take(pageSize).Future();
+            var items = pageSize >= totalItems ? query : query.Skip(itemIndex).Take(pageSize);
 
             return new Pageable<TEntity>(pageIndex, pageSize, totalItems, await items.ToListAsync());
         }
@@ -72,12 +71,12 @@ namespace Microsoft.EntityFrameworkCore
             var oQuery = query.ForPageableSpec(spec);
 
             //Catch to improve the performance
-            var totalItems = oQuery.DeferredCount().FutureValue();
+            var totalItems =await oQuery.CountAsync();
 
             var itemIndex = spec.PageIndex * spec.PageSize;
             if (itemIndex >= totalItems) itemIndex = totalItems - spec.PageSize; //Get last page.
 
-            var items = spec.PageSize >= totalItems ? oQuery.Future() : oQuery.Skip(itemIndex).Take(spec.PageSize).Future();
+            var items = spec.PageSize >= totalItems ? oQuery : oQuery.Skip(itemIndex).Take(spec.PageSize);
 
             return new Pageable<TEntity>(spec.PageIndex, spec.PageSize, totalItems, await items.ToListAsync());
         }

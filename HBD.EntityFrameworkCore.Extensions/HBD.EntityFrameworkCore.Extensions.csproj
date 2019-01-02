@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.2</Version>
+    <Version>1.0.2.1</Version>
     <Copyright>@drunkcoding.net 2019</Copyright>
     <Description>The extensions for EntityFrameworkCore which automate the ModelBuilder registration for Relational Database</Description>
     <PackageLicense>https://opensource.org/licenses/MIT</PackageLicense>
@@ -41,8 +41,6 @@ Version 1.0.0
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.2.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
-    <PackageReference Include="Z.EntityFramework.Plus.QueryDeferred.EFCore" Version="1.7.1" />
-    <PackageReference Include="Z.EntityFramework.Plus.QueryFuture.EFCore" Version="1.7.20" />
   </ItemGroup>
 
 </Project>
