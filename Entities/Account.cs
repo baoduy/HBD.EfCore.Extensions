@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Runtime.CompilerServices;
-using HBD.EntityFrameworkCore.Extensions.Abstractions;
+using HBD.EfCore.Extensions.Abstractions;
 
-[assembly: InternalsVisibleTo("HBD.EntityFrameworkCore.Extensions.Tests")]
+[assembly: InternalsVisibleTo("HBD.EfCore.Extensions.Tests")]
 
 namespace DataLayer
 {

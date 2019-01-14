@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\HBD.EntityFrameworkCore.Extensions\HBD.EntityFrameworkCore.Extensions.csproj" />
+    <ProjectReference Include="..\HBD.EfCore.Extensions\HBD.EfCore.Extensions.csproj" />
   </ItemGroup>
 
   <ItemGroup>

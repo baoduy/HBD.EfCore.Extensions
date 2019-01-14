@@ -138,7 +138,7 @@ namespace DataLayer.Migrations
                     b.ToTable("User");
                 });
 
-            modelBuilder.Entity("HBD.EntityFrameworkCore.Extensions.Internal.EnumTables<DataLayer.EnumStatus>", b =>
+            modelBuilder.Entity("HBD.EfCore.Extensions.Internal.EnumTables<DataLayer.EnumStatus>", b =>
                 {
                     b.Property<int>("Id");
 

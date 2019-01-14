@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using DbContext = HBD.EntityFrameworkCore.Extensions.DbContext;
+using DbContext = HBD.EfCore.Extensions.DbContext;
 
 namespace DataLayer
 {

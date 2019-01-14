@@ -1,5 +1,5 @@
-﻿using HBD.EntityFrameworkCore.Extensions;
-using HBD.EntityFrameworkCore.Extensions.Abstractions;
+﻿using HBD.EfCore.Extensions;
+using HBD.EfCore.Extensions.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;

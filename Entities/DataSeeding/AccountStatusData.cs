@@ -1,4 +1,4 @@
-﻿using HBD.EntityFrameworkCore.Extensions.Configurations;
+﻿using HBD.EfCore.Extensions.Configurations;
 
 namespace DataLayer.DataSeeding
 {

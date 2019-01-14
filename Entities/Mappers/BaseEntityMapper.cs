@@ -1,8 +1,8 @@
 ﻿using System.Runtime.CompilerServices;
-using HBD.EntityFrameworkCore.Extensions.Configurations;
+using HBD.EfCore.Extensions.Configurations;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-[assembly: InternalsVisibleTo("HBD.EntityFrameworkCore.Extensions.Tests")]
+[assembly: InternalsVisibleTo("HBD.EfCore.Extensions.Tests")]
 
 namespace DataLayer.Mappers
 {

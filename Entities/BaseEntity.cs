@@ -1,4 +1,4 @@
-﻿using HBD.EntityFrameworkCore.Extensions.Abstractions;
+﻿using HBD.EfCore.Extensions.Abstractions;
 
 namespace DataLayer
 {
