@@ -92,6 +92,7 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
 
             var list = await UnitTestSetup.Db.ForSpec(new UserAccountStartWithDSpec().NotMe())
                 .AsNoTracking()
+                .Where(u => u.Account.UserName != null)
                 .ToListAsync();
 
             list.Should().NotBeEmpty();
@@ -114,11 +115,13 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
         [TestMethod]
         public async Task TestUserSpecAsync_IncludingAccount()
         {
-            await UnitTestSetup.Db.SeedData();
-            var list = await UnitTestSetup.Db.ForSpec(new UserIncludeAccountSpec()).Where(u => u.Id < 5).ToListAsync();
+            await UnitTestSetup.Db.SeedData(force: true);
 
-            list.Should().NotBeEmpty();
-            list.All(u => u.Account != null).Should().BeTrue();
+            var item = await UnitTestSetup.Db.ForSpec(new UserIncludeAccountSpec())
+                .AsNoTracking().LastOrDefaultAsync();
+
+            item.Should().NotBeNull();
+            item.Account.Should().NotBeNull();
         }
 
         [TestMethod]

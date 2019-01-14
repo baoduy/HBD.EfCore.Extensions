@@ -4,6 +4,7 @@ using DataLayer;
 using FluentAssertions;
 using HBD.EntityFrameworkCore.Extensions.Abstractions;
 using HBD.EntityFrameworkCore.Extensions.Attributes;
+using HBD.Framework.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

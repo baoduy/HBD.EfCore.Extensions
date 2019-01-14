@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
+using HBD.Framework.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace HBD.EntityFrameworkCore.Extensions.Specification
@@ -38,9 +39,7 @@ namespace HBD.EntityFrameworkCore.Extensions.Specification
             var leftExpression = _left.ToExpression();
             var rightExpression = _right.ToExpression();
 
-            var andExpression = Expression.AndAlso(leftExpression.Body, Expression.Invoke(rightExpression, leftExpression.Parameters[0]));
-
-            return Expression.Lambda<Func<T, bool>>(andExpression, leftExpression.Parameters);
+            return leftExpression.And(rightExpression);
         }
 
         #endregion Public Methods

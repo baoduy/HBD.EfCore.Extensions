@@ -9,7 +9,8 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests.TestClasses
 {
     internal class UserAccountStartWithDSpec : Spec<User>
     {
-        public override IQueryable<User> Includes(IQueryable<User> query) => query.Include(i => i.Account);
+        public override IQueryable<User> Includes(IQueryable<User> query) => 
+            query.Include(i => i.Account);
 
         public override Expression<Func<User, bool>> ToExpression() => u => u.Account.UserName.StartsWith("D");
     }

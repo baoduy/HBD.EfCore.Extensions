@@ -4,6 +4,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using DataLayer;
 using FluentAssertions;
+using HBD.Framework.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -40,12 +41,6 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests
             var summary = BenchmarkRunner.Run<TestSpec>();
         }
 
-        [Benchmark]
-        public void Test_ScanClassesWithFilter()
-        {
-            var list = typeof(MyDbContext).Assembly.ScanClassesWithFilter("Mapper").ToList();
-            list.Should().NotBeEmpty();
-        }
         #endregion Public Methods
     }
 }

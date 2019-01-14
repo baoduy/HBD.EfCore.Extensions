@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.2.1</Version>
+    <Version>1.0.3</Version>
     <Copyright>@drunkcoding.net 2019</Copyright>
     <Description>The extensions for EntityFrameworkCore which automate the ModelBuilder registration for Relational Database</Description>
     <PackageLicense>https://opensource.org/licenses/MIT</PackageLicense>
@@ -11,7 +11,9 @@
     <RepositoryUrl>https://github.com/baoduy/HBD.EntityFrameworkCore.Extensions</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>EntityFramework, EntityFrameworkCore, ModelBuilder Automation</PackageTags>
-    <PackageReleaseNotes>Version 1.0.2
+    <PackageReleaseNotes>Version 1.0.3
+- Using HBD.Framework.Extensions and moving Type extractor to HBD.Framework.Extensions.
+Version 1.0.2
 - Add ISavingAwareness interface allows Entity handling the calulation properties before saving to Db.
 - Add more extension method for Specs.
 - Changes Includes method to receive a Iqueryable instead return array of expression.
@@ -38,8 +40,9 @@ Version 1.0.0
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.2.0" />
+    <PackageReference Include="HBD.Framework.Extensions" Version="1.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.2.1" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
   </ItemGroup>
 

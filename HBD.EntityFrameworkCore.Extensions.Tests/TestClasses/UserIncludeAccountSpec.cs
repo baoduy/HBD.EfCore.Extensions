@@ -11,7 +11,8 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests.TestClasses
     {
         #region Public Properties
 
-        public override IQueryable<User> Includes(IQueryable<User> query) => query.Include(u => u.Account);
+        public override IQueryable<User> Includes(IQueryable<User> query) 
+            => query.Include(u => u.Account);
 
         #endregion Public Properties
 

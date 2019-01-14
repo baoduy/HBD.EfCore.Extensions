@@ -5,6 +5,7 @@ using System.Reflection;
 using HBD.EntityFrameworkCore.Extensions.Attributes;
 using HBD.EntityFrameworkCore.Extensions.Internal;
 using HBD.EntityFrameworkCore.Extensions.Options;
+using HBD.Framework.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace HBD.EntityFrameworkCore.Extensions

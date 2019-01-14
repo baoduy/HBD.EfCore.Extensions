@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
+using HBD.Framework.Extensions;
 
 namespace HBD.EntityFrameworkCore.Extensions.Specification
 {
@@ -27,9 +28,7 @@ namespace HBD.EntityFrameworkCore.Extensions.Specification
         public override Expression<Func<T, bool>> ToExpression()
         {
             var expression = _specification.ToExpression();
-            var notExpression = Expression.Not(expression.Body);
-
-            return Expression.Lambda<Func<T, bool>>(notExpression, expression.Parameters);
+            return expression.NotMe();
         }
 
         #endregion Public Methods

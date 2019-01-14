@@ -10,9 +10,9 @@ namespace HBD.EntityFrameworkCore.Extensions.Tests.Helpers
     {
         #region Public Methods
 
-        public static async Task SeedData(this MyDbContext @this, int number = 100)
+        public static async Task SeedData(this MyDbContext @this, int number = 100, bool force = false)
         {
-            if (@this.Set<User>().Count() >= number) return;
+            if (!force && @this.Set<User>().Count() >= number) return;
 
             await @this.Set<User>().AddRangeAsync(GenerateUsers(number));
             await @this.SaveChangesAsync();

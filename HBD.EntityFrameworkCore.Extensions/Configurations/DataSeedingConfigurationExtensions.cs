@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using HBD.EntityFrameworkCore.Extensions.Configurations;
 using HBD.EntityFrameworkCore.Extensions.Options;
+using HBD.Framework.Extensions;
 
 // ReSharper disable CheckNamespace
 namespace Microsoft.EntityFrameworkCore
