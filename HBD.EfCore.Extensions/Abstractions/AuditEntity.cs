@@ -8,16 +8,13 @@ namespace HBD.EfCore.Extensions.Abstractions
         #region Protected Constructors
 
         /// <inheritdoc/>
-        protected AuditEntity(string createdBy) : this(default(TKey), createdBy)
+        protected AuditEntity(string createdBy) : this(default, createdBy)
         {
         }
 
         /// <inheritdoc/>
-        protected AuditEntity(TKey id, string createdBy) : base(id)
-        {
-            CreatedBy = createdBy ?? throw new ArgumentNullException(nameof(createdBy));
-            CreatedOn = DateTimeOffset.Now;
-        }
+        protected AuditEntity(TKey id, string createdBy) : base(id) 
+            => CreatedBy = createdBy ?? throw new ArgumentNullException(nameof(createdBy));
 
         /// <inheritdoc/>
         protected AuditEntity(TKey id) : base(id)
@@ -31,7 +28,7 @@ namespace HBD.EfCore.Extensions.Abstractions
         [MaxLength(256)]
         public string CreatedBy { get; private set; }
 
-        public DateTimeOffset CreatedOn { get; private set; }
+        public DateTimeOffset CreatedOn { get; private set; }=DateTimeOffset.Now;
 
         [MaxLength(256)]
         public string UpdatedBy { get; private set; }
@@ -50,8 +47,12 @@ namespace HBD.EfCore.Extensions.Abstractions
         {
             //If ID is default means the entity is not saved yet.
             //Only Set the value if Id >=0
-            if (KeyComparer.Equals(Id, default(TKey)))
+            if (KeyComparer.Equals(Id, default))
+            {
+                CreatedBy = userName ?? throw new ArgumentNullException(nameof(userName));
+                CreatedOn = DateTimeOffset.Now;
                 return;
+            }
 
             UpdatedBy = userName ?? throw new ArgumentNullException(nameof(userName));
             UpdatedOn = DateTimeOffset.Now;

@@ -16,11 +16,10 @@ namespace Microsoft.EntityFrameworkCore
             int pageSize)
         {
             Validate(pageIndex, pageSize);
+            var itemIndex = pageIndex * pageSize;
 
-            //Catch to improve the performance
             var totalItems = query.Count();
 
-            var itemIndex = pageIndex * pageSize;
             if (itemIndex >= totalItems) itemIndex = totalItems - pageSize; //Get last page.
 
             var items = pageSize >= totalItems ? query : query.Skip(itemIndex).Take(pageSize);
@@ -32,13 +31,13 @@ namespace Microsoft.EntityFrameworkCore
         {
             if (spec == null) throw new ArgumentNullException(nameof(spec));
             Validate(spec.PageIndex, spec.PageSize);
+            var itemIndex = spec.PageIndex * spec.PageSize;
 
             var oQuery = query.ForPageableSpec(spec);
 
             //Catch to improve the performance
             var totalItems = oQuery.Count();
-
-            var itemIndex = spec.PageIndex * spec.PageSize;
+          
             if (itemIndex >= totalItems) itemIndex = totalItems - spec.PageSize; //Get last page.
 
             var items = spec.PageSize >= totalItems ? oQuery : oQuery.Skip(itemIndex).Take(spec.PageSize);
@@ -50,11 +49,11 @@ namespace Microsoft.EntityFrameworkCore
             int pageIndex, int pageSize)
         {
             Validate(pageIndex, pageSize);
+            var itemIndex = pageIndex * pageSize;
 
             //Catch to improve the performance
             var totalItems = await query.CountAsync();
-
-            var itemIndex = pageIndex * pageSize;
+       
             if (itemIndex < 0) itemIndex = 0; //Get first Page
             if (itemIndex >= totalItems) itemIndex = totalItems - pageSize; //Get last page.
 

@@ -1,8 +1,10 @@
-﻿using System;
-using DataLayer;
+﻿using DataLayer;
 using FluentAssertions;
-using HBD.EfCore.Extensions;
+using HBD.EfCore.Extensions.Tests.Helpers;
+using HBD.EfCore.Extensions.Tests.TestClasses;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Linq;
 
 namespace HBD.EfCore.Extensions.Tests
 {
@@ -10,6 +12,36 @@ namespace HBD.EfCore.Extensions.Tests
     public class ExtensionsTests
     {
         #region Public Methods
+
+        [TestMethod]
+        public void Test_GetKeys()
+        {
+            UnitTestSetup.Db.GetKeys<User>().Single()
+                .Should().Be("Id");
+        }
+
+        [TestMethod]
+        public void Test_GetKeys_NotEntity()
+        {
+            UnitTestSetup.Db.GetKeys<UserAccountStartWithDSpec>().Any()
+                .Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void Test_GetKeyValue()
+        {
+            var user = new User(1, "Duy");
+            UnitTestSetup.Db.GetKeyValuesOf<User>(user).Single()
+                .Should().Be(1);
+        }
+
+        [TestMethod]
+        public void Test_GetKeyValue_NotEntity()
+        {
+            var user = new { Id = 1, Name = "Duy" };
+            UnitTestSetup.Db.GetKeyValuesOf<object>(user).Any()
+                .Should().BeFalse();
+        }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]

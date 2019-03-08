@@ -11,7 +11,7 @@ namespace HBD.EfCore.Extensions.Options
         /// </summary>
         /// <param name="entityAssemblies"></param>
         /// <returns></returns>
-        RegistrationInfo FromAssemblies(params Assembly[] entityAssemblies);
+        RegistrationInfo ScanFrom(params Assembly[] entityAssemblies);
 
         #endregion Public Methods
     }

@@ -19,7 +19,7 @@ namespace HBD.EfCore.Extensions
         /// </summary>
         /// <param name="modelBuilder"></param>
         /// <param name="registrations"></param>
-        public static void RegisterStaticDataFrom(this ModelBuilder modelBuilder,
+        internal static void RegisterStaticDataFrom(this ModelBuilder modelBuilder,
             IEnumerable<RegistrationInfo> registrations)
         {
             foreach (var type in registrations.SelectMany(r =>
@@ -31,16 +31,17 @@ namespace HBD.EfCore.Extensions
 
         #region Private Methods
 
+        private static readonly MethodInfo Method = typeof(StaticDataEnumEntityExtensions)
+            .GetMethod(nameof(RegisterStaticDataType), BindingFlags.Static | BindingFlags.NonPublic);
+
         private static void RegisterStaticDataFromEnumType(this ModelBuilder modelBuilder, Type enumType)
         {
             var enumTableType = typeof(EnumTables<>).MakeGenericType(enumType);
-            var method = typeof(StaticDataEnumEntityExtensions).GetMethod(nameof(RegisterStaticDataType),
-                BindingFlags.Static | BindingFlags.NonPublic);
 
-            if (method == null)
+            if (Method == null)
                 throw new ArgumentException($"The {nameof(RegisterStaticDataType)} is not found");
 
-            var md = method.MakeGenericMethod(enumTableType);
+            var md = Method.MakeGenericMethod(enumTableType);
             md.Invoke(null, new object[] { modelBuilder });
         }
 

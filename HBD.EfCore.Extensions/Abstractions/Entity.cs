@@ -10,12 +10,22 @@ namespace HBD.EfCore.Extensions.Abstractions
 {
     public abstract class Entity<TKey> : IConcurrencyEntity<TKey>, IEquatable<Entity<TKey>>
     {
+        #region Private Fields
+
+        private readonly string _internalId;
+
+        #endregion Private Fields
+
         #region Protected Constructors
 
         /// <summary>
-        ///     Constructor for EF Core using for Data Seeding
+        /// Constructor for EF Core using for Data Seeding
         /// </summary>
-        protected Entity(TKey id) => Id = id;
+        protected Entity(TKey id)
+        {
+            Id = id;
+            _internalId = Guid.NewGuid().ToString();
+        }
 
         #endregion Protected Constructors
 
@@ -29,7 +39,7 @@ namespace HBD.EfCore.Extensions.Abstractions
         public virtual TKey Id { get; private set; }
 
         /// <summary>
-        ///     The ConcurrencyCheck which using by EF
+        /// The ConcurrencyCheck which using by EF
         /// </summary>
         [ConcurrencyCheck]
         [Timestamp]
@@ -60,10 +70,14 @@ namespace HBD.EfCore.Extensions.Abstractions
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
-            if (KeyComparer.Equals(Id, default(TKey)) || KeyComparer.Equals(other.Id, default(TKey))) return false;
+            if (KeyComparer.Equals(Id, default) || KeyComparer.Equals(other.Id, default)) return false;
 
             return KeyComparer.Equals(Id, other.Id);
         }
+
+        public override int GetHashCode() => (_internalId != null ? _internalId.GetHashCode() : 0);
+
+        #endregion Public Methods
 
         //public override int GetHashCode()
         //{
@@ -72,25 +86,23 @@ namespace HBD.EfCore.Extensions.Abstractions
         //        return (KeyComparer.GetHashCode(Id) * 397) ^ GetType().Name.GetHashCode();
         //    }
         //}
-
-        #endregion Public Methods
     }
 
     public abstract class Entity : Entity<int>, IConcurrencyEntity
     {
         #region Protected Constructors
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         /// <summary>
-        ///     Constructor for EF Core
+        /// Constructor for EF Core
         /// </summary>
         protected Entity() : this(0)
         {
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         /// <summary>
-        ///     Constructor for EF Core using for Data Seeding
+        /// Constructor for EF Core using for Data Seeding
         /// </summary>
         protected Entity(int id) : base(id < 0 ? 0 : id)
         {

@@ -1,17 +1,46 @@
-﻿using System;
+﻿using HBD.EfCore.Extensions.Attributes;
+using HBD.EfCore.Extensions.Internal;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
-using HBD.EfCore.Extensions.Attributes;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace HBD.EfCore.Extensions
 {
     public static class Extensions
     {
         #region Public Methods
+
+        /// <summary>
+        /// Get Primary Keys of a Entity
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="dbContext"></param>
+        /// <returns></returns>
+        public static IEnumerable<string> GetKeys<TEntity>(this DbContext dbContext)
+            => dbContext.GetKeys(typeof(TEntity));
+
+        public static IEnumerable<string> GetKeys(this DbContext context, Type entityType)
+                    => context.Model.FindEntityType(entityType)?.FindPrimaryKey().Properties.Select(i => i.Name)
+                       ?? new string[0];
+
+        /// <summary>
+        /// Get Primary key value of a Entity
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="context"></param>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public static IEnumerable<object> GetKeyValuesOf<TEntity>(this DbContext context, object entity)
+        {
+            var keys = context.GetKeys<TEntity>();
+
+            foreach (var key in keys)
+                yield return entity.GetType().GetProperty(key)?.GetValue(entity);
+        }
 
         /// <summary>
         /// Update the values from obj for Owned type ONLY. Those properties marked as
@@ -64,79 +93,29 @@ namespace HBD.EfCore.Extensions
 
         #region Internal Methods
 
+        internal static void ConfigModelCreating(this DbContext dbContext,
+                                            ModelBuilder modelBuilder)
+        {
+            if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));
+            if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
+
+            var options = dbContext.GetService<EntityMappingService>()?.EntityMapping;
+            if (options == null) return;
+
+            if (options.Registrations.Count <= 0)
+                options.ScanFrom(dbContext.GetType().Assembly);
+
+            //Register Entities
+            modelBuilder.RegisterEntityMappingFrom(options.Registrations);
+            //Register StaticData Of
+            modelBuilder.RegisterStaticDataFrom(options.Registrations);
+            //Register Data Seeding
+            modelBuilder.RegisterDataSeedingFrom(options.Registrations);
+        }
+
         internal static Type GetEntityType(Type entityMappingType)
                     => entityMappingType.GetInterfaces().First(a => a.IsGenericType).GetGenericArguments().First();
 
         #endregion Internal Methods
-
-        /// <summary>
-        /// Get Property Name of expression
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <typeparam name="TProp"></typeparam>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public static string GetPropName<T, TProp>(this Expression<Func<T, TProp>> action) where T : class
-        {
-            var expression = GetMemberInfo(action);
-            return expression.Member.Name;
-        }
-
-        /// <summary>
-        /// Get Expression member
-        /// </summary>
-        /// <param name="method"></param>
-        /// <returns></returns>
-        private static MemberExpression GetMemberInfo(Expression method)
-        {
-            if (!(method is LambdaExpression lambda))
-                throw new ArgumentNullException(nameof(method));
-
-            MemberExpression memberExpr = null;
-
-            switch (lambda.Body.NodeType)
-            {
-                case ExpressionType.Convert:
-                    memberExpr =
-                        ((UnaryExpression)lambda.Body).Operand as MemberExpression;
-                    break;
-                case ExpressionType.MemberAccess:
-                    memberExpr = lambda.Body as MemberExpression;
-                    break;
-            }
-
-            if (memberExpr == null)
-                throw new ArgumentException(nameof(method));
-
-            return memberExpr;
-        }
-
-        /// <summary>
-        /// Check whether the property value had been Add or Updated
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="this"></param>
-        /// <param name="props"></param>
-        /// <returns></returns>
-        public static bool HasChangeOn<T>(this EntityEntry<T> @this, Expression<Func<T, object>> props) where T : class
-        {
-            var name = props.GetPropName();
-            var prop = @this.Properties.FirstOrDefault(i => i.Metadata.Name == name);
-
-            if (prop != null) return prop.IsModified || @this.State == EntityState.Added;
-
-            var navi = @this.Navigations.FirstOrDefault(n => n.Metadata.Name == name);
-
-            if (navi != null)
-            {
-                if (navi.EntityEntry.State == EntityState.Added)
-                    return true;
-
-                if (!navi.IsLoaded) return false;
-                return navi.IsModified;
-            }
-
-            return @this.State == EntityState.Added;
-        }
     }
 }
