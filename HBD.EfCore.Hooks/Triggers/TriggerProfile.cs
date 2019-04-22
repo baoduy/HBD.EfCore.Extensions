@@ -11,7 +11,7 @@ namespace HBD.EfCore.Hooks.Triggers
         TriggerType TriggerType { get; }
     }
 
-    public abstract class TriggerProfile<T> : ITriggerProfile
+    public abstract class TriggerProfile<T> : ITriggerProfile where T : class
     {
         private readonly TriggerType _triggerType;
         Type ITriggerProfile.EntityType => typeof(T);
@@ -20,9 +20,9 @@ namespace HBD.EfCore.Hooks.Triggers
 
         protected TriggerProfile(TriggerType triggerType) => _triggerType = triggerType;
 
-        internal Task Execute(IReadOnlyCollection<dynamic> entities, TriggerContext context)
-            => Execute(entities.OfType<T>().ToList(), context);
+        internal Task Execute(IEnumerable<dynamic> entities, ITriggerContext context)
+            => Execute(entities.OfType<TriggerEntityState<T>>().ToList(), context);
 
-        protected abstract Task Execute(IReadOnlyCollection<T> entities, TriggerContext context);
+        protected abstract Task Execute(IEnumerable<TriggerEntityState<T>> entities, ITriggerContext context);
     }
 }

@@ -31,7 +31,7 @@ namespace Microsoft.EntityFrameworkCore
 
         private static Type[] GetDataSeedingTypes(this Assembly[] assemblies)
             => assemblies.Extract().Class().NotAbstract().NotGeneric().NotInterface()
-                .IsInstanceOf(typeof(IDataSeedingConfiguration<>)).ToArray();
+                .IsInstanceOf(typeof(IDataSeedingConfiguration<>)).Distinct().ToArray();
 
         private static Type[] GetDataSeedingTypes(this RegistrationInfo @this)
             => GetDataSeedingTypes(@this.EntityAssemblies);

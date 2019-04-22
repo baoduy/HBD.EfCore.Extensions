@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using HBD.EfCore.Extensions.Attributes;
 
 namespace HBD.EfCore.Extensions.Abstractions
@@ -7,7 +8,7 @@ namespace HBD.EfCore.Extensions.Abstractions
     {
         #region Public Properties
 
-        [Key] [IgnoreFromUpdate] TKey Id { get; }
+        [Key, Column(Order = 1)] [IgnoreFromUpdate] TKey Id { get; }
 
         #endregion Public Properties
     }

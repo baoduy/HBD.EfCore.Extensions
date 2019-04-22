@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using HBD.Framework.Extensions;
 
@@ -31,7 +32,7 @@ namespace HBD.EfCore.Hooks
 
         public HookOptions ScanFrom(params Assembly[] assemblies)
         {
-            var types = assemblies.Extract().Class().NotAbstract().IsInstanceOf<IHook>();
+            var types = assemblies.Extract().Class().NotAbstract().IsInstanceOf<IHook>().Distinct();
             HooksTypes.AddRange(types);
 
             return this;

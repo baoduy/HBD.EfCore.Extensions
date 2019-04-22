@@ -1,4 +1,5 @@
 ﻿using HBD.EfCore.Extensions.Abstractions;
+using HBD.EfCore.Extensions.Attributes;
 using HBD.EfCore.Extensions.Configurations;
 using HBD.EfCore.Extensions.Options;
 using HBD.Framework.Extensions;
@@ -40,11 +41,11 @@ namespace Microsoft.EntityFrameworkCore
 
         private static Type[] GetEntityMappingTypes(this Assembly[] assemblies)
             => assemblies.Extract().Class().NotAbstract().NotGeneric().NotInterface()
-                .IsInstanceOf(typeof(IEntityTypeConfiguration<>)).ToArray();
+                .IsInstanceOf(typeof(IEntityTypeConfiguration<>)).Distinct().ToArray();
 
         private static IEnumerable<Type> GetEntityTypes(this Assembly[] assemblies, Expression<Func<Type, bool>> predicate = null)
             => assemblies.Extract().Class().NotAbstract().NotGeneric().NotInterface()
-                .IsInstanceOf(typeof(IEntity<>)).Where(predicate).ToArray();
+                .IsInstanceOf(typeof(IEntity<>)).Where(predicate).Where(t => !t.HasAttribute<IgnoreMapperAttribute>(true)).ToArray();
 
         private static Type GetGenericMapper(Type entityType, IEnumerable<Type> mapperTypes)
         {
@@ -71,7 +72,7 @@ namespace Microsoft.EntityFrameworkCore
         private static IEnumerable<Type> GetMappers(this RegistrationInfo registration)
         {
             var genericMapperFromAssemblies = registration.EntityAssemblies.Extract().Generic().Class()
-                .IsInstanceOf(typeof(IEntityTypeConfiguration<>)).ToArray();
+                .IsInstanceOf(typeof(IEntityTypeConfiguration<>)).Distinct().ToArray();
 
             //There is no DefaultEntityMapperTypes then use the default one.
             if (registration.DefaultEntityMapperTypes == null || !registration.DefaultEntityMapperTypes.Any())

@@ -30,10 +30,10 @@ namespace Microsoft.EntityFrameworkCore
             Action<DbContextOptionsBuilder> dbContextOptions = null,
             int poolSize = 128)
             where TContext : DbContext =>
-            serviceCollection.AddDbContextPool<TContext>((provider, builder) =>
+            serviceCollection.AddDbContextPool<TContext>(builder =>
             {
                 dbContextOptions?.Invoke(builder);
-                builder.BuildDbContextWithHooksOptions(provider, hookOptions);
+                builder.BuildDbContextWithHooksOptions(serviceCollection, hookOptions);
             }, poolSize);
 
 
@@ -54,12 +54,11 @@ namespace Microsoft.EntityFrameworkCore
             ServiceLifetime contextLifetime = ServiceLifetime.Scoped,
             ServiceLifetime optionsLifetime = ServiceLifetime.Scoped)
             where TContext : DbContext =>
-            serviceCollection.AddDbContext<TContext>((provider, builder) =>
-            {
-                dbContextOptions?.Invoke(builder);
-                builder
-                    .BuildDbContextWithHooksOptions(provider, hookOptions);
-            }, contextLifetime, optionsLifetime);
+            serviceCollection.AddDbContext<TContext>(builder =>
+           {
+               dbContextOptions?.Invoke(builder);
+               builder.BuildDbContextWithHooksOptions(serviceCollection, hookOptions);
+           }, contextLifetime, optionsLifetime);
 
         #endregion Public Methods
 
@@ -111,7 +110,7 @@ namespace Microsoft.EntityFrameworkCore
 
         private static SetupOptions BuildDbContextWithHooksOptions(
             this DbContextOptionsBuilder builder,
-            IServiceProvider globalServiceProvider,
+            IServiceCollection globalServiceCollection,
             Action<SetupOptions> hookOptions)
         {
             var setupOptions = new SetupOptions();
@@ -128,8 +127,8 @@ namespace Microsoft.EntityFrameworkCore
 
             if (setupOptions.Trigger)
             {
-                builder.AddServices(sv => sv.UseTrigger(setupOptions.Assemblies));
-                builder.AddServices(sv => sv.AddSingleton(new TriggerContext(globalServiceProvider)));
+                //builder.AddServices(sv => sv.UseTriggerProfiles(setupOptions.Assemblies));
+                globalServiceCollection.UseTriggerProfiles(setupOptions.Assemblies);
                 builder.UseHooks(op => op.Add<TriggerHook>());
             }
 

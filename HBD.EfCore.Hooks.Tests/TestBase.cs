@@ -1,4 +1,5 @@
 using System;
+using HBD.EfCore.Hooks.Tests.Providers;
 using HBD.TestHelper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,7 +17,7 @@ namespace HBD.EfCore.Hooks.Tests
         {
             var coll = new ServiceCollection()
                 .AddDbContextWithHooks<TestHookDbContext>(
-                    hooks => hooks.UseTrigger(),
+                    hooks => hooks.UseTrigger().ScanFrom(typeof(Dummy).Assembly),
                     op =>
                         op.UseSqliteMemory()
                             .UseDebugLogger());

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using DataLayer;
 using DataLayer.Mappers;
@@ -171,6 +172,20 @@ namespace HBD.EfCore.Extensions.Tests
         }
 
         [TestMethod]
+        public async Task TestEnumStatus1DataSeeding()
+        {
+            using (var db = new MyDbContext(new DbContextOptionsBuilder()
+                .UseSqliteMemory()
+                //No Assembly provided it will scan the MyDbContext assembly.
+                .UseAutoConfigModel()
+                .Options))
+            {
+                await db.Database.EnsureCreatedAsync();
+                (await db.Set<EnumTables<EnumStatus1>>().CountAsync()).Should().Be(3);
+            }
+        }
+
+        [TestMethod]
         [Ignore]
         [ExpectedException(typeof(ArgumentException))]
         public void TestWithCustomEntityMapper_Bad()
@@ -194,6 +209,21 @@ namespace HBD.EfCore.Extensions.Tests
                 .UseAutoConfigModel(op =>
                     op.ScanFrom(typeof(MyDbContext).Assembly).WithFilter(null))
                 .Options);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void TestIgnoredEntity()
+        {
+            var db = new MyDbContext(new DbContextOptionsBuilder()
+                .UseSqliteMemory()
+                .UseAutoConfigModel(op =>
+                    op.ScanFrom(typeof(MyDbContext).Assembly))
+                .Options);
+
+            db.Database.EnsureCreated();
+
+            var list = db.Set<IgnoredAutoMapperEntity>().ToList();
         }
 
         #endregion Public Methods

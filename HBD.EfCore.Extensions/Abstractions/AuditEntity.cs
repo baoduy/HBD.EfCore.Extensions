@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HBD.EfCore.Extensions.Abstractions
 {
@@ -8,16 +9,15 @@ namespace HBD.EfCore.Extensions.Abstractions
         #region Protected Constructors
 
         /// <inheritdoc/>
-        protected AuditEntity(string createdBy) : this(default, createdBy)
-        {
-        }
-
-        /// <inheritdoc/>
-        protected AuditEntity(TKey id, string createdBy) : base(id) 
+        protected AuditEntity(TKey id, string createdBy) : base(id)
             => CreatedBy = createdBy ?? throw new ArgumentNullException(nameof(createdBy));
 
         /// <inheritdoc/>
         protected AuditEntity(TKey id) : base(id)
+        {
+        }
+
+        protected AuditEntity()
         {
         }
 
@@ -26,13 +26,17 @@ namespace HBD.EfCore.Extensions.Abstractions
         #region Public Properties
 
         [MaxLength(256)]
+        [Column(Order = 996)]
         public string CreatedBy { get; private set; }
 
-        public DateTimeOffset CreatedOn { get; private set; }=DateTimeOffset.Now;
+        [Column(Order = 997)]
+        public DateTimeOffset CreatedOn { get; private set; } = DateTimeOffset.Now;
 
         [MaxLength(256)]
+        [Column(Order = 998)]
         public string UpdatedBy { get; private set; }
 
+        [Column(Order = 999)]
         public DateTimeOffset? UpdatedOn { get; private set; }
 
         #endregion Public Properties
@@ -65,17 +69,17 @@ namespace HBD.EfCore.Extensions.Abstractions
     {
         #region Protected Constructors
 
-        /// <inheritdoc/>
-        protected AuditEntity(string createdBy) : base(createdBy)
-        {
-        }
-
         protected AuditEntity(int id, string createdBy) : base(id, createdBy)
         {
         }
 
         /// <inheritdoc/>
-        protected AuditEntity() : base(0)
+        protected AuditEntity(int id) : base(id)
+        {
+        }
+
+        /// <inheritdoc/>
+        protected AuditEntity()
         {
         }
 

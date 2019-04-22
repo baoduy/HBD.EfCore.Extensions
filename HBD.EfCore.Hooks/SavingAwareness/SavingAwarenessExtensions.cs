@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace HBD.EfCore.Hooks.SavingAwareness
 {
@@ -30,14 +31,14 @@ namespace HBD.EfCore.Hooks.SavingAwareness
         /// <param name="this"></param>
         /// <param name="props"></param>
         /// <returns></returns>
-        public static bool HasChangeOn<T>(this EntityEntry<T> @this, Expression<Func<T, object>> props) where T : class
+        public static bool HasAddedOrChangedOn<T>(this EntityEntry<T> @this, Expression<Func<T, object>> props) where T : class
         {
-            var name = props.GetPropName();
-            var prop = @this.Properties.FirstOrDefault(i => i.Metadata.Name == name);
+            var property = props.GetPropertyAccess();
+            var prop = @this.Properties.FirstOrDefault(i => i.Metadata.Name == property.Name);
 
             if (prop != null) return prop.IsModified || @this.State == EntityState.Added;
 
-            var navigation = @this.Navigations.FirstOrDefault(n => n.Metadata.Name == name);
+            var navigation = @this.Navigations.FirstOrDefault(n => n.Metadata.Name == property.Name);
 
             if (navigation == null) return @this.State == EntityState.Added;
 

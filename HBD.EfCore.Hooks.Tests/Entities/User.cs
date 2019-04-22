@@ -43,7 +43,7 @@ namespace HBD.EfCore.Hooks.Tests.Entities
 
             if (state == EntityState.Deleted) return Task.CompletedTask;
 
-            if (dbContext.Entry(this).HasChangeOn(i => i.Payments))
+            if (dbContext.Entry(this).HasAddedOrChangedOn(i => i.Payments))
             {
                 TotalPaymentCalculated = true;
                 TotalPayment = Payments.Any() ? Payments.Sum(i => i.Amount) : 0;

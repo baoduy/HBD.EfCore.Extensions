@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using HBD.EfCore.Extensions.Configurations;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 [assembly: InternalsVisibleTo("HBD.EfCore.Extensions.Tests")]
@@ -19,9 +20,10 @@ namespace DataLayer.Mappers
         public override void Configure(EntityTypeBuilder<T> builder)
         {
             Called = true;
+
             base.Configure(builder);
             builder.HasIndex(c => c.Id).IsUnique();
-            builder.Property(c => c.Id).ValueGeneratedOnAdd();
+            builder.Property(c => c.Id).UseSqlServerIdentityColumn();
         }
 
         #endregion Public Methods

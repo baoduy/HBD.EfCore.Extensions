@@ -10,21 +10,24 @@ namespace HBD.EfCore.Hooks.Tests.Providers
     {
         public bool HasEntity { get; private set; }
         public bool HasServiceProvider { get; private set; }
-        public bool Called { get; private set; }
+        public bool HasFirstNameChanged { get; private set; }
+        public int Called { get; private set; }
 
         public void Reset()
         {
-            Called = false;
+            Called = 0;
             HasEntity = false;
             HasServiceProvider = false;
         }
 
-        protected override Task Execute(IReadOnlyCollection<User> entities, TriggerContext context)
+        protected override Task Execute(IEnumerable<TriggerEntityState<User>> entities, ITriggerContext context)
         {
-            Called = true;
+            Called += 1;
 
             HasEntity = entities.Any();
             HasServiceProvider = context.ServiceProvider != null;
+            HasFirstNameChanged = entities.Any(e => e.HasChangedOn(t => t.FirstName));
+
             return Task.CompletedTask;
         }
 

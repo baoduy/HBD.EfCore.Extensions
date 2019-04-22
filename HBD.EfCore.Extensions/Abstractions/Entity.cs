@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
+using HBD.EfCore.Extensions.Attributes;
 
 [assembly: InternalsVisibleTo("HBD.EfCore.Extensions.Tests")]
 
@@ -17,6 +18,7 @@ namespace HBD.EfCore.Extensions.Abstractions
         #endregion Private Fields
 
         #region Protected Constructors
+        protected Entity() => _internalId = Guid.NewGuid().ToString();
 
         /// <summary>
         /// Constructor for EF Core using for Data Seeding
@@ -34,20 +36,32 @@ namespace HBD.EfCore.Extensions.Abstractions
         public static EqualityComparer<TKey> KeyComparer => EqualityComparer<TKey>.Default;
 
         // ReSharper disable once UnusedAutoPropertyAccessor.Local
-        [Key]
+        [Key, Column(Order = 0)]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public virtual TKey Id { get; private set; }
+        [IgnoreFromUpdate]
+        public virtual TKey Id
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         /// The ConcurrencyCheck which using by EF
         /// </summary>
         [ConcurrencyCheck]
         [Timestamp]
+        [Column(Order = 1000)]
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         // ReSharper disable once UnusedAutoPropertyAccessor.Local
         public byte[] RowVersion { get; private set; }
 
         #endregion Public Properties
+
+        /// <summary>
+        /// Set Id to the primary key
+        /// </summary>
+        /// <param name="id"></param>
+        protected void SetId(TKey id) => Id = id;
 
         #region Public Methods
 
@@ -78,14 +92,6 @@ namespace HBD.EfCore.Extensions.Abstractions
         public override int GetHashCode() => (_internalId != null ? _internalId.GetHashCode() : 0);
 
         #endregion Public Methods
-
-        //public override int GetHashCode()
-        //{
-        //    unchecked
-        //    {
-        //        return (KeyComparer.GetHashCode(Id) * 397) ^ GetType().Name.GetHashCode();
-        //    }
-        //}
     }
 
     public abstract class Entity : Entity<int>, IConcurrencyEntity
@@ -96,7 +102,7 @@ namespace HBD.EfCore.Extensions.Abstractions
         /// <summary>
         /// Constructor for EF Core
         /// </summary>
-        protected Entity() : this(0)
+        protected Entity()
         {
         }
 
@@ -104,7 +110,7 @@ namespace HBD.EfCore.Extensions.Abstractions
         /// <summary>
         /// Constructor for EF Core using for Data Seeding
         /// </summary>
-        protected Entity(int id) : base(id < 0 ? 0 : id)
+        protected Entity(int id) : base(id)
         {
         }
 

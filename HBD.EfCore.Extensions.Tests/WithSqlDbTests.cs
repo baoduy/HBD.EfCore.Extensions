@@ -1,8 +1,8 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using DataLayer;
+﻿using DataLayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HBD.EfCore.Extensions.Tests
 {
@@ -11,47 +11,92 @@ namespace HBD.EfCore.Extensions.Tests
     {
         #region Private Fields
 
-        private const string ConnectionString =
-            "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=TestDb;Integrated Security=True;Connect Timeout=30;";
+        public const string ConnectionString =
+            "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=Hbd.EfCore.Test;Integrated Security=True;Connect Timeout=30;";
 
         #endregion Private Fields
+
+        private MyDbContext db;
+
+        [TestInitialize]
+        public void Setup()
+        {
+            db = new MyDbContext(new DbContextOptionsBuilder()
+                .UseSqlServer(ConnectionString)
+                .UseAutoConfigModel(op => op.ScanFrom(typeof(MyDbContext).Assembly))
+                .Options);
+
+            db.Database.EnsureCreated();
+        }
+
+        [TestCleanup]
+        public void CleanUp()
+        {
+            db.Database.EnsureDeleted();
+            db.Dispose();
+        }
 
         #region Public Methods
 
         [TestMethod]
-        public async Task TestAsync()
+        public async Task Test_Create_WithSqlDb_Async()
         {
-            using (var db = new MyDbContext(new DbContextOptionsBuilder()
-                .UseSqlServer(ConnectionString)
-                .UseAutoConfigModel(op => op.ScanFrom(typeof(MyDbContext).Assembly))
-                .Options))
+            //Create User with Address
+            db.Set<User>().Add(new User("Duy")
             {
-                await db.Database.EnsureCreatedAsync();
-
-                //Create User with Address
-                await db.Set<User>().AddAsync(new User("Duy")
-                {
-                    FirstName = "Duy",
-                    LastName = "Hoang",
-                    Addresses =
+                FirstName = "Duy",
+                LastName = "Hoang",
+                Addresses =
                     {
                         new Address
                         {
                             Street = "12"
                         }
                     }
-                });
+            });
 
-                await db.SaveChangesAsync();
+            var count = await db.SaveChangesAsync();
+            Assert.IsTrue(count >= 1);
 
-                var users = await db.Set<User>().ToListAsync();
+            var users = await db.Set<User>().ToListAsync();
 
-                await db.Database.EnsureDeletedAsync();
+            Assert.IsTrue(users.Count >= 1);
+            Assert.IsTrue(users.All(u => u.RowVersion != null));
+        }
 
-                Assert.IsTrue(users.Count == 1);
+        [TestMethod]
+        public async Task Test_Update_WithSqlDb_Async()
+        {
+            await Test_Create_WithSqlDb_Async();
 
-                Assert.IsTrue(users.All(u => u.RowVersion != null));
-            }
+            var user = await db.Set<User>().LastAsync();
+
+            user.FirstName = "Steven";
+            user.Addresses.Last().Street = "Steven Street";
+
+            await db.SaveChangesAsync();
+
+            user = await db.Set<User>().LastAsync();
+
+            Assert.IsTrue(user.FirstName == "Steven");
+
+            Assert.IsTrue(user.Addresses.Last().Street == "Steven Street");
+        }
+
+        [TestMethod]
+        public async Task Test_Delete_WithSqlDb_Async()
+        {
+            await Test_Create_WithSqlDb_Async();
+
+            var user = await db.Set<User>().LastAsync();
+
+            db.Remove(user);
+
+            await db.SaveChangesAsync();
+
+            var count = await db.Set<User>().CountAsync(u => u.Id == user.Id);
+
+            Assert.IsTrue(count == 0);
         }
 
         #endregion Public Methods

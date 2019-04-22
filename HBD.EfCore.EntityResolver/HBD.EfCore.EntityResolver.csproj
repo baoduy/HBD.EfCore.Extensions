@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <Description>The helper to load reference entity for Model based on linking primary key or models.</Description>
     <Copyright>@drunkcoding.net 2019</Copyright>
-    <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/baoduy/HBD.EfCore.Extensions</PackageProjectUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/baoduy/Images/master/NugetLogo.PNG</PackageIconUrl>
     <RepositoryUrl>https://github.com/baoduy/HBD.EfCore.Extensions</RepositoryUrl>
@@ -12,9 +12,10 @@
     <PackageTags>EntityFrameworkCore, ModelBuilder Automation</PackageTags>
     <PackageReleaseNotes>Version 1.0.0
 - The first version of HBD.EfCore.EntityResolver</PackageReleaseNotes>
-    <Version>1.0.0-beta07</Version>
+    <Version>1.0.0.3</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <LangVersion>7.3</LangVersion>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -23,8 +24,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="8.0.0" />
-    <PackageReference Include="HBD.EfCore.Extensions" Version="1.2.0-beta01" />
+    <PackageReference Include="AutoMapper" Version="7.0.1" />
+    <PackageReference Include="HBD.EfCore.Extensions" Version="1.2.0.6" />
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.11" />
   </ItemGroup>
 

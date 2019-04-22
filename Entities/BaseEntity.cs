@@ -2,7 +2,7 @@
 
 namespace DataLayer
 {
-    public abstract class BaseEntity : AuditEntity<int>
+    public abstract class BaseEntity : AuditEntity
     {
         #region Protected Constructors
 
@@ -17,7 +17,7 @@ namespace DataLayer
         }
 
         /// <inheritdoc/>
-        protected BaseEntity():base(0)
+        protected BaseEntity()
         {
         }
 

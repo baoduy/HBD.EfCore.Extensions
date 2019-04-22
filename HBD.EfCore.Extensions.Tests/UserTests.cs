@@ -55,6 +55,12 @@ namespace HBD.EfCore.Extensions.Tests
             UnitTestSetup.Db.ChangeTracker.AutoDetectChangesEnabled.Should().BeTrue();
         }
 
+        [TestMethod]
+        public void Created_User_Id_ShouldBe_Zero()
+        {
+            var user = new User();
+            user.Id.Should().Be(0);
+        }
         #endregion Public Methods
     }
 }

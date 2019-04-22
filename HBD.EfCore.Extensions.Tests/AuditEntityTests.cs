@@ -17,6 +17,7 @@ namespace HBD.EfCore.Extensions.Tests
 
             user.UpdatedBy.Should().BeNullOrEmpty();
             user.UpdatedOn.Should().BeNull();
+            user.Id.Should().Be(0);
         }
 
         [TestMethod]
@@ -27,6 +28,7 @@ namespace HBD.EfCore.Extensions.Tests
 
             user.UpdatedBy.Should().Be("Hoang");
             user.UpdatedOn.Should().NotBeNull();
+            user.Id.Should().Be(1);
         }
 
         #endregion Public Methods
