@@ -9,8 +9,11 @@ namespace HBD.EfCore.Extensions.Abstractions
         #region Protected Constructors
 
         /// <inheritdoc/>
-        protected AuditEntity(TKey id, string createdBy) : base(id)
-            => CreatedBy = createdBy ?? throw new ArgumentNullException(nameof(createdBy));
+        protected AuditEntity(TKey id, string createdBy, DateTimeOffset? createdOn = null) : base(id)
+        {
+            CreatedBy = createdBy ?? throw new ArgumentNullException(nameof(createdBy));
+            CreatedOn = createdOn ?? DateTimeOffset.Now;
+        }
 
         /// <inheritdoc/>
         protected AuditEntity(TKey id) : base(id)
@@ -30,7 +33,7 @@ namespace HBD.EfCore.Extensions.Abstractions
         public string CreatedBy { get; private set; }
 
         [Column(Order = 997)]
-        public DateTimeOffset CreatedOn { get; private set; } = DateTimeOffset.Now;
+        public DateTimeOffset CreatedOn { get; private set; }
 
         [MaxLength(256)]
         [Column(Order = 998)]
@@ -69,7 +72,7 @@ namespace HBD.EfCore.Extensions.Abstractions
     {
         #region Protected Constructors
 
-        protected AuditEntity(int id, string createdBy) : base(id, createdBy)
+        protected AuditEntity(int id, string createdBy, DateTimeOffset? createdOn = null) : base(id, createdBy, createdOn)
         {
         }
 

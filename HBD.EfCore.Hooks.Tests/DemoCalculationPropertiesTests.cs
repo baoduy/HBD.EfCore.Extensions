@@ -38,14 +38,17 @@ namespace HBD.EfCore.Hooks.Tests
             var db = GetService<TestHookDbContext>();
 
             var user = db.Set<User>().Last();
+
             //Reset Checking state of User
             user.Reset();
+
             //Ensure TotalPaymentCalculated = false
             user.TotalPaymentCalculated.Should().BeFalse();
             user.TotalPayment.Should().Be(100);
 
             //Save changes
             await db.SaveChangesAsync();
+
             //the calculation of TotalPayment should not be performed.
             user.TotalPaymentCalculated.Should().BeFalse();
             user.TotalPayment.Should().Be(100);
@@ -64,15 +67,16 @@ namespace HBD.EfCore.Hooks.Tests
             //Ensure TotalPaymentCalculated = false
             user.TotalPaymentCalculated.Should().BeFalse();
             user.TotalPayment.Should().Be(100);
-           
+
             //Update user Payment
-            user.Payments.Add(new Payment { Amount = 100 });
+            user.AddPayment(new Payment { Amount = 100 });
+
             //Save changes
             await db.SaveChangesAsync();
 
             //the calculation of TotalPayment should not be performed.
+            user.TotalPayment.Should().Be(user.Payments.Sum(i => i.Amount));
             user.TotalPaymentCalculated.Should().BeTrue();
-            user.TotalPayment.Should().Be(200);
         }
 
         #endregion Public Methods

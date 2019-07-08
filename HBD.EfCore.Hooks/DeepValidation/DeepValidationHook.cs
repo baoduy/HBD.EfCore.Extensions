@@ -11,6 +11,10 @@ namespace HBD.EfCore.Hooks.DeepValidation
 {
     public sealed class DeepValidationHook : Hook
     {
+        private readonly SetupOptions _options;
+
+        public DeepValidationHook(SetupOptions options) => _options = options;
+
         /// <summary>
         /// Disable DeepValidationHook
         /// </summary>
@@ -38,7 +42,7 @@ namespace HBD.EfCore.Hooks.DeepValidation
                     var valContext = new ValidationContext(entity, valProvider, null);
                     errors.Clear();
 
-                    if (!Validator.TryValidateObject(entity, valContext, errors, true))
+                    if (!Validator.TryValidateObject(entity, valContext, errors, _options.ValidateAllProperties))
                         status.AddRange(errors);
                 }
             }

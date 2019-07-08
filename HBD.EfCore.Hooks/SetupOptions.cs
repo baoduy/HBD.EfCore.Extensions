@@ -8,10 +8,11 @@ namespace HBD.EfCore.Hooks
     {
         internal bool DeepValidation { get; private set; } = true;
         internal bool SavingAwareness { get; private set; } = true;
+        internal bool ValidateAllProperties { get; private set; } = false;
         internal bool Trigger { get; private set; } = false;
         internal Assembly[] Assemblies { get; private set; }
 
-        public SetupOptions UseDeepValidation(bool flag = true)
+        public SetupOptions UseDeepValidation(bool flag = true,bool validateAllProperties = true)
         {
             DeepValidation = flag;
             return this;

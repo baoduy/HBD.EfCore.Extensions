@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.1</Version>
+    <Version>1.0.1.1</Version>
     <Authors>Duy Hoang</Authors>
     <Company>drunkcoding.net</Company>
     <Description>The libray allow to listening event of OnSaving and OnSaved from EfCore</Description>
@@ -29,7 +29,7 @@ Version 1.0.0
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HBD.Framework.Extensions" Version="1.0.1" />
+    <PackageReference Include="HBD.Framework.Extensions" Version="1.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.0" />
   </ItemGroup>
 

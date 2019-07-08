@@ -116,6 +116,8 @@ namespace Microsoft.EntityFrameworkCore
             var setupOptions = new SetupOptions();
             hookOptions.Invoke(setupOptions);
 
+            builder.AddServices(op => op.AddSingleton(setupOptions));
+
             if (setupOptions.Assemblies == null)
                 setupOptions.ScanFrom(builder.Options.ContextType.Assembly);
 

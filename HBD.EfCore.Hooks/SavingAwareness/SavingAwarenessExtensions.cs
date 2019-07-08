@@ -31,7 +31,7 @@ namespace HBD.EfCore.Hooks.SavingAwareness
         /// <param name="this"></param>
         /// <param name="props"></param>
         /// <returns></returns>
-        public static bool HasAddedOrChangedOn<T>(this EntityEntry<T> @this, Expression<Func<T, object>> props) where T : class
+        public static bool IsAddedOrHasChangedOn<T>(this EntityEntry<T> @this, Expression<Func<T, object>> props) where T : class
         {
             var property = props.GetPropertyAccess();
             var prop = @this.Properties.FirstOrDefault(i => i.Metadata.Name == property.Name);

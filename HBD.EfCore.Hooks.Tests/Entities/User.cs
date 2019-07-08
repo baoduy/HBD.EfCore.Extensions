@@ -28,14 +28,23 @@ namespace HBD.EfCore.Hooks.Tests.Entities
         public int SavingCalled { get; private set; }
 
         [Column(TypeName = "Money")] public decimal TotalPayment { get; private set; }
+
         [NotMapped] public bool TotalPaymentCalculated { get; private set; }
 
         [NotMapped]
         public bool Validated { get; private set; }
 
+        public DateTime UpdatedOn { get; set; }
         #endregion Public Properties
 
         #region Public Methods
+
+        public void AddPayment(Payment payment)
+        {
+            this.Payments.Add(payment);
+            //Trigger the changes for this
+            UpdatedOn = DateTime.Now;
+        }
 
         public Task OnSavingAsync(EntityState state, DbContext dbContext)
         {
@@ -43,7 +52,7 @@ namespace HBD.EfCore.Hooks.Tests.Entities
 
             if (state == EntityState.Deleted) return Task.CompletedTask;
 
-            if (dbContext.Entry(this).HasAddedOrChangedOn(i => i.Payments))
+            if (dbContext.Entry(this).IsAddedOrHasChangedOn(i => i.Payments))
             {
                 TotalPaymentCalculated = true;
                 TotalPayment = Payments.Any() ? Payments.Sum(i => i.Amount) : 0;

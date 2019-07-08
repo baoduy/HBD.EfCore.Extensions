@@ -110,7 +110,11 @@ namespace HBD.EfCore.Hooks
         /// <param name="dbContext"></param>
         /// <returns></returns>
         private static IReadOnlyCollection<TriggerEntityState> GetChangedEntities(this DbContext dbContext) =>
-            dbContext.ChangeTracker.Entries().Where(e => e.State != EntityState.Detached).Select(e =>
+            dbContext.ChangeTracker.Entries()
+                .Where(e => e.State == EntityState.Added
+                            || e.State == EntityState.Modified
+                            || e.State == EntityState.Deleted)
+                .Select(e =>
             {
                 var props = e.GetChangedProperties();
                 return new TriggerEntityState(e.Entity, props, e.Metadata.ClrType, e.State);

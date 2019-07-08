@@ -43,6 +43,8 @@ namespace HBD.EfCore.Hooks.Triggers
 
         private static async Task ExecuteAsync(IReadOnlyCollection<TriggerEntityState> entities)
         {
+            if (entities.Count <= 0) return;
+
             if (Context == null)
                 throw new InvalidOperationException(nameof(TriggerContext));
 
@@ -88,7 +90,7 @@ namespace HBD.EfCore.Hooks.Triggers
                         entities.Where(e => e.State == EntityState.Deleted).GetTriggerEntity(rule.EntityType));
             }
 
-            return ((dynamic)rule).Execute(final, context);
+            return final.Any() ? (Task) ((dynamic)rule).Execute(final, context) : Task.CompletedTask;
         }
 
         #endregion Private Methods
