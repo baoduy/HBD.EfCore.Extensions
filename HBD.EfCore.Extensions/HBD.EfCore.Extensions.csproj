@@ -11,7 +11,9 @@
     <RepositoryUrl>https://github.com/baoduy/HBD.EfCore.Extensions</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>EntityFrameworkCore, ModelBuilder Automation</PackageTags>
-    <PackageReleaseNotes>Version 1.2.4
+    <PackageReleaseNotes>Version 1.2.5
+- Add Guid Entities
+Version 1.2.4
 -   Allow set CreatedOn when creating entity.
 Version 1.2.3
 -   Allow to define Table name and Schema of Static Data
@@ -51,8 +53,11 @@ Version 1.0.0
     <PackageId>HBD.EfCore.Extensions</PackageId>
     <Authors>HBD.EfCore.Extensions</Authors>
     <Product>HBD.EfCore.Extensions</Product>
-    <PackageLicenseUrl></PackageLicenseUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageVersion>1.2.5</PackageVersion>
+    <Owners>Duy HHoang</Owners>
+    <Summary>The extensions for EntityFrameworkCore which automate the ModelBuilder registration for Relational Database</Summary>
+    <Title>HBD.EfCore.Extensions</Title>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -62,8 +67,8 @@ Version 1.0.0
 
   <ItemGroup>
     <PackageReference Include="HBD.Framework.Extensions" Version="1.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.2.6" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
   </ItemGroup>
 

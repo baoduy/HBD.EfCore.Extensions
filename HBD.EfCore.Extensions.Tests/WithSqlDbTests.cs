@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace HBD.EfCore.Extensions.Tests
@@ -11,8 +12,10 @@ namespace HBD.EfCore.Extensions.Tests
     {
         #region Private Fields
 
-        public const string ConnectionString =
-            "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=Hbd.EfCore.Test;Integrated Security=True;Connect Timeout=30;";
+        public static string ConnectionString =>
+             RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ?
+            "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=Hbd.EfCore.Test;Integrated Security=True;Connect Timeout=30;" :
+            "Data Source=localhost;Initial Catalog=CodesERP;User Id=sa;Password=Pass@word1;";
 
         #endregion Private Fields
 
@@ -26,7 +29,7 @@ namespace HBD.EfCore.Extensions.Tests
                 .UseAutoConfigModel(op => op.ScanFrom(typeof(MyDbContext).Assembly))
                 .Options);
 
-            db.Database.EnsureCreated();
+            db.Database.Migrate();
         }
 
         [TestCleanup]

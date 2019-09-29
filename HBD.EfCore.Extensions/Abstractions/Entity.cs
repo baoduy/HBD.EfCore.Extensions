@@ -9,6 +9,10 @@ using HBD.EfCore.Extensions.Attributes;
 
 namespace HBD.EfCore.Extensions.Abstractions
 {
+    /// <summary>
+    /// Abstract Entity with Key definition paramter.
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
     public abstract class Entity<TKey> : IConcurrencyEntity<TKey>, IEquatable<Entity<TKey>>
     {
         #region Private Fields
@@ -94,6 +98,9 @@ namespace HBD.EfCore.Extensions.Abstractions
         #endregion Public Methods
     }
 
+    /// <summary>
+    /// Default base Entity with Id is int.
+    /// </summary>
     public abstract class Entity : Entity<int>, IConcurrencyEntity
     {
         #region Protected Constructors
@@ -111,6 +118,32 @@ namespace HBD.EfCore.Extensions.Abstractions
         /// Constructor for EF Core using for Data Seeding
         /// </summary>
         protected Entity(int id) : base(id)
+        {
+        }
+
+        #endregion Protected Constructors
+    }
+
+    /// <summary>
+    /// The Base Entity with Id is Guid
+    /// </summary>
+    public abstract class EntityGuid : Entity<Guid>, IConcurrencyEntity<Guid>
+    {
+        #region Protected Constructors
+
+        /// <inheritdoc/>
+        /// <summary>
+        /// Constructor for EF Core
+        /// </summary>
+        protected EntityGuid() : this(Guid.NewGuid())
+        {
+        }
+
+        /// <inheritdoc/>
+        /// <summary>
+        /// Constructor for EF Core using for Data Seeding
+        /// </summary>
+        protected EntityGuid(Guid id) : base(id)
         {
         }
 

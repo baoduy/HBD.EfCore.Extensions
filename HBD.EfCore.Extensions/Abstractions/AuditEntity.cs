@@ -88,4 +88,26 @@ namespace HBD.EfCore.Extensions.Abstractions
 
         #endregion Protected Constructors
     }
+
+    public abstract class AuditEntityGuid : AuditEntity<Guid>, IAuditEntity<Guid>
+    {
+        #region Protected Constructors
+
+        protected AuditEntityGuid(Guid id, string createdBy, DateTimeOffset? createdOn = null)
+            : base(id, createdBy, createdOn)
+        {
+        }
+
+        /// <inheritdoc/>
+        protected AuditEntityGuid(Guid id) : base(id)
+        {
+        }
+
+        /// <inheritdoc/>
+        protected AuditEntityGuid() : base(Guid.NewGuid())
+        {
+        }
+
+        #endregion Protected Constructors
+    }
 }
