@@ -10,18 +10,19 @@ using HBD.EfCore.Extensions.Attributes;
 namespace HBD.EfCore.Extensions.Abstractions
 {
     /// <summary>
-    /// Abstract Entity with Key definition paramter.
+    /// Abstract Entity with Key definition parameter.
     /// </summary>
     /// <typeparam name="TKey"></typeparam>
     public abstract class Entity<TKey> : IConcurrencyEntity<TKey>, IEquatable<Entity<TKey>>
     {
-        #region Private Fields
+        #region Fields
 
         private readonly string _internalId;
 
-        #endregion Private Fields
+        #endregion Fields
 
-        #region Protected Constructors
+        #region Constructors
+
         protected Entity() => _internalId = Guid.NewGuid().ToString();
 
         /// <summary>
@@ -33,9 +34,9 @@ namespace HBD.EfCore.Extensions.Abstractions
             _internalId = Guid.NewGuid().ToString();
         }
 
-        #endregion Protected Constructors
+        #endregion Constructors
 
-        #region Public Properties
+        #region Properties
 
         public static EqualityComparer<TKey> KeyComparer => EqualityComparer<TKey>.Default;
 
@@ -56,18 +57,13 @@ namespace HBD.EfCore.Extensions.Abstractions
         [Timestamp]
         [Column(Order = 1000)]
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+
         // ReSharper disable once UnusedAutoPropertyAccessor.Local
         public byte[] RowVersion { get; private set; }
 
-        #endregion Public Properties
+        #endregion Properties
 
-        /// <summary>
-        /// Set Id to the primary key
-        /// </summary>
-        /// <param name="id"></param>
-        protected void SetId(TKey id) => Id = id;
-
-        #region Public Methods
+        #region Methods
 
         public static bool operator !=(Entity<TKey> a, Entity<TKey> b) => !(a == b);
 
@@ -95,7 +91,13 @@ namespace HBD.EfCore.Extensions.Abstractions
 
         public override int GetHashCode() => (_internalId != null ? _internalId.GetHashCode() : 0);
 
-        #endregion Public Methods
+        /// <summary>
+        /// Set Id to the primary key
+        /// </summary>
+        /// <param name="id"></param>
+        protected void SetId(TKey id) => Id = id;
+
+        #endregion Methods
     }
 
     /// <summary>
@@ -103,7 +105,7 @@ namespace HBD.EfCore.Extensions.Abstractions
     /// </summary>
     public abstract class Entity : Entity<int>, IConcurrencyEntity
     {
-        #region Protected Constructors
+        #region Constructors
 
         /// <inheritdoc/>
         /// <summary>
@@ -121,7 +123,7 @@ namespace HBD.EfCore.Extensions.Abstractions
         {
         }
 
-        #endregion Protected Constructors
+        #endregion Constructors
     }
 
     /// <summary>
@@ -129,7 +131,7 @@ namespace HBD.EfCore.Extensions.Abstractions
     /// </summary>
     public abstract class EntityGuid : Entity<Guid>, IConcurrencyEntity<Guid>
     {
-        #region Protected Constructors
+        #region Constructors
 
         /// <inheritdoc/>
         /// <summary>
@@ -147,6 +149,6 @@ namespace HBD.EfCore.Extensions.Abstractions
         {
         }
 
-        #endregion Protected Constructors
+        #endregion Constructors
     }
 }
