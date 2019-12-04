@@ -1,22 +1,21 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 using System.Linq.Expressions;
-using HBD.Framework.Extensions;
-using Microsoft.EntityFrameworkCore;
 
 namespace HBD.EfCore.Extensions.Specification
 {
     /// <inheritdoc/>
     internal sealed class OrSpec<T> : Spec<T>
     {
-        #region Private Fields
+        #region Fields
 
         private readonly Spec<T> _left;
         private readonly Spec<T> _right;
 
-        #endregion Private Fields
+        #endregion Fields
 
-        #region Public Constructors
+        #region Constructors
 
         public OrSpec(Spec<T> left, Spec<T> right)
         {
@@ -24,21 +23,23 @@ namespace HBD.EfCore.Extensions.Specification
             _left = left;
         }
 
-        #endregion Public Constructors
+        #endregion Constructors
 
-        #region Public Methods
+        #region Methods
 
         public override IQueryable<T> Includes(IQueryable<T> query)
             => query.Includes(_left).Includes(_right);
 
         public override Expression<Func<T, bool>> ToExpression()
         {
-            var leftExpression = _left.ToExpression();
-            var rightExpression = _right.ToExpression();
+            var leftExp = _left.ToExpression();
+            var rightExp = _right.ToExpression();
+            var p = leftExp.Parameters.Single();
 
-            return leftExpression.Or(rightExpression);
+            return Expression.Lambda<Func<T, bool>>(
+                Expression.Or(leftExp.Body, Expression.Invoke(rightExp, p)), p);
         }
 
-        #endregion Public Methods
+        #endregion Methods
     }
 }

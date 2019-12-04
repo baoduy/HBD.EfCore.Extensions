@@ -1,16 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace HBD.EfCore.EntityResolver
+namespace HBD.EfCore.EntityResolvers
 {
     public interface IEntityResolver<out TDbDbContext> where TDbDbContext : DbContext
     {
-        #region Public Properties
+        #region Properties
 
         TDbDbContext DbContext { get; }
 
-        #endregion Public Properties
+        #endregion Properties
 
-        #region Public Methods
+        #region Methods
 
         /// <summary>
         /// Transform The Model
@@ -40,7 +40,8 @@ namespace HBD.EfCore.EntityResolver
         /// <returns></returns>
         TDestination ResolveAndMap<TDestination>(object source, bool ignoreOtherProperties = false)
             where TDestination : class;
-        #endregion Public Methods
+
+        #endregion Methods
     }
 
     public interface IEntityResolver : IEntityResolver<DbContext>

@@ -5,7 +5,7 @@ namespace HBD.EfCore.Extensions.Pageable
 {
     internal class Pageable<TEntity> : IPageable<TEntity>
     {
-        #region Public Constructors
+        #region Constructors
 
         public Pageable(int pageIndex, int pageSize, int totalItems, IList<TEntity> items)
         {
@@ -15,16 +15,20 @@ namespace HBD.EfCore.Extensions.Pageable
             Items = new ReadOnlyCollection<TEntity>(items);
         }
 
-        #endregion Public Constructors
+        #endregion Constructors
 
-        #region Public Properties
+        #region Properties
 
         public IReadOnlyCollection<TEntity> Items { get; }
+
         public int PageIndex { get; }
+
         public int PageSize { get; }
+
         public int TotalItems { get; }
+
         public int TotalPage => TotalItems / PageSize + (TotalItems % PageSize > 0 ? 1 : 0);
 
-        #endregion Public Properties
+        #endregion Properties
     }
 }

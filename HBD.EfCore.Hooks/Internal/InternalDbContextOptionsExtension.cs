@@ -5,22 +5,28 @@ namespace HBD.EfCore.Hooks.Internal
 {
     internal abstract class InternalDbContextOptionsExtension : IDbContextOptionsExtension
     {
-        #region Public Properties
+        #region Fields
 
-        public string LogFragment => $"use {this.GetType().Name}";
+        private DbContextOptionsExtensionInfo info;
 
-        #endregion Public Properties
+        #endregion Fields
 
-        #region Public Methods
+        #region Properties
 
-        public virtual bool ApplyServices(IServiceCollection services) => false;
+        public DbContextOptionsExtensionInfo Info => info ??= new InternalDbContextOptionsExtensionInfo(this);
 
-        public virtual long GetServiceProviderHashCode() => this.GetType().Name.GetHashCode();
+        #endregion Properties
+
+        #region Methods
+
+        public virtual void ApplyServices(IServiceCollection services)
+        {
+        }
 
         public virtual void Validate(IDbContextOptions options)
         {
         }
 
-        #endregion Public Methods
+        #endregion Methods
     }
 }

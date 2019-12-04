@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.0.0-preview001</Version>
+    <Authors>Duy Hoang</Authors>
+    <Description>The DDD implementation with EfCore</Description>
+    <Copyright>@drunkcoding.net 2020</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIconUrl>https://raw.githubusercontent.com/baoduy/Images/master/NugetLogo.PNG</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/baoduy/HBD.EfCore.Extensions</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/baoduy/HBD.EfCore.Extensions</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>EfCore, DDD</PackageTags>
+    <PackageReleaseNotes>
+      Version 1.0.0
+      - The first version of EfCore DDD which supports Domains, Aggregate, Entity and Events
+    </PackageReleaseNotes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Events\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="9.0.0" />
+    <PackageReference Include="HBD.Actions.Runner" Version="1.0.0-preview005" />
+    <PackageReference Include="HBD.EfCore.GenericEventRunner" Version="1.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\HBD.EfCore.Extensions\HBD.EfCore.Extensions.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,12 +1,13 @@
 ﻿using HBD.EfCore.Extensions.Configurations;
+using System.Collections.Generic;
 
 namespace DataLayer.DataSeeding
 {
     public class AccountStatusData : IDataSeedingConfiguration<AccountStatus>
     {
-        #region Public Properties
+        #region Properties
 
-        public AccountStatus[] Data => new[]
+        public ICollection<AccountStatus> Data => new[]
         {
             new AccountStatus(1)
             {
@@ -18,6 +19,6 @@ namespace DataLayer.DataSeeding
             }
         };
 
-        #endregion Public Properties
+        #endregion Properties
     }
 }

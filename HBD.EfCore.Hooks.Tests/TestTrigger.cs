@@ -12,7 +12,50 @@ namespace HBD.EfCore.Hooks.Tests
     [TestClass]
     public class TestTrigger : TestBase
     {
-        #region Public Methods
+        #region Methods
+
+        [TestMethod]
+        public void Hook_ShouldNot_Be_Called_If_CollectionIs_Empty_AddNew()
+        {
+            var db = GetService<TestHookDbContext>();
+
+            var profile = TriggerHook.Context.ServiceProvider.GetServices<ITriggerProfile>()
+                .First(i => i is UserUpdatedTrigger) as UserUpdatedTrigger;
+
+            profile.Reset();
+
+            var user = new User
+            {
+                FirstName = "Duy",
+                LastName = "Hoang",
+            };
+
+            db.Add(user);
+            db.SaveChanges();
+
+            profile.CalledCount.Should().Be(0);
+        }
+
+        [TestMethod]
+        public void Hook_ShouldNot_Be_Called_If_CollectionIs_Empty_Update()
+        {
+            Hook_ShouldNot_Be_Called_If_CollectionIs_Empty_AddNew();
+
+            var db = GetService<TestHookDbContext>();
+
+            var profile = TriggerHook.Context.ServiceProvider.GetServices<ITriggerProfile>()
+                .First(i => i is UserUpdatedTrigger) as UserUpdatedTrigger;
+
+            profile.Reset();
+
+            var user = db.Set<User>().First();
+            user.FirstName = "Updated Lah lah";
+
+            db.SaveChanges();
+
+            profile.CalledCount.Should().Be(1);
+            profile.HasEntity.Should().BeTrue();
+        }
 
         [TestMethod]
         public void Test_Profiles_from_DI()
@@ -35,22 +78,38 @@ namespace HBD.EfCore.Hooks.Tests
         public void Trigger_Created_Event()
         {
             var db = GetService<TestHookDbContext>();
+            var triggerAll = TriggerHook.Context.ServiceProvider.GetServices<ITriggerProfile>()
+                .OfType<UserTrigger>().ToList();
 
-            var profile = TriggerHook.Context.ServiceProvider.GetServices<ITriggerProfile>()
-                .First(i => i is DummyTriggerProfile) as DummyTriggerProfile;
-
-            profile.Reset();
+            triggerAll.ResetAll();
 
             var user = new User
             {
                 FirstName = "Duy 1",
                 LastName = "Hoang 1",
             };
-            db.Add(user);
 
+            db.Add(user);
             db.SaveChanges();
 
-            profile.Called.Should().Be(1);
+            triggerAll.ForEach(t =>
+            {
+                if (t is UserTriggerAll a)
+                {
+                    a.CalledCount.Should().Be(1);
+                    a.HasEntity.Should().BeTrue();
+                }
+                else if (t is UserCreatedTrigger c)
+                {
+                    c.CalledCount.Should().Be(1);
+                    c.HasEntity.Should().BeTrue();
+                }
+                else
+                {
+                    t.CalledCount.Should().Be(0);
+                    t.HasEntity.Should().BeFalse();
+                }
+            });
         }
 
         [TestMethod]
@@ -58,10 +117,10 @@ namespace HBD.EfCore.Hooks.Tests
         {
             var db = GetService<TestHookDbContext>();
 
-            var profile = TriggerHook.Context.ServiceProvider.GetServices<ITriggerProfile>()
-                .First(i => i is DummyTriggerProfile) as DummyTriggerProfile;
+            var triggerAll = TriggerHook.Context.ServiceProvider.GetServices<ITriggerProfile>()
+                .OfType<UserTrigger>().ToList();
 
-            profile.Reset();
+            triggerAll.ResetAll();
 
             var user = new User
             {
@@ -70,15 +129,34 @@ namespace HBD.EfCore.Hooks.Tests
             };
             db.Add(user);
 
-            await db.SaveChangesAsync();
+            await db.SaveChangesAsync().ConfigureAwait(false);
 
-            profile.Called.Should().Be(1);
+            triggerAll.ForEach(t =>
+            {
+                if (t is UserTriggerAll a)
+                {
+                    a.CalledCount.Should().Be(1);
+                    a.HasEntity.Should().BeTrue();
+                }
+                else if (t is UserCreatedTrigger c)
+                {
+                    c.CalledCount.Should().Be(1);
+                    c.HasEntity.Should().BeTrue();
+                }
+                else
+                {
+                    t.CalledCount.Should().Be(0);
+                    t.HasEntity.Should().BeFalse();
+                }
+            });
         }
 
         [TestMethod]
         public void Trigger_Delete_Event()
         {
             var db = GetService<TestHookDbContext>();
+            var triggerAll = TriggerHook.Context.ServiceProvider.GetServices<ITriggerProfile>()
+               .OfType<UserTrigger>().ToList();
 
             var user = new User
             {
@@ -86,24 +164,39 @@ namespace HBD.EfCore.Hooks.Tests
                 LastName = "Hoang 3",
             };
             db.Add(user);
-
             db.SaveChanges();
 
-            var profile = TriggerHook.Context.ServiceProvider.GetServices<ITriggerProfile>()
-                .First(i => i is DummyTriggerProfile) as DummyTriggerProfile;
-
-            profile.Reset();
+            triggerAll.ResetAll();
 
             db.Remove(user);
             db.SaveChanges();
 
-            profile.Called.Should().Be(1);
+            triggerAll.ForEach(t =>
+            {
+                if (t is UserTriggerAll a)
+                {
+                    a.CalledCount.Should().Be(1);
+                    a.HasEntity.Should().BeTrue();
+                }
+                else if (t is UserDeletedTrigger c)
+                {
+                    c.CalledCount.Should().Be(1);
+                    c.HasEntity.Should().BeTrue();
+                }
+                else
+                {
+                    t.CalledCount.Should().Be(0);
+                    t.HasEntity.Should().BeFalse();
+                }
+            });
         }
 
         [TestMethod]
         public async Task Trigger_Delete_Event_Async()
         {
             var db = GetService<TestHookDbContext>();
+            var triggerAll = TriggerHook.Context.ServiceProvider.GetServices<ITriggerProfile>()
+              .OfType<UserTrigger>().ToList();
 
             var user = new User
             {
@@ -112,17 +205,31 @@ namespace HBD.EfCore.Hooks.Tests
             };
             db.Add(user);
 
-            await db.SaveChangesAsync();
+            await db.SaveChangesAsync().ConfigureAwait(false);
 
-            var profile = TriggerHook.Context.ServiceProvider.GetServices<ITriggerProfile>()
-                .First(i => i is DummyTriggerProfile) as DummyTriggerProfile;
-
-            profile.Reset();
+            triggerAll.ResetAll();
 
             db.Remove(user);
-            await db.SaveChangesAsync();
+            await db.SaveChangesAsync().ConfigureAwait(false);
 
-            profile.Called.Should().Be(1);
+            triggerAll.ForEach(t =>
+            {
+                if (t is UserTriggerAll a)
+                {
+                    a.CalledCount.Should().Be(1);
+                    a.HasEntity.Should().BeTrue();
+                }
+                else if (t is UserDeletedTrigger c)
+                {
+                    c.CalledCount.Should().Be(1);
+                    c.HasEntity.Should().BeTrue();
+                }
+                else
+                {
+                    t.CalledCount.Should().Be(0);
+                    t.HasEntity.Should().BeFalse();
+                }
+            });
         }
 
         [TestMethod]
@@ -139,17 +246,17 @@ namespace HBD.EfCore.Hooks.Tests
             };
             db.Add(user);
 
-            await db.SaveChangesAsync();
+            await db.SaveChangesAsync().ConfigureAwait(false);
 
             var profile = TriggerHook.Context.ServiceProvider.GetServices<ITriggerProfile>()
-                .First(i => i is DummyTriggerProfile) as DummyTriggerProfile;
+                .First(i => i is UserTriggerAll) as UserTriggerAll;
 
             profile.Reset();
 
             db.Remove(user);
-            await db.SaveChangesAsync();
+            await db.SaveChangesAsync().ConfigureAwait(false);
 
-            profile.Called.Should().Be(0);
+            profile.CalledCount.Should().Be(0);
 
             TriggerHook.Disabled = false;
         }
@@ -160,7 +267,7 @@ namespace HBD.EfCore.Hooks.Tests
             var db = GetService<TestHookDbContext>();
 
             var profile = TriggerHook.Context.ServiceProvider.GetServices<ITriggerProfile>()
-                .First(i => i is DummyTriggerProfile) as DummyTriggerProfile;
+                .First(i => i is UserTriggerAll) as UserTriggerAll;
 
             profile.Reset();
 
@@ -173,7 +280,7 @@ namespace HBD.EfCore.Hooks.Tests
 
             db.SaveChanges();
 
-            profile.Called.Should().Be(1);
+            profile.CalledCount.Should().Be(1);
             profile.HasEntity.Should().BeTrue();
             profile.HasServiceProvider.Should().BeTrue();
         }
@@ -182,6 +289,8 @@ namespace HBD.EfCore.Hooks.Tests
         public void Trigger_Updated_Event()
         {
             var db = GetService<TestHookDbContext>();
+            var triggerAll = TriggerHook.Context.ServiceProvider.GetServices<ITriggerProfile>()
+             .OfType<UserTrigger>().ToList();
 
             var user = new User
             {
@@ -192,22 +301,37 @@ namespace HBD.EfCore.Hooks.Tests
 
             db.SaveChanges();
 
-            var profile = TriggerHook.Context.ServiceProvider.GetServices<ITriggerProfile>()
-                .First(i => i is DummyTriggerProfile) as DummyTriggerProfile;
-
-            profile.Reset();
+            triggerAll.ResetAll();
 
             user.FirstName = "AAA";
             db.SaveChanges();
 
-            profile.Called.Should().Be(1);
-            profile.HasFirstNameChanged.Should().BeTrue();
+            triggerAll.ForEach(t =>
+            {
+                if (t is UserTriggerAll a)
+                {
+                    a.CalledCount.Should().Be(1);
+                    a.HasEntity.Should().BeTrue();
+                }
+                else if (t is UserUpdatedTrigger c)
+                {
+                    c.CalledCount.Should().Be(1);
+                    c.HasEntity.Should().BeTrue();
+                }
+                else
+                {
+                    t.CalledCount.Should().Be(0);
+                    t.HasEntity.Should().BeFalse();
+                }
+            });
         }
 
         [TestMethod]
         public async Task Trigger_Updated_Event_Async()
         {
             var db = GetService<TestHookDbContext>();
+            var triggerAll = TriggerHook.Context.ServiceProvider.GetServices<ITriggerProfile>()
+            .OfType<UserTrigger>().ToList();
 
             var user = new User
             {
@@ -216,66 +340,34 @@ namespace HBD.EfCore.Hooks.Tests
             };
             db.Add(user);
 
-            await db.SaveChangesAsync();
+            await db.SaveChangesAsync().ConfigureAwait(false);
 
-            var profile = TriggerHook.Context.ServiceProvider.GetServices<ITriggerProfile>()
-                .First(i => i is DummyTriggerProfile) as DummyTriggerProfile;
-
-            profile.Reset();
+            triggerAll.ResetAll();
 
             user.FirstName = "AAA";
 
-            await db.SaveChangesAsync();
+            await db.SaveChangesAsync().ConfigureAwait(false);
 
-            profile.Called.Should().Be(1);
-            profile.HasFirstNameChanged.Should().BeTrue();
-        }
-
-
-        [TestMethod]
-        public void Hook_ShouldNot_Be_Called_If_CollectionIs_Empty_AddNew()
-        {
-            var db = GetService<TestHookDbContext>();
-
-            var profile = TriggerHook.Context.ServiceProvider.GetServices<ITriggerProfile>()
-                .First(i => i is UpdatedTriggerProfile) as UpdatedTriggerProfile;
-
-            profile.Reset();
-
-            var user = new User
+            triggerAll.ForEach(t =>
             {
-                FirstName = "Duy",
-                LastName = "Hoang",
-            };
-
-            db.Add(user);
-
-            db.SaveChanges();
-
-            profile.IsCalled.Should().BeFalse();
+                if (t is UserTriggerAll a)
+                {
+                    a.CalledCount.Should().Be(1);
+                    a.HasEntity.Should().BeTrue();
+                }
+                else if (t is UserUpdatedTrigger c)
+                {
+                    c.CalledCount.Should().Be(1);
+                    c.HasEntity.Should().BeTrue();
+                }
+                else
+                {
+                    t.CalledCount.Should().Be(0);
+                    t.HasEntity.Should().BeFalse();
+                }
+            });
         }
 
-        [TestMethod]
-        public void Hook_ShouldNot_Be_Called_If_CollectionIs_Empty_Update()
-        {
-            Hook_ShouldNot_Be_Called_If_CollectionIs_Empty_AddNew();
-
-            var db = GetService<TestHookDbContext>();
-
-            var profile = TriggerHook.Context.ServiceProvider.GetServices<ITriggerProfile>()
-                .First(i => i is UpdatedTriggerProfile) as UpdatedTriggerProfile;
-
-            profile.Reset();
-
-            var user = db.Set<User>().Last();
-
-            user.FirstName = "Updated Lah lah";
-
-            db.SaveChanges();
-
-            profile.IsCalled.Should().BeTrue();
-            profile.IsEmpty.Should().BeFalse();
-        }
-        #endregion Public Methods
+        #endregion Methods
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -6,29 +7,21 @@ namespace HBD.EfCore.Hooks
 {
     public sealed class SetupOptions
     {
+        #region Properties
+
+        internal ICollection<Assembly> Assemblies { get; private set; }
+
         internal bool DeepValidation { get; private set; } = true;
+
         internal bool SavingAwareness { get; private set; } = true;
-        internal bool ValidateAllProperties { get; private set; } = false;
+
         internal bool Trigger { get; private set; } = false;
-        internal Assembly[] Assemblies { get; private set; }
 
-        public SetupOptions UseDeepValidation(bool flag = true,bool validateAllProperties = true)
-        {
-            DeepValidation = flag;
-            return this;
-        }
+        internal bool ValidateAllProperties { get; private set; } = false;
 
-        public SetupOptions UseDeepSavingAwareness(bool flag = true)
-        {
-            SavingAwareness = flag;
-            return this;
-        }
+        #endregion Properties
 
-        public SetupOptions UseTrigger(bool flag = true)
-        {
-            Trigger = flag;
-            return this;
-        }
+        #region Methods
 
         public SetupOptions ScanFrom(params Assembly[] assemblies)
         {
@@ -38,5 +31,25 @@ namespace HBD.EfCore.Hooks
             Assemblies = assemblies;
             return this;
         }
+
+        public SetupOptions UseDeepSavingAwareness(bool flag = true)
+        {
+            SavingAwareness = flag;
+            return this;
+        }
+
+        public SetupOptions UseDeepValidation(bool flag = true)
+        {
+            DeepValidation = flag;
+            return this;
+        }
+
+        public SetupOptions UseTrigger(bool flag = true)
+        {
+            Trigger = flag;
+            return this;
+        }
+
+        #endregion Methods
     }
 }

@@ -14,7 +14,7 @@ namespace HBD.EfCore.Hooks
 {
     public static class HookExtensions
     {
-        #region Public Methods
+        #region Methods
 
         /// <summary>
         ///     Get changed properties includes navigation properties.
@@ -23,16 +23,17 @@ namespace HBD.EfCore.Hooks
         /// <returns></returns>
         public static IEnumerable<string> GetChangedProperties(this EntityEntry @this)
         {
+            if (@this is null)
+            {
+                throw new ArgumentNullException(nameof(@this));
+            }
+
             foreach (var name in @this.Properties.Where(p => p.IsModified).Select(p => p.Metadata.Name))
                 yield return name;
 
             foreach (var name in @this.Navigations.Where(p => p.IsModified).Select(p => p.Metadata.Name))
                 yield return name;
         }
-
-        #endregion Public Methods
-
-        #region Internal Methods
 
         /// <summary>
         ///     Action SaveChangesWithHooks
@@ -71,15 +72,11 @@ namespace HBD.EfCore.Hooks
         {
             var entries = dbContext.GetChangedEntities();
 
-            await dbContext.OnSaving(entries, cancellationToken);
-            var result = await saveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
-            await dbContext.OnSaved(entries, cancellationToken);
+            await dbContext.OnSaving(entries, cancellationToken).ConfigureAwait(false);
+            var result = await saveChangesAsync(acceptAllChangesOnSuccess, cancellationToken).ConfigureAwait(false);
+            await dbContext.OnSaved(entries, cancellationToken).ConfigureAwait(false);
             return result;
         }
-
-        #endregion Internal Methods
-
-        #region Private Methods
 
         private static IReadOnlyCollection<IHook> EnsureValidationHookAtLast(this IEnumerable<IHook> hooks)
         {
@@ -138,9 +135,9 @@ namespace HBD.EfCore.Hooks
         private static Task OnSaved(this DbContext dbContext, IReadOnlyCollection<TriggerEntityState> entities,
             CancellationToken cancellationToken = default)
         {
-            var services = dbContext.GetHooks();
-            return services.Any()
-                ? Task.WhenAll(services.Select(p => p.OnSaved(entities, dbContext, cancellationToken)))
+            var hooks = dbContext.GetHooks();
+            return hooks.Any()
+                ? Task.WhenAll(hooks.Select(p => p.OnSaved(entities, dbContext, cancellationToken)))
                 : Task.CompletedTask;
         }
 
@@ -154,12 +151,12 @@ namespace HBD.EfCore.Hooks
         private static Task OnSaving(this DbContext dbContext, IReadOnlyCollection<TriggerEntityState> entities,
             CancellationToken cancellationToken = default)
         {
-            var services = dbContext.GetHooks();
-            return services.Any()
-                ? Task.WhenAll(services.Select(p => p.OnSaving(entities, dbContext, cancellationToken)))
+            var hooks = dbContext.GetHooks();
+            return hooks.Any()
+                ? Task.WhenAll(hooks.Select(p => p.OnSaving(entities, dbContext, cancellationToken)))
                 : Task.CompletedTask;
         }
 
-        #endregion Private Methods
+        #endregion Methods
     }
 }

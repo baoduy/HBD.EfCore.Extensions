@@ -22,7 +22,7 @@ namespace HBD.EfCore.Extensions.Tests
                 .UseAutoConfigModel(op => op.ScanFrom(typeof(MyDbContext).Assembly))
                 .Options))
             {
-                await db.Database.EnsureCreatedAsync();
+                await db.Database.EnsureCreatedAsync().ConfigureAwait(false);
             }
         }
 

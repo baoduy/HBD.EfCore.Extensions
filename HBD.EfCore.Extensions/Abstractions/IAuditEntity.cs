@@ -1,12 +1,12 @@
-﻿using System;
+﻿using HBD.EfCore.Extensions.Attributes;
+using System;
 using System.ComponentModel.DataAnnotations;
-using HBD.EfCore.Extensions.Attributes;
 
 namespace HBD.EfCore.Extensions.Abstractions
 {
     public interface IAuditEntity<out TKey> : IConcurrencyEntity<TKey>
     {
-        #region Public Properties
+        #region Properties
 
         [Required]
         [MaxLength(255)]
@@ -19,7 +19,7 @@ namespace HBD.EfCore.Extensions.Abstractions
 
         [IgnoreFromUpdate] DateTimeOffset? UpdatedOn { get; }
 
-        #endregion Public Properties
+        #endregion Properties
     }
 
     public interface IAuditEntity : IAuditEntity<int>, IConcurrencyEntity

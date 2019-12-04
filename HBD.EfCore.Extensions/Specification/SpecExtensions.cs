@@ -1,35 +1,15 @@
-﻿using System;
+﻿using HBD.EfCore.Extensions.Pageable;
+using HBD.EfCore.Extensions.Specification;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
-using HBD.EfCore.Extensions.Pageable;
-using HBD.EfCore.Extensions.Specification;
 
 // ReSharper disable CheckNamespace
 namespace Microsoft.EntityFrameworkCore
 {
     public static class SpecExtensions
     {
-        #region Private Methods
-        private static TSpec CreateInstance<T, TSpec>(params object[] args) where TSpec : Spec<T> => (TSpec)Activator.CreateInstance(typeof(TSpec), args);
-
-        private static IQueryable<T> ForSpec<T>(this IQueryable<T> query, Spec<T> spec) where T : class
-        {
-            switch (spec)
-            {
-                case null:
-                    return query;
-
-                case PageableSpec<T> _:
-                    throw new ArgumentException(
-                        "The Spec is a PageableSpec. Please use ForPageSpec extension instead.");
-                default:
-                    return query.Includes(spec).Wheres(spec);
-            }
-        }
-
-        #endregion Private Methods
-
-        #region Public Methods
+        #region Methods
 
         /// <summary>
         ///     Create a Pageable to PageableSpec
@@ -43,17 +23,24 @@ namespace Microsoft.EntityFrameworkCore
             => @this.ForPageSpec(CreateInstance<T, TSpec>(args));
 
         /// <summary>
-        ///     Create a Pageable to PageableSpec
+        ///     Create a Paging-able to PageableSpec
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="this"></param>
         /// <param name="spec"></param>
         /// <returns></returns>
         public static IPageable<T> ForPageSpec<T>(this DbContext @this, PageableSpec<T> spec) where T : class
-            => @this.Set<T>().ToPageable(spec);
+        {
+            if (@this is null)
+            {
+                throw new ArgumentNullException(nameof(@this));
+            }
+
+            return @this.Set<T>().ToPageable(spec);
+        }
 
         /// <summary>
-        ///     Create a Pageable to PageableSpec
+        ///     Create a Paging-able to PageableSpec
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <typeparam name="TSpec"></typeparam>
@@ -70,7 +57,14 @@ namespace Microsoft.EntityFrameworkCore
         /// <param name="spec"></param>
         /// <returns></returns>
         public static Task<IPageable<T>> ForPageSpecAsync<T>(this DbContext @this, PageableSpec<T> spec) where T : class
-            => @this.Set<T>().ToPageableAsync(spec);
+        {
+            if (@this is null)
+            {
+                throw new ArgumentNullException(nameof(@this));
+            }
+
+            return @this.Set<T>().ToPageableAsync(spec);
+        }
 
         /// <summary>
         ///     Create query for a Spec
@@ -90,7 +84,14 @@ namespace Microsoft.EntityFrameworkCore
         /// <param name="spec"></param>
         /// <returns></returns>
         public static IQueryable<T> ForSpec<T>(this DbContext @this, Spec<T> spec) where T : class
-            => @this.Set<T>().ForSpec(spec);
+        {
+            if (@this is null)
+            {
+                throw new ArgumentNullException(nameof(@this));
+            }
+
+            return @this.Set<T>().ForSpec(spec);
+        }
 
         /// <summary>
         ///     Add ONLY Including of Spec to query
@@ -132,6 +133,23 @@ namespace Microsoft.EntityFrameworkCore
         public static IQueryable<T> Wheres<T>(this IQueryable<T> @this, Spec<T> spec)
             => spec == null ? @this : @this.Where(spec.ToExpression());
 
-        #endregion Public Methods
+        private static TSpec CreateInstance<T, TSpec>(params object[] args) where TSpec : Spec<T> => (TSpec)Activator.CreateInstance(typeof(TSpec), args);
+
+        private static IQueryable<T> ForSpec<T>(this IQueryable<T> query, Spec<T> spec) where T : class
+        {
+            switch (spec)
+            {
+                case null:
+                    return query;
+
+                case PageableSpec<T> _:
+                    throw new ArgumentException(
+                        "The Spec is a PageableSpec. Please use ForPageSpec extension instead.");
+                default:
+                    return query.Includes(spec).Wheres(spec);
+            }
+        }
+
+        #endregion Methods
     }
 }

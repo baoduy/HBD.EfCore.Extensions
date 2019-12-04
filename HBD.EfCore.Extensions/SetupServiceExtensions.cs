@@ -1,34 +1,29 @@
-﻿using System;
-using HBD.EfCore.Extensions.Internal;
+﻿using HBD.EfCore.Extensions.Internal;
 using HBD.EfCore.Extensions.Options;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using System;
 
 // ReSharper disable CheckNamespace
 namespace Microsoft.EntityFrameworkCore
 {
     public static class SetupServiceExtensions
     {
-        #region Public Methods
+        #region Methods
 
-        public static DbContextOptionsBuilder<TContext> UseAutoConfigModel<TContext>(
-            this DbContextOptionsBuilder<TContext> @this,
-            Action<IEntityMappingExtension> options = null)
-            where TContext : DbContext
+        public static DbContextOptionsBuilder<TContext> UseAutoConfigModel<TContext>(this DbContextOptionsBuilder<TContext> @this, Action<IEntityMappingExtension> options = null) where TContext : DbContext
             => (DbContextOptionsBuilder<TContext>)((DbContextOptionsBuilder)@this)
                 .UseAutoConfigModel(options);
 
-        public static DbContextOptionsBuilder UseAutoConfigModel(this DbContextOptionsBuilder @this,
-            Action<IEntityMappingExtension> options = null)
+        public static DbContextOptionsBuilder UseAutoConfigModel(this DbContextOptionsBuilder @this, Action<IEntityMappingExtension> options = null)
         {
+            if (@this is null)
+                throw new ArgumentNullException(nameof(@this));
+
             var op = @this.GetOrCreateExtension();
             options?.Invoke(op);
 
             return @this;
         }
-
-        #endregion Public Methods
-
-        #region Private Methods
 
         private static EntityMappingExtension GetOrCreateExtension(this DbContextOptionsBuilder optionsBuilder)
         {
@@ -43,6 +38,6 @@ namespace Microsoft.EntityFrameworkCore
             return op;
         }
 
-        #endregion Private Methods
+        #endregion Methods
     }
 }

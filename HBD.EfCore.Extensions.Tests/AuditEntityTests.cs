@@ -1,5 +1,7 @@
 ﻿using DataLayer;
 using FluentAssertions;
+using HBD.TestHelper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace HBD.EfCore.Extensions.Tests
@@ -7,7 +9,7 @@ namespace HBD.EfCore.Extensions.Tests
     [TestClass]
     public class AuditEntityTests
     {
-        #region Public Methods
+        #region Methods
 
         [TestMethod]
         public void TestCreatingEntity()
@@ -21,9 +23,12 @@ namespace HBD.EfCore.Extensions.Tests
         }
 
         [TestMethod]
-        public void TestUpdatingEntity()
+        public async System.Threading.Tasks.Task TestUpdatingEntityAsync()
         {
-            var user = new User(1, "Duy");
+            await UnitTestSetup.Db.SeedData().ConfigureAwait(false);
+            var user = await UnitTestSetup.Db.Set<User>().FirstAsync();
+            user.Should().NotBeNull();
+
             user.UpdatedByUser("Hoang");
 
             user.UpdatedBy.Should().Be("Hoang");
@@ -31,6 +36,6 @@ namespace HBD.EfCore.Extensions.Tests
             user.Id.Should().Be(1);
         }
 
-        #endregion Public Methods
+        #endregion Methods
     }
 }

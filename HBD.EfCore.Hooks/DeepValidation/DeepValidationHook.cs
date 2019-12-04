@@ -11,17 +11,36 @@ namespace HBD.EfCore.Hooks.DeepValidation
 {
     public sealed class DeepValidationHook : Hook
     {
+        #region Fields
+
         private readonly SetupOptions _options;
 
+        #endregion Fields
+
+        #region Constructors
+
         public DeepValidationHook(SetupOptions options) => _options = options;
+
+        #endregion Constructors
+
+        #region Properties
 
         /// <summary>
         /// Disable DeepValidationHook
         /// </summary>
         public static bool Disabled { get; set; }
 
+        #endregion Properties
+
+        #region Methods
+
         public override Task OnSaving(IReadOnlyCollection<TriggerEntityState> entities, DbContext dbContext, CancellationToken cancellationToken = default)
         {
+            if (dbContext is null)
+            {
+                throw new System.ArgumentNullException(nameof(dbContext));
+            }
+
             if (Disabled) return Task.CompletedTask;
 
             dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
@@ -56,5 +75,7 @@ namespace HBD.EfCore.Hooks.DeepValidation
 
             return base.OnSaving(entities, dbContext, cancellationToken);
         }
+
+        #endregion Methods
     }
 }

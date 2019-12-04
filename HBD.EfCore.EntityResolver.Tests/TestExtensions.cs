@@ -2,6 +2,7 @@ using FluentAssertions;
 using HBD.EfCore.EntityResolver.Tests.Entities;
 using HBD.EfCore.EntityResolver.Tests.Models;
 using HBD.EfCore.EntityResolver.Tests.Specs;
+using HBD.EfCore.EntityResolvers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
@@ -11,24 +12,19 @@ namespace HBD.EfCore.EntityResolver.Tests
     [TestClass]
     public class TestExtensions
     {
+        #region Methods
+
         [TestMethod]
-        public void IsInstanceOf()
+        public void Get_Generic_Interfaces()
         {
-            typeof(int).IsInstanceOf(typeof(IEquatable<>))
-                .Should().BeTrue();
-
-            typeof(int).IsInstanceOf(typeof(IEquatable<>))
-                .Should().BeTrue();
-
-            typeof(IEquatable<int>).IsInstanceOf(typeof(IEquatable<>))
-                .Should().BeTrue();
+            var types = typeof(UserModel).GetGenericInterfaceTypes().ToList();
+            types.Should().HaveCount(1);
         }
-
 
         [TestMethod]
         public void GetResolveInfo()
         {
-            var info = Extensions.GetResolveInfo(typeof(UserModel)).ToList();
+            var info = ResolverExtensions.GetResolveInfo(typeof(UserModel)).ToList();
 
             info.Count.Should().BeGreaterOrEqualTo(2);
             info.All(i => i.Property != null &&
@@ -46,7 +42,20 @@ namespace HBD.EfCore.EntityResolver.Tests
         [ExpectedException(typeof(ArgumentException))]
         public void GetResolveInfo_Exception()
         {
-            _ = Extensions.GetResolveInfo(typeof(UserErrorModel)).ToList();
+            _ = ResolverExtensions.GetResolveInfo(typeof(UserErrorModel)).ToList();
+        }
+
+        [TestMethod]
+        public void IsInstanceOf()
+        {
+            typeof(int).IsInstanceOf(typeof(IEquatable<>))
+                .Should().BeTrue();
+
+            typeof(int).IsInstanceOf(typeof(IEquatable<>))
+                .Should().BeTrue();
+
+            typeof(IEquatable<int>).IsInstanceOf(typeof(IEquatable<>))
+                .Should().BeTrue();
         }
 
         [TestMethod]
@@ -67,11 +76,6 @@ namespace HBD.EfCore.EntityResolver.Tests
             (dInfo.Account as AccountBasicViewModel)?.Id.Should().Be(info.AccountId);
         }
 
-        [TestMethod]
-        public void Get_Generic_Interfaces()
-        {
-            var types = typeof(UserModel).GetGenericInterfaceTypes().ToList();
-            types.Should().HaveCount(1);
-        }
+        #endregion Methods
     }
 }

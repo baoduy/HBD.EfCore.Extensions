@@ -1,21 +1,20 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 using System.Linq.Expressions;
-using HBD.Framework.Extensions;
-using Microsoft.EntityFrameworkCore;
 
 namespace HBD.EfCore.Extensions.Specification
 {
     internal sealed class AndSpec<T> : Spec<T>
     {
-        #region Private Fields
+        #region Fields
 
         private readonly Spec<T> _left;
         private readonly Spec<T> _right;
 
-        #endregion Private Fields
+        #endregion Fields
 
-        #region Public Constructors
+        #region Constructors
 
         public AndSpec(Spec<T> left, Spec<T> right)
         {
@@ -23,16 +22,12 @@ namespace HBD.EfCore.Extensions.Specification
             _left = left;
         }
 
-        #endregion Public Constructors
+        #endregion Constructors
 
-        #region Public Properties
+        #region Methods
 
         public override IQueryable<T> Includes(IQueryable<T> query)
             => query.Includes(_left).Includes(_right);
-
-        #endregion Public Properties
-
-        #region Public Methods
 
         public override Expression<Func<T, bool>> ToExpression()
         {
@@ -42,6 +37,6 @@ namespace HBD.EfCore.Extensions.Specification
             return leftExpression.And(rightExpression);
         }
 
-        #endregion Public Methods
+        #endregion Methods
     }
 }

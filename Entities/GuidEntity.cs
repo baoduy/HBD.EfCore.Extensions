@@ -1,5 +1,4 @@
-﻿using System;
-using HBD.EfCore.Extensions.Abstractions;
+﻿using HBD.EfCore.Extensions.Abstractions;
 
 namespace DataLayer
 {

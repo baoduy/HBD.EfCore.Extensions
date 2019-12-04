@@ -4,7 +4,7 @@ namespace HBD.EfCore.Extensions.Options
 {
     public interface IEntityMappingExtension
     {
-        #region Public Methods
+        #region Methods
 
         /// <summary>
         /// The Assemblies will be scan
@@ -13,6 +13,6 @@ namespace HBD.EfCore.Extensions.Options
         /// <returns></returns>
         RegistrationInfo ScanFrom(params Assembly[] entityAssemblies);
 
-        #endregion Public Methods
+        #endregion Methods
     }
 }

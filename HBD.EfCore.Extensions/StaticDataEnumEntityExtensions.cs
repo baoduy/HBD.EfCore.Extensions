@@ -14,27 +14,26 @@ namespace HBD.EfCore.Extensions
 {
     public static class StaticDataEnumEntityExtensions
     {
-        #region Public Methods
+        #region Fields
+
+        private static readonly MethodInfo Method = typeof(StaticDataEnumEntityExtensions)
+                    .GetMethod(nameof(RegisterStaticDataType), BindingFlags.Static | BindingFlags.NonPublic);
+
+        #endregion Fields
+
+        #region Methods
 
         /// <summary>
         /// Register StaticDataOfAttribute Entities from RegistrationInfos <see cref="RegistrationInfo"/>
         /// </summary>
         /// <param name="modelBuilder"></param>
         /// <param name="registrations"></param>
-        internal static void RegisterStaticDataFrom(this ModelBuilder modelBuilder,
-            IEnumerable<RegistrationInfo> registrations)
+        internal static void RegisterStaticDataFrom(this ModelBuilder modelBuilder, IEnumerable<RegistrationInfo> registrations)
         {
             foreach (var type in registrations.SelectMany(r =>
                 r.EntityAssemblies.Extract().Enum().HasAttribute<StaticDataAttribute>()).Distinct())
                 modelBuilder.RegisterStaticDataFromEnumType(type);
         }
-
-        #endregion Public Methods
-
-        #region Private Methods
-
-        private static readonly MethodInfo Method = typeof(StaticDataEnumEntityExtensions)
-            .GetMethod(nameof(RegisterStaticDataType), BindingFlags.Static | BindingFlags.NonPublic);
 
         private static void RegisterStaticDataFromEnumType(this ModelBuilder modelBuilder, Type enumType)
         {
@@ -52,7 +51,7 @@ namespace HBD.EfCore.Extensions
         {
             var enumType = typeof(TEnumTable).GetGenericArguments().First();
             var builder = modelBuilder.Entity<TEnumTable>()
-                .ToTable(attribute?.Table ?? enumType.Name, attribute?.Schema);
+                .ToTable(attribute?.Table ?? enumType.Name.Pluralize(), attribute?.Schema);
 
             #region Add EnumStatus as Data Seeding
 
@@ -82,7 +81,7 @@ namespace HBD.EfCore.Extensions
 
                         builder.Property<string>(nameof(DisplayAttribute.GroupName))
                             .HasMaxLength(255);
-                       
+
                         hasDisplayAttribute = true;
                     }
 
@@ -107,6 +106,6 @@ namespace HBD.EfCore.Extensions
             #endregion Add EnumStatus as Data Seeding
         }
 
-        #endregion Private Methods
+        #endregion Methods
     }
 }

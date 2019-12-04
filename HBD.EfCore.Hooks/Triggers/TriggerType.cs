@@ -3,7 +3,7 @@
 namespace HBD.EfCore.Hooks.Triggers
 {
     [Flags]
-    public enum TriggerType
+    public enum TriggerTypes
     {
         None = 0,
         Created = 1,

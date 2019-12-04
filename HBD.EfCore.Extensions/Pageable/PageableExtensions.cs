@@ -1,16 +1,16 @@
-﻿using System;
+﻿using HBD.EfCore.Extensions.Pageable;
+using HBD.EfCore.Extensions.Specification;
+using HBD.EfCore.Extensions.Utilities;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
-using HBD.EfCore.Extensions.Pageable;
-using HBD.EfCore.Extensions.Specification;
-using Remotion.Linq.Clauses;
 
 // ReSharper disable CheckNamespace
 namespace Microsoft.EntityFrameworkCore
 {
     public static class PageableExtensions
     {
-        #region Public Methods
+        #region Methods
 
         public static IPageable<TEntity> ToPageable<TEntity>(this IOrderedQueryable<TEntity> query, int pageIndex,
             int pageSize)
@@ -37,7 +37,7 @@ namespace Microsoft.EntityFrameworkCore
 
             //Catch to improve the performance
             var totalItems = oQuery.Count();
-          
+
             if (itemIndex >= totalItems) itemIndex = totalItems - spec.PageSize; //Get last page.
 
             var items = spec.PageSize >= totalItems ? oQuery : oQuery.Skip(itemIndex).Take(spec.PageSize);
@@ -52,14 +52,14 @@ namespace Microsoft.EntityFrameworkCore
             var itemIndex = pageIndex * pageSize;
 
             //Catch to improve the performance
-            var totalItems = await query.CountAsync();
-       
+            var totalItems = await query.CountAsync().ConfigureAwait(false);
+
             if (itemIndex < 0) itemIndex = 0; //Get first Page
             if (itemIndex >= totalItems) itemIndex = totalItems - pageSize; //Get last page.
 
             var items = pageSize >= totalItems ? query : query.Skip(itemIndex).Take(pageSize);
 
-            return new Pageable<TEntity>(pageIndex, pageSize, totalItems, await items.ToListAsync());
+            return new Pageable<TEntity>(pageIndex, pageSize, totalItems, await items.ToListAsync().ConfigureAwait(false));
         }
 
         public static async Task<IPageable<TEntity>> ToPageableAsync<TEntity>(this IQueryable<TEntity> query, PageableSpec<TEntity> spec) where TEntity : class
@@ -70,19 +70,15 @@ namespace Microsoft.EntityFrameworkCore
             var oQuery = query.ForPageableSpec(spec);
 
             //Catch to improve the performance
-            var totalItems =await oQuery.CountAsync();
+            var totalItems = await oQuery.CountAsync().ConfigureAwait(false);
 
             var itemIndex = spec.PageIndex * spec.PageSize;
             if (itemIndex >= totalItems) itemIndex = totalItems - spec.PageSize; //Get last page.
 
             var items = spec.PageSize >= totalItems ? oQuery : oQuery.Skip(itemIndex).Take(spec.PageSize);
 
-            return new Pageable<TEntity>(spec.PageIndex, spec.PageSize, totalItems, await items.ToListAsync());
+            return new Pageable<TEntity>(spec.PageIndex, spec.PageSize, totalItems, await items.ToListAsync().ConfigureAwait(false));
         }
-
-        #endregion Public Methods
-
-        #region Private Methods
 
         private static IOrderedQueryable<TEntity> ForPageableSpec<TEntity>(this IQueryable<TEntity> query, PageableSpec<TEntity> spec) where TEntity : class
         {
@@ -96,6 +92,6 @@ namespace Microsoft.EntityFrameworkCore
             if (pageSize <= 0) throw new ArgumentException($"{nameof(pageSize)} should be > 0");
         }
 
-        #endregion Private Methods
+        #endregion Methods
     }
 }

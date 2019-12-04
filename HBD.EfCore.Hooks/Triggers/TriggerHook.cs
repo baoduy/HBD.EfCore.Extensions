@@ -10,9 +10,22 @@ namespace HBD.EfCore.Hooks.Triggers
 {
     public sealed class TriggerHook : Hook
     {
+        #region Properties
+
         public static ITriggerContext Context { get; private set; }
 
-        internal static bool IsInitialized() => Context != null;
+        /// <summary>
+        ///     Disable TriggerHook
+        /// </summary>
+        public static bool Disabled { get; set; }
+
+        #endregion Properties
+
+        #region Methods
+
+        public override Task OnSaved(IReadOnlyCollection<TriggerEntityState> entities, DbContext dbContext,
+            CancellationToken cancellationToken = default) =>
+            Disabled ? Task.CompletedTask : ExecuteAsync(entities.Where(e => e.State != EntityState.Unchanged).ToList());
 
         internal static IServiceCollection Initialize(IServiceCollection serviceCollection)
         {
@@ -22,24 +35,7 @@ namespace HBD.EfCore.Hooks.Triggers
             return serviceCollection;
         }
 
-        #region Public Properties
-
-        /// <summary>
-        ///     Disable TriggerHook
-        /// </summary>
-        public static bool Disabled { get; set; }
-
-        #endregion Public Properties
-
-        #region Public Methods
-
-        public override Task OnSaved(IReadOnlyCollection<TriggerEntityState> entities, DbContext dbContext,
-            CancellationToken cancellationToken = default) =>
-            Disabled ? Task.CompletedTask : ExecuteAsync(entities.Where(e => e.State != EntityState.Unchanged).ToList());
-
-        #endregion Public Methods
-
-        #region Private Methods
+        internal static bool IsInitialized() => Context != null;
 
         private static async Task ExecuteAsync(IReadOnlyCollection<TriggerEntityState> entities)
         {
@@ -52,27 +48,26 @@ namespace HBD.EfCore.Hooks.Triggers
                          group e by e.EntityType into g
                          select new { EntityType = g.Key, Entries = g.ToList() };
 
-            var profiles = Context.ServiceProvider.GetServices<ITriggerProfile>()
-                .ToList();
+            var profiles = Context.ServiceProvider.GetServices<ITriggerProfile>().ToList();
 
             if (!profiles.Any()) return;
 
             var tasks = from g in groups
+
                             // ReSharper disable once InconsistentlySynchronizedField
                         from p in profiles
                         where g.EntityType == p.EntityType
-                              && p.TriggerType != TriggerType.None
+                              && p.TriggerType != TriggerTypes.None
                         select ExecuteAsync(g.Entries, p, Context);
 
-            await Task.WhenAll(tasks);
+            await Task.WhenAll(tasks).ConfigureAwait(false);
         }
 
-        private static Task ExecuteAsync(IReadOnlyCollection<TriggerEntityState> entities, ITriggerProfile rule,
-            ITriggerContext context)
+        private static Task ExecuteAsync(IReadOnlyCollection<TriggerEntityState> entities, ITriggerProfile rule, ITriggerContext context)
         {
             List<dynamic> final;
 
-            if (rule.TriggerType == TriggerType.All)
+            if (rule.TriggerType == TriggerTypes.All)
             {
                 final = entities.GetTriggerEntity(rule.EntityType).ToList();
             }
@@ -80,19 +75,19 @@ namespace HBD.EfCore.Hooks.Triggers
             {
                 final = new List<dynamic>();
 
-                if (rule.TriggerType.HasFlag(TriggerType.Created))
+                if (rule.TriggerType.HasFlag(TriggerTypes.Created))
                     final.AddRange(entities.Where(e => e.State == EntityState.Added).GetTriggerEntity(rule.EntityType));
-                if (rule.TriggerType.HasFlag(TriggerType.Updated))
+                if (rule.TriggerType.HasFlag(TriggerTypes.Updated))
                     final.AddRange(entities.Where(e => e.State == EntityState.Modified)
                         .GetTriggerEntity(rule.EntityType));
-                if (rule.TriggerType.HasFlag(TriggerType.Deleted))
+                if (rule.TriggerType.HasFlag(TriggerTypes.Deleted))
                     final.AddRange(
                         entities.Where(e => e.State == EntityState.Deleted).GetTriggerEntity(rule.EntityType));
             }
 
-            return final.Any() ? (Task) ((dynamic)rule).Execute(final, context) : Task.CompletedTask;
+            return final.Any() ? (Task)((dynamic)rule).Execute(final, context) : Task.CompletedTask;
         }
 
-        #endregion Private Methods
+        #endregion Methods
     }
 }

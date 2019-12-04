@@ -4,18 +4,18 @@ using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using DataLayer;
 using FluentAssertions;
-using HBD.EfCore.Extensions.Tests.Helpers;
-using HBD.EfCore.Extensions.Tests.TestClasses;
 using HBD.EfCore.Extensions.Specification;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using HBD.TestHelper;
+using DataLayer.Specs;
 
 namespace HBD.EfCore.Extensions.Tests
 {
     [TestClass]
     public class SpecTests
     {
-        #region Public Methods
+        #region Methods
 
         [TestMethod]
         [Benchmark]
@@ -23,7 +23,7 @@ namespace HBD.EfCore.Extensions.Tests
         {
             var list = await UnitTestSetup.Db.Set<User>().AsNoTracking().ToPageableAsync(
                 new PageableSpec<User>(10, 100, u => u.FirstName,
-                    spec: new UserIdGreaterThan10Spec()));
+                    spec: new UserIdGreaterThan10Spec())).ConfigureAwait(false);
 
             list.Items.Count.Should().BeGreaterOrEqualTo(90);
             list.Items.All(u => u.Addresses.Count > 0).Should().BeTrue();
@@ -31,94 +31,93 @@ namespace HBD.EfCore.Extensions.Tests
         }
 
         [TestMethod]
-        [Benchmark]
-        public async Task TestSpecUser_Generic()
-        {
-            var list = await UnitTestSetup.Db.ForSpec<User, UserIdGreaterThan10Spec>().AsNoTracking().ToListAsync();
-            list.Should().NotBeEmpty();
-        }
-
-
-        [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public async Task TestPagingUser_NullOrderBy()
         {
             var list = await UnitTestSetup.Db.Set<User>().AsNoTracking().ToPageableAsync(
                 new PageableSpec<User>(10, 100, null,
-                    spec: new UserIdGreaterThan10Spec()));
+                    spec: new UserIdGreaterThan10Spec())).ConfigureAwait(false);
         }
 
         [TestMethod]
         [Benchmark]
-        public async Task TestUser_AndSpec()
+        public async Task TestSpecUser_Generic()
         {
-            var list = await UnitTestSetup.Db
-                .ForSpec(new UserIdGreaterThan10Spec().And(new UserAccountStartWithDSpec()))
-                .AsNoTracking()
-                .ToListAsync();
-
+            var list = await UnitTestSetup.Db.ForSpec<User, UserIdGreaterThan10Spec>().AsNoTracking().ToListAsync().ConfigureAwait(false);
             list.Should().NotBeEmpty();
-            list.All(u => u.Addresses.Count > 0).Should().BeTrue();
-            list.All(u => u.Account != null && u.Account.UserName.StartsWith("D")).Should().BeTrue();
-            list.All(u => u.Id > 10).Should().BeTrue();
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public async Task TestUser_ButNotNullSpec()
-        {
-            var spec = new UserIdGreaterThan10Spec().ButNot(null);
-            var list = await UnitTestSetup.Db.ForSpec(spec).AsNoTracking()
-                .ToListAsync();
-        }
+        //[TestMethod]
+        //[Benchmark]
+        //public async Task TestUser_AndSpec()
+        //{
+        //    var list = await UnitTestSetup.Db
+        //        .ForSpec(new UserIdGreaterThan10Spec())
+        //        .AsNoTracking()
+        //        .ToListAsync();
 
-        [TestMethod]
-        [Benchmark]
-        public async Task TestUser_ButNotSpec()
-        {
-            var spec = new UserIdGreaterThan10Spec().ButNot(new UserAccountStartWithDSpec());
-            var list = await UnitTestSetup.Db.ForSpec(spec).AsNoTracking()
-                .ToListAsync();
+        //    list.Should().NotBeEmpty();
+        //    list.All(u => u.Addresses.Count > 0).Should().BeTrue();
+        //    list.All(u => u.Account != null && u.Account.UserName.StartsWith("D")).Should().BeTrue();
+        //    list.All(u => u.Id > 10).Should().BeTrue();
+        //}
 
-            list.Should().NotBeEmpty();
-            list.All(u => u.Id > 10 && !u.Account.UserName.StartsWith("D")).Should().BeTrue();
-        }
+        //[TestMethod]
+        //[ExpectedException(typeof(ArgumentNullException))]
+        //public async Task TestUser_ButNotNullSpec()
+        //{
+        //    var spec = new UserIdGreaterThan10Spec().ButNot(null);
+        //    var list = await UnitTestSetup.Db.ForSpec(spec).AsNoTracking()
+        //        .ToListAsync();
+        //}
 
-        [TestMethod]
-        [Benchmark]
-        public async Task TestUser_NotMeSpec()
-        {
-            await UnitTestSetup.Db.SeedData();
+        //[TestMethod]
+        //[Benchmark]
+        //public async Task TestUser_ButNotSpec()
+        //{
+        //    var spec = new UserIdGreaterThan10Spec().ButNot(new UserAccountStartWithDSpec());
+        //    var list = await UnitTestSetup.Db.ForSpec(spec).AsNoTracking()
+        //        .ToListAsync();
 
-            var list = await UnitTestSetup.Db.ForSpec(new UserAccountStartWithDSpec().NotMe())
-                .AsNoTracking()
-                .Where(u => u.Account.UserName != null)
-                .ToListAsync();
+        //    list.Should().NotBeEmpty();
+        //    list.All(u => u.Id > 10 && !u.Account.UserName.StartsWith("D")).Should().BeTrue();
+        //}
 
-            list.Should().NotBeEmpty();
-            list.All(u => u.Account.UserName.StartsWith("D")).Should().BeFalse();
-        }
+        //[TestMethod]
+        //[Benchmark]
+        //public async Task TestUser_NotMeSpec()
+        //{
+        //    await UnitTestSetup.Db.SeedData();
 
-        [TestMethod]
-        [Benchmark]
-        public async Task TestUser_OrSpec()
-        {
-            var spec = new UserIdGreaterThan10Spec().Or(new UserAccountStartWithDSpec());
+        //    var list = await UnitTestSetup.Db.ForSpec(new UserAccountStartWithDSpec().NotMe())
+        //        .AsNoTracking()
+        //        .Where(u => u.Account.UserName != null)
+        //        .ToListAsync();
 
-            var list = await UnitTestSetup.Db.ForSpec(spec).AsNoTracking()
-                .ToListAsync();
+        //    list.Should().NotBeEmpty();
+        //    list.All(u => u.Account.UserName.StartsWith("D")).Should().BeFalse();
+        //}
 
-            list.Should().NotBeEmpty();
-            list.All(u => spec.IsSatisfied(u)).Should().BeTrue();
-        }
+        //[TestMethod]
+        //[Benchmark]
+        //public async Task TestUser_OrSpec()
+        //{
+        //    var spec = new UserIdGreaterThan10Spec().Or(new UserAccountStartWithDSpec());
+
+        //    var list = await UnitTestSetup.Db.ForSpec(spec).AsNoTracking()
+        //        .ToListAsync();
+
+        //    list.Should().NotBeEmpty();
+        //    list.All(u => spec.IsSatisfied(u)).Should().BeTrue();
+        //}
 
         [TestMethod]
         public async Task TestUserSpecAsync_IncludingAccount()
         {
-            await UnitTestSetup.Db.SeedData(force: true);
+            await UnitTestSetup.Db.SeedData(force: true).ConfigureAwait(false);
 
             var item = await UnitTestSetup.Db.ForSpec(new UserIncludeAccountSpec())
-                .AsNoTracking().LastOrDefaultAsync();
+                .AsNoTracking().FirstOrDefaultAsync().ConfigureAwait(false);
 
             item.Should().NotBeNull();
             item.Account.Should().NotBeNull();
@@ -127,12 +126,13 @@ namespace HBD.EfCore.Extensions.Tests
         [TestMethod]
         public async Task TestUserSpecAsync_IncludingAddress()
         {
-            var list = await UnitTestSetup.Db.ForSpec(new UserIdGreaterThan10Spec()).AsNoTracking().ToListAsync();
+            var list = await UnitTestSetup.Db.ForSpec(new UserIdGreaterThan10Spec()).AsNoTracking().ToListAsync().ConfigureAwait(false);
 
             list.Should().NotBeEmpty();
             list.All(u => u.Addresses.Count > 0).Should().BeTrue();
             list.All(u => u.Account == null).Should().BeTrue();
         }
-        #endregion Public Methods
+
+        #endregion Methods
     }
 }

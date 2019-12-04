@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.1.1</Version>
+    <Version>3.0.0-preview002</Version>
     <Authors>Duy Hoang</Authors>
     <Company>drunkcoding.net</Company>
     <Description>The libray allow to listening event of OnSaving and OnSaved from EfCore</Description>
@@ -14,13 +14,18 @@
     <RepositoryUrl>https://github.com/baoduy/HBD.EfCore.Extensions</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>EntityFrameworkCore, ModelBuilder Automation, Hooks</PackageTags>
-    <PackageReleaseNotes>Version 1.0.1
-- Update validation logic, stop validate if any error found.
+    <PackageReleaseNotes>
+      Version 3.0.0
+      - Support EfCore 3.x
 
-Version 1.0.0
-- Convert ISavingAware, Deep Validation from HBD.EfCore.Extensions to Hooks
-- Add Trigger Hook</PackageReleaseNotes>
-    <LangVersion>7.3</LangVersion>
+      Version 1.0.1
+      - Update validation logic, stop validate if any error found.
+
+      Version 1.0.0
+      - Convert ISavingAware, Deep Validation from HBD.EfCore.Extensions to Hooks
+      - Add Trigger Hook
+</PackageReleaseNotes>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -29,8 +34,11 @@ Version 1.0.0
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HBD.Framework.Extensions" Version="1.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.6" />
+    <PackageReference Include="HBD.Framework.Extensions" Version="3.0.0-preview002" />
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.0.0" />
   </ItemGroup>
-
 </Project>

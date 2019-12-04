@@ -1,17 +1,24 @@
-﻿using System;
+﻿using HBD.EfCore.Extensions.Configurations;
+using HBD.EfCore.Extensions.Options;
+using HBD.Framework.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using HBD.EfCore.Extensions.Configurations;
-using HBD.EfCore.Extensions.Options;
-using HBD.Framework.Extensions;
 
 // ReSharper disable CheckNamespace
 namespace Microsoft.EntityFrameworkCore
 {
     public static class DataSeedingConfigurationExtensions
     {
-        #region Public Methods
+        #region Fields
+
+        private static readonly MethodInfo Method = typeof(DataSeedingConfigurationExtensions)
+                    .GetMethod(nameof(RegisterData), BindingFlags.Static | BindingFlags.NonPublic);
+
+        #endregion Fields
+
+        #region Methods
 
         /// <summary>
         ///     Register EntityTypeConfiguration from RegistrationInfos <see cref="RegistrationInfo" />
@@ -25,25 +32,20 @@ namespace Microsoft.EntityFrameworkCore
                 modelBuilder.HasData(type);
         }
 
-        #endregion Public Methods
-
-        #region Private Methods
-
-        private static Type[] GetDataSeedingTypes(this Assembly[] assemblies)
-            => assemblies.Extract().Class().NotAbstract().NotGeneric().NotInterface()
+        private static Type[] GetDataSeedingTypes(this ICollection<Assembly> assemblies)
+        {
+            return assemblies.ToArray().Extract().Class().NotAbstract().NotGeneric().NotInterface()
                 .IsInstanceOf(typeof(IDataSeedingConfiguration<>)).Distinct().ToArray();
+        }
 
         private static Type[] GetDataSeedingTypes(this RegistrationInfo @this)
             => GetDataSeedingTypes(@this.EntityAssemblies);
-
-        static readonly MethodInfo Method = typeof(DataSeedingConfigurationExtensions)
-            .GetMethod(nameof(RegisterData), BindingFlags.Static | BindingFlags.NonPublic);
 
         private static void HasData(this ModelBuilder modelBuilder, Type mapperType)
         {
             if (mapperType == null) throw new ArgumentNullException(nameof(mapperType));
 
-            var eType = HBD.EfCore.Extensions.Extensions.GetEntityType(mapperType);
+            var eType = HBD.EfCore.Extensions.EfCoreExtensions.GetEntityType(mapperType);
 
             if (Method == null || eType == null)
                 throw new ArgumentException($"The {nameof(RegisterData)} or EntityType are not found");
@@ -57,11 +59,12 @@ namespace Microsoft.EntityFrameworkCore
             where TEntity : class
         {
             var dataSeeding = (IDataSeedingConfiguration<TEntity>)Activator.CreateInstance(typeof(TMapping));
+
             //dataSeeding.Apply(builder.Entity<TEntity>());
-            builder.Entity<TEntity>().HasData(dataSeeding.Data);
+            builder.Entity<TEntity>().HasData(dataSeeding.Data.ToArray());
             return builder;
         }
 
-        #endregion Private Methods
+        #endregion Methods
     }
 }

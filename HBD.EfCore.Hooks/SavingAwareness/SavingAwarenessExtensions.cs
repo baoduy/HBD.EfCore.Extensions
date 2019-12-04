@@ -1,28 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore.Internal;
 
 namespace HBD.EfCore.Hooks.SavingAwareness
 {
     public static class SavingAwarenessExtensions
     {
-        #region Public Methods
-
-        /// <summary>
-        /// Get Property Name of expression
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <typeparam name="TProp"></typeparam>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        private static string GetPropName<T, TProp>(this Expression<Func<T, TProp>> action) where T : class
-        {
-            var expression = GetMemberInfo(action);
-            return expression.Member.Name;
-        }
+        #region Methods
 
         /// <summary>
         /// Check whether the property value had been Add or Updated
@@ -33,6 +20,11 @@ namespace HBD.EfCore.Hooks.SavingAwareness
         /// <returns></returns>
         public static bool IsAddedOrHasChangedOn<T>(this EntityEntry<T> @this, Expression<Func<T, object>> props) where T : class
         {
+            if (@this is null)
+            {
+                throw new ArgumentNullException(nameof(@this));
+            }
+
             var property = props.GetPropertyAccess();
             var prop = @this.Properties.FirstOrDefault(i => i.Metadata.Name == property.Name);
 
@@ -47,10 +39,6 @@ namespace HBD.EfCore.Hooks.SavingAwareness
 
             return navigation.IsLoaded && navigation.IsModified;
         }
-
-        #endregion Public Methods
-
-        #region Private Methods
 
         /// <summary>
         /// Get Expression member
@@ -84,6 +72,19 @@ namespace HBD.EfCore.Hooks.SavingAwareness
             return memberExpr;
         }
 
-        #endregion Private Methods
+        /// <summary>
+        /// Get Property Name of expression
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TProp"></typeparam>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        private static string GetPropName<T, TProp>(this Expression<Func<T, TProp>> action) where T : class
+        {
+            var expression = GetMemberInfo(action);
+            return expression.Member.Name;
+        }
+
+        #endregion Methods
     }
 }

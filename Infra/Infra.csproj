@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Mappers\Profiles\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HBD.Framework.Extensions" Version="3.0.0-preview002" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.0.0" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Domains\Domains.csproj" />
+    <ProjectReference Include="..\HBD.EfCore.Extensions\HBD.EfCore.Extensions.csproj" />
+  </ItemGroup>
+
+</Project>

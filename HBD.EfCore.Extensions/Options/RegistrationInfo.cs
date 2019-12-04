@@ -1,14 +1,15 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using Microsoft.EntityFrameworkCore;
 
 namespace HBD.EfCore.Extensions.Options
 {
     public sealed class RegistrationInfo
     {
-        #region Internal Constructors
+        #region Constructors
 
         internal RegistrationInfo(params Assembly[] entityAssemblies)
         {
@@ -18,22 +19,27 @@ namespace HBD.EfCore.Extensions.Options
             EntityAssemblies = entityAssemblies;
         }
 
-        #endregion Internal Constructors
+        #endregion Constructors
 
-        #region Public Properties
-
-        public Assembly[] EntityAssemblies { get; }
-
-        #endregion Public Properties
-
-        #region Internal Properties
+        #region Properties
 
         internal Type[] DefaultEntityMapperTypes { get; private set; }
+
+        internal ICollection<Assembly> EntityAssemblies { get; }
+
+        internal bool IgnoreOtherEntities { get; private set; }
+
         internal Expression<Func<Type, bool>> Predicate { get; private set; }
 
-        #endregion Internal Properties
+        #endregion Properties
 
-        #region Public Methods
+        #region Methods
+
+        public RegistrationInfo IgnoreOthers()
+        {
+            IgnoreOtherEntities = true;
+            return this;
+        }
 
         /// <summary>
         /// The default mapper type of the Entity if the custom mapper is not found. This Mapper type
@@ -54,10 +60,6 @@ namespace HBD.EfCore.Extensions.Options
             return this;
         }
 
-        #endregion Public Methods
-
-        #region Internal Methods
-
         internal void Validate()
         {
             if (DefaultEntityMapperTypes == null) return;
@@ -71,6 +73,6 @@ namespace HBD.EfCore.Extensions.Options
                     $"The {nameof(DefaultEntityMapperTypes)} must be a instance of {typeof(IEntityTypeConfiguration<>).Name}.");
         }
 
-        #endregion Internal Methods
+        #endregion Methods
     }
 }

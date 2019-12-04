@@ -9,13 +9,13 @@ namespace DataLayer.Mappers
 {
     internal class AuditEntityMapper<T> : EntityTypeConfiguration<T> where T : BaseEntity
     {
-        #region Public Properties
+        #region Properties
 
         public static bool Called { get; private set; }
 
-        #endregion Public Properties
+        #endregion Properties
 
-        #region Public Methods
+        #region Methods
 
         public override void Configure(EntityTypeBuilder<T> builder)
         {
@@ -23,9 +23,9 @@ namespace DataLayer.Mappers
 
             base.Configure(builder);
             builder.HasIndex(c => c.Id).IsUnique();
-            builder.Property(c => c.Id).UseSqlServerIdentityColumn();
+            builder.Property(c => c.Id).UseIdentityColumn();
         }
 
-        #endregion Public Methods
+        #endregion Methods
     }
 }

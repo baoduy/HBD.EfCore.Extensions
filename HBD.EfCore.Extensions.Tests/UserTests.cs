@@ -1,6 +1,6 @@
 ﻿using DataLayer;
 using FluentAssertions;
-using HBD.EfCore.Extensions.Tests.Helpers;
+using HBD.TestHelper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 
@@ -9,7 +9,7 @@ namespace HBD.EfCore.Extensions.Tests
     [TestClass]
     public class UserTests
     {
-        #region Public Methods
+        #region Methods
 
         [TestMethod]
         public void AddUserAndAddress()
@@ -42,15 +42,15 @@ namespace HBD.EfCore.Extensions.Tests
             UnitTestSetup.Db.Add(user);
             UnitTestSetup.Db.SaveChanges();
 
-            var u = UnitTestSetup.Db.Set<User>().Last();
+            var u = UnitTestSetup.Db.Set<User>().First();
             u.Should().NotBeNull();
-            u.Addresses.Should().HaveCount(2);
+            u.Addresses.Should().HaveCountGreaterOrEqualTo(2);
 
-            u.Addresses.Remove(u.Addresses.Last());
+            u.Addresses.Remove(u.Addresses.First());
             UnitTestSetup.Db.SaveChanges();
 
-            u = UnitTestSetup.Db.Set<User>().Last();
-            u.Addresses.Should().HaveCount(1);
+            u = UnitTestSetup.Db.Set<User>().First();
+            u.Addresses.Should().HaveCountGreaterOrEqualTo(1);
 
             UnitTestSetup.Db.ChangeTracker.AutoDetectChangesEnabled.Should().BeTrue();
         }
@@ -61,6 +61,7 @@ namespace HBD.EfCore.Extensions.Tests
             var user = new User();
             user.Id.Should().Be(0);
         }
-        #endregion Public Methods
+
+        #endregion Methods
     }
 }

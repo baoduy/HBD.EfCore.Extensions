@@ -1,12 +1,14 @@
-﻿namespace HBD.EfCore.Extensions.Configurations
+﻿using System.Collections.Generic;
+
+namespace HBD.EfCore.Extensions.Configurations
 {
     public interface IDataSeedingConfiguration<TEntity> where TEntity : class
     {
-        #region Public Properties
+        #region Properties
 
         //void Apply(EntityTypeBuilder<TEntity> builder);
-        TEntity[] Data { get; }
+        ICollection<TEntity> Data { get; }
 
-        #endregion Public Properties
+        #endregion Properties
     }
 }

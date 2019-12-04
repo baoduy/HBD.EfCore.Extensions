@@ -5,7 +5,12 @@ namespace HBD.EfCore.Extensions.Attributes
     [AttributeUsage(AttributeTargets.Enum)]
     public sealed class StaticDataAttribute : Attribute
     {
-        public string Table { get; set; }
+        #region Properties
+
         public string Schema { get; set; }
+
+        public string Table { get; set; }
+
+        #endregion Properties
     }
 }

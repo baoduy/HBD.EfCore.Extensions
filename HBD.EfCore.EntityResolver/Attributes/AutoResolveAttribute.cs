@@ -1,7 +1,7 @@
 ﻿using HBD.EfCore.Extensions.Specification;
 using System;
 
-namespace HBD.EfCore.EntityResolver.Attributes
+namespace HBD.EfCore.EntityResolvers.Attributes
 {
     /// <inheritdoc />
     /// <summary>
@@ -10,16 +10,17 @@ namespace HBD.EfCore.EntityResolver.Attributes
     [AttributeUsage(AttributeTargets.Property)]
     public sealed class AutoResolveAttribute : Attribute
     {
-        #region Public Constructors
+        #region Constructors
+
         /// <summary>
         /// Resolve with entity type if entity type is not provided it will be find from Linked interface of Property Type
         /// </summary>
         /// <param name="entityType"></param>
         public AutoResolveAttribute(Type entityType = null) => EntityType = entityType;
 
-        #endregion Public Constructors
+        #endregion Constructors
 
-        #region Public Properties
+        #region Properties
 
         /// <summary>
         /// The Type of Entity will be resolved.
@@ -33,6 +34,6 @@ namespace HBD.EfCore.EntityResolver.Attributes
         /// </summary>
         public Type SpecType { get; set; }
 
-        #endregion Public Properties
+        #endregion Properties
     }
 }

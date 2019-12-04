@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using HBD.EfCore.EntityResolver.Internal;
+using HBD.EfCore.EntityResolvers.Internal;
 using Microsoft.EntityFrameworkCore.Internal;
 using System;
 using System.Collections;
@@ -12,22 +12,22 @@ using DbContext = Microsoft.EntityFrameworkCore.DbContext;
 
 // ReSharper disable ClassWithVirtualMembersNeverInherited.Global
 
-namespace HBD.EfCore.EntityResolver
+namespace HBD.EfCore.EntityResolvers
 {
     public class EntityResolverAsync : EntityResolverAsync<DbContext>, IEntityResolverAsync
     {
-        #region Public Constructors
+        #region Constructors
 
         public EntityResolverAsync(DbContext dbContext, IMapper mapper) : base(dbContext, mapper)
         {
         }
 
-        #endregion Public Constructors
+        #endregion Constructors
     }
 
     public class EntityResolverAsync<TDbDbContext> : IEntityResolverAsync<TDbDbContext> where TDbDbContext : DbContext
     {
-        #region Public Constructors
+        #region Constructors
 
         public EntityResolverAsync(TDbDbContext dbContext, IMapper mapper = null)
         {
@@ -35,31 +35,27 @@ namespace HBD.EfCore.EntityResolver
             Mapper = mapper;
         }
 
-        #endregion Public Constructors
+        #endregion Constructors
 
-        #region Public Properties
+        #region Properties
 
         public TDbDbContext DbContext { get; }
 
         public IMapper Mapper { get; }
 
-        #endregion Public Properties
+        protected MethodInfo GetEntitiesKeyOrSpecAsyncMethod { get; } = typeof(ResolverExtensions)
+                                    .GetMethod(nameof(ResolverExtensions.GetEntitiesByKeyOrSpecAsync), BindingFlags.Static | BindingFlags.NonPublic);
 
-        #region Protected Properties
+        #endregion Properties
 
-        protected MethodInfo GetEntitiesKeyOrSpecAsyncMethod { get; } = typeof(Extensions)
-                                    .GetMethod(nameof(Extensions.GetEntitiesByKeyOrSpecAsync), BindingFlags.Static | BindingFlags.NonPublic);
-
-        #endregion Protected Properties
-
-        #region Public Methods
+        #region Methods
 
         /// <inheritdoc/>
         public async Task ResolveAndMapAsync<TModel>(TModel source, object destination, bool ignoreOtherProperties = false)
             where TModel : class
         {
             EnsureMapperAvailable();
-            var results = await ResolveAsync(source, ignoreOtherProperties);
+            var results = await ResolveAsync(source, ignoreOtherProperties).ConfigureAwait(false);
             if (results == null) return;
             Mapper.Map(results, destination);
         }
@@ -69,7 +65,7 @@ namespace HBD.EfCore.EntityResolver
             where TDestination : class
         {
             EnsureMapperAvailable();
-            var results = await ResolveAsync(source, ignoreOtherProperties);
+            var results = await ResolveAsync(source, ignoreOtherProperties).ConfigureAwait(false);
             return results == null ? null : (TDestination)Mapper.Map<TDestination>(results);
         }
 
@@ -77,7 +73,7 @@ namespace HBD.EfCore.EntityResolver
         public async Task<dynamic> ResolveAsync<TModel>(TModel model, bool ignoreOtherProperties = false) where TModel : class
         {
             var config = InternalCache.GetModelInfo(model);
-            if (!EnumerableExtensions.Any(config))
+            if (!config.Any())
                 return null;
 
             IDictionary<string, object> dynamicModel = ignoreOtherProperties ? new ExpandoObject() : model.ToDynamic();
@@ -94,41 +90,41 @@ namespace HBD.EfCore.EntityResolver
                 }
 
                 if (propValue == null) continue;
-                var items = await ResolveItem(propValue, propertyInfo);
 
-                dynamicModel[name] = propValue is ICollection ? items.ToList() : items.SingleOrDefault();
+                var items = new List<dynamic>();
+
+                await foreach (var i in ResolveItem(propValue, propertyInfo))
+                    items.Add(i);
+
+                dynamicModel[name] = propValue is ICollection ? items : items.SingleOrDefault();
             }
 
             return dynamicModel;
         }
 
-        #endregion Public Methods
-
-        #region Protected Methods
-
         protected virtual string GetPropName(string originalName)
-            => originalName.Replace("Id", string.Empty)
-                .Replace("_Id", string.Empty);
+            => originalName == null
+            ? originalName
+            : originalName
+                .Replace("Id", string.Empty, StringComparison.OrdinalIgnoreCase)
+                .Replace("_Id", string.Empty, StringComparison.OrdinalIgnoreCase);
 
-        protected virtual async Task<IEnumerable<dynamic>> ResolveItem(
-            object value,
-            ResolverPropertyInfo resolverPropertyInfo)
+        protected virtual IAsyncEnumerable<dynamic> ResolveItem(object value, ResolverPropertyInfo resolverPropertyInfo)
         {
+            if (resolverPropertyInfo is null)
+                throw new ArgumentNullException(nameof(resolverPropertyInfo));
+
             var md = GetEntitiesKeyOrSpecAsyncMethod.MakeGenericMethod(resolverPropertyInfo.Attribute.EntityType);
             var specType = resolverPropertyInfo.Attribute.SpecType;
 
-            return await (Task<IEnumerable<dynamic>>)md.Invoke(this, new[] { DbContext, value, specType });
+            return (IAsyncEnumerable<dynamic>)md.Invoke(this, new[] { DbContext, value, specType });
         }
-
-        #endregion Protected Methods
-
-        #region Private Methods
 
         private void EnsureMapperAvailable()
         {
             if (Mapper == null) throw new InvalidOperationException($"{nameof(Mapper)} is NULL");
         }
 
-        #endregion Private Methods
+        #endregion Methods
     }
 }

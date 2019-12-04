@@ -2,6 +2,8 @@
 using HBD.EfCore.EntityResolver.Tests.Entities;
 using HBD.EfCore.EntityResolver.Tests.Helpers;
 using HBD.EfCore.EntityResolver.Tests.Models;
+using HBD.EfCore.EntityResolvers;
+using HBD.TestHelper;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -11,47 +13,30 @@ namespace HBD.EfCore.EntityResolver.Tests
     [TestClass]
     public class TestEntityResolver
     {
-        [TestMethod]
-        public void Test_SingleItem()
-        {
-            var db = UnitTestSetup.Db;
-            db.SeedData().GetAwaiter().GetResult();
-
-            var resolver = new EntityResolver(db, null);
-
-            var result = resolver.Resolve(new UserModel
-            {
-                AccountId = 1,
-                OtherAccount = new AccountBasicViewModel { Id = 2 }
-            });
-
-            (result.Account as Account).Should().NotBeNull();
-            (result.OtherAccount as Account).Should().NotBeNull();
-        }
+        #region Methods
 
         [TestMethod]
-        public void Test_Without_Spec_Item()
+        public void Test_AlwaysIncluded()
         {
-            var db = UnitTestSetup.Db;
+            var db = ResolverTestSetup.Db;
             db.SeedData().GetAwaiter().GetResult();
 
-            var resolver = new EntityResolver(db, null);
+            var resolver = ResolverTestSetup.Provider.GetService<IEntityResolver>();
 
-            var result = resolver.Resolve(new UserModel
-            {
-                OtherAccountWithoutSpec = new AccountBasicViewModel { Id = 1 }
-            });
+            var rs = resolver.Resolve(new UserModel());
+            (rs.CreateDateTime as DateTime?).Should().BeOnOrAfter(DateTime.Today);
 
-            (result.OtherAccountWithoutSpec as Account).Should().NotBeNull();
+            rs = resolver.Resolve(new UserModel(), true);
+            (rs.CreateDateTime as DateTime?).Should().BeOnOrAfter(DateTime.Today);
         }
 
         [TestMethod]
         public void Test_Collection_Items()
         {
-            var db = UnitTestSetup.Db;
+            var db = ResolverTestSetup.Db;
             db.SeedData().GetAwaiter().GetResult();
 
-            var resolver = new EntityResolver(db, null);
+            var resolver = new HBD.EfCore.EntityResolvers.EntityResolver(db, null);
 
             var result = resolver.Resolve(new UserModel
             {
@@ -64,28 +49,36 @@ namespace HBD.EfCore.EntityResolver.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
-        public void Test_ResolveAndMap_Error()
+        public void Test_Generic_ResolveAndMap_Exception()
         {
-            var db = UnitTestSetup.Db;
+            var db = ResolverTestSetup.Db;
             db.SeedData().GetAwaiter().GetResult();
 
-            var resolver = new EntityResolver(db, null);
-            var user = resolver.ResolveAndMap<User>(new UserModel
-            {
-                ListAccounts = new[] {
-                    new AccountBasicViewModel { Id = 1 },
-                    new AccountBasicViewModel { Id = 2 } }
-            });
+            var resolver = ResolverTestSetup.Provider.GetService<IEntityResolver>();
+
+            var result = resolver.ResolveAndMap<User>(new object());
+            result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void Test_Resolve_Exception()
+        {
+            var db = ResolverTestSetup.Db;
+            db.SeedData().GetAwaiter().GetResult();
+
+            var resolver = ResolverTestSetup.Provider.GetService<IEntityResolver>();
+
+            var result = resolver.Resolve(new object());
+            ((object)result).Should().BeNull();
         }
 
         [TestMethod]
         public void Test_ResolveAndMap()
         {
-            var db = UnitTestSetup.Db;
+            var db = ResolverTestSetup.Db;
             db.SeedData().GetAwaiter().GetResult();
 
-            var resolver = UnitTestSetup.Provider.GetService<IEntityResolver>();
+            var resolver = ResolverTestSetup.Provider.GetService<IEntityResolver>();
 
             var user = resolver.ResolveAndMap<User>(new UserModel
             {
@@ -100,53 +93,66 @@ namespace HBD.EfCore.EntityResolver.Tests
         }
 
         [TestMethod]
-        public void Test_Resolve_Exception()
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void Test_ResolveAndMap_Error()
         {
-            var db = UnitTestSetup.Db;
+            var db = ResolverTestSetup.Db;
             db.SeedData().GetAwaiter().GetResult();
 
-            var resolver = UnitTestSetup.Provider.GetService<IEntityResolver>();
-
-            var result = resolver.Resolve(new object());
-            ((object)result).Should().BeNull();
-        }
-
-        [TestMethod]
-        public void Test_Generic_ResolveAndMap_Exception()
-        {
-            var db = UnitTestSetup.Db;
-            db.SeedData().GetAwaiter().GetResult();
-
-            var resolver = UnitTestSetup.Provider.GetService<IEntityResolver>();
-
-            var result = resolver.ResolveAndMap<User>(new object());
-            result.Should().BeNull();
+            var resolver = new HBD.EfCore.EntityResolvers.EntityResolver(db, null);
+            var user = resolver.ResolveAndMap<User>(new UserModel
+            {
+                ListAccounts = new[] {
+                    new AccountBasicViewModel { Id = 1 },
+                    new AccountBasicViewModel { Id = 2 } }
+            });
         }
 
         [TestMethod]
         public void Test_ResolveAndMap_Exception()
         {
-            var db = UnitTestSetup.Db;
+            var db = ResolverTestSetup.Db;
             db.SeedData().GetAwaiter().GetResult();
 
-            var resolver = UnitTestSetup.Provider.GetService<IEntityResolver>();
+            var resolver = ResolverTestSetup.Provider.GetService<IEntityResolver>();
 
             resolver.ResolveAndMap(new object(), new User());
         }
 
         [TestMethod]
-        public void Test_AlwaysIncluded()
+        public void Test_SingleItem()
         {
-            var db = UnitTestSetup.Db;
+            var db = ResolverTestSetup.Db;
             db.SeedData().GetAwaiter().GetResult();
 
-            var resolver = UnitTestSetup.Provider.GetService<IEntityResolver>();
+            var resolver = new HBD.EfCore.EntityResolvers.EntityResolver(db, null);
 
-            var rs = resolver.Resolve(new UserModel());
-            (rs.CreateDateTime as DateTime?).Should().BeOnOrAfter(DateTime.Today);
+            var result = resolver.Resolve(new UserModel
+            {
+                AccountId = 1,
+                OtherAccount = new AccountBasicViewModel { Id = 2 }
+            });
 
-            rs = resolver.Resolve(new UserModel(), true);
-            (rs.CreateDateTime as DateTime?).Should().BeOnOrAfter(DateTime.Today);
+            (result.Account as Account).Should().NotBeNull();
+            (result.OtherAccount as Account).Should().NotBeNull();
         }
+
+        [TestMethod]
+        public void Test_Without_Spec_Item()
+        {
+            var db = ResolverTestSetup.Db;
+            db.SeedData().GetAwaiter().GetResult();
+
+            var resolver = new HBD.EfCore.EntityResolvers.EntityResolver(db, null);
+
+            var result = resolver.Resolve(new UserModel
+            {
+                OtherAccountWithoutSpec = new AccountBasicViewModel { Id = 1 }
+            });
+
+            (result.OtherAccountWithoutSpec as Account).Should().NotBeNull();
+        }
+
+        #endregion Methods
     }
 }

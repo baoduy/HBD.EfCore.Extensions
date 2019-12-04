@@ -7,21 +7,20 @@ namespace HBD.EfCore.Hooks.Internal
 {
     internal class ServiceInjectionExtension : InternalDbContextOptionsExtension, IServiceInjectionExtension
     {
-        #region Private Fields
+        #region Fields
 
         private readonly IList<Action<IServiceCollection>> _factories = new List<Action<IServiceCollection>>();
 
-        #endregion Private Fields
+        #endregion Fields
 
-        #region Public Methods
+        #region Methods
 
-        public override bool ApplyServices(IServiceCollection services)
+        public override void ApplyServices(IServiceCollection services)
         {
             foreach (var factory in _factories)
                 factory(services);
 
             _factories.Clear();
-            return base.ApplyServices(services);
         }
 
         public void Includes(Action<IServiceCollection> factory)
@@ -30,6 +29,6 @@ namespace HBD.EfCore.Hooks.Internal
             _factories.Add(factory);
         }
 
-        #endregion Public Methods
+        #endregion Methods
     }
 }

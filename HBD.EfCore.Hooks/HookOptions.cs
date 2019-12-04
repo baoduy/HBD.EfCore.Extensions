@@ -1,21 +1,22 @@
-﻿using System;
+﻿using HBD.Framework.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using HBD.Framework.Extensions;
 
 namespace HBD.EfCore.Hooks
 {
     public class HookOptions
     {
-        #region Private Fields
+        #region Properties
 
-        internal  HashSet<IHook> HooksInstance { get; } = new HashSet<IHook>();
-        internal  HashSet<Type> HooksTypes  { get; }= new HashSet<Type>();
+        internal HashSet<IHook> HooksInstance { get; } = new HashSet<IHook>();
 
-        #endregion Private Fields
+        internal HashSet<Type> HooksTypes { get; } = new HashSet<Type>();
 
-        #region Public Methods
+        #endregion Properties
+
+        #region Methods
 
         public HookOptions Add<THookProvider>() where THookProvider : IHook
         {
@@ -38,6 +39,6 @@ namespace HBD.EfCore.Hooks
             return this;
         }
 
-        #endregion Public Methods
+        #endregion Methods
     }
 }

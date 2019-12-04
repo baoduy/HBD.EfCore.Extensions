@@ -1,7 +1,7 @@
 ﻿using DataLayer;
+using DataLayer.Specs;
 using FluentAssertions;
-using HBD.EfCore.Extensions.Tests.Helpers;
-using HBD.EfCore.Extensions.Tests.TestClasses;
+using HBD.TestHelper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
@@ -11,7 +11,7 @@ namespace HBD.EfCore.Extensions.Tests
     [TestClass]
     public class ExtensionsTests
     {
-        #region Public Methods
+        #region Methods
 
         [TestMethod]
         public void Test_GetKeys()
@@ -108,6 +108,6 @@ namespace HBD.EfCore.Extensions.Tests
             user.NotReadOnly.Should().Be(user1.NotReadOnly);
         }
 
-        #endregion Public Methods
+        #endregion Methods
     }
 }

@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using HBD.EfCore.EntityResolver.Internal;
+using HBD.EfCore.EntityResolvers.Internal;
 using Microsoft.EntityFrameworkCore.Internal;
 using System;
 using System.Collections;
@@ -11,22 +11,22 @@ using DbContext = Microsoft.EntityFrameworkCore.DbContext;
 
 // ReSharper disable ClassWithVirtualMembersNeverInherited.Global
 
-namespace HBD.EfCore.EntityResolver
+namespace HBD.EfCore.EntityResolvers
 {
     public class EntityResolver : EntityResolver<DbContext>, IEntityResolver
     {
-        #region Public Constructors
+        #region Constructors
 
         public EntityResolver(DbContext dbContext, IMapper mapper) : base(dbContext, mapper)
         {
         }
 
-        #endregion Public Constructors
+        #endregion Constructors
     }
 
     public class EntityResolver<TDbDbContext> : IEntityResolver<TDbDbContext> where TDbDbContext : DbContext
     {
-        #region Public Constructors
+        #region Constructors
 
         public EntityResolver(TDbDbContext dbContext, IMapper mapper = null)
         {
@@ -34,30 +34,26 @@ namespace HBD.EfCore.EntityResolver
             Mapper = mapper;
         }
 
-        #endregion Public Constructors
+        #endregion Constructors
 
-        #region Public Properties
+        #region Properties
 
         public TDbDbContext DbContext { get; }
 
         public IMapper Mapper { get; }
 
-        #endregion Public Properties
+        protected MethodInfo GetEntitiesKeyOrSpecMethod { get; } = typeof(ResolverExtensions)
+                                    .GetMethod(nameof(ResolverExtensions.GetEntitiesByKeyOrSpec), BindingFlags.Static | BindingFlags.NonPublic);
 
-        #region Protected Properties
+        #endregion Properties
 
-        protected MethodInfo GetEntitiesKeyOrSpecMethod { get; } = typeof(Extensions)
-                                    .GetMethod(nameof(Extensions.GetEntitiesByKeyOrSpec), BindingFlags.Static | BindingFlags.NonPublic);
-
-        #endregion Protected Properties
-
-        #region Public Methods
+        #region Methods
 
         /// <inheritdoc/>
         public dynamic Resolve<TModel>(TModel model, bool ignoreOtherProperties = false) where TModel : class
         {
             var config = InternalCache.GetModelInfo(model);
-            if (!EnumerableExtensions.Any(config))
+            if (!config.Any())
                 return null;
 
             IDictionary<string, object> dynamicModel = ignoreOtherProperties ? new ExpandoObject() : model.ToDynamic();
@@ -87,7 +83,7 @@ namespace HBD.EfCore.EntityResolver
         {
             EnsureMapperAvailable();
             var results = Resolve(source, ignoreOtherProperties);
-            if(results==null)return;
+            if (results == null) return;
             Mapper.Map(results, destination);
         }
 
@@ -97,36 +93,31 @@ namespace HBD.EfCore.EntityResolver
         {
             EnsureMapperAvailable();
             var results = Resolve(source, ignoreOtherProperties);
-            return results == null ? null : (TDestination) Mapper.Map<TDestination>(results);
+            return results == null ? null : (TDestination)Mapper.Map<TDestination>(results);
         }
 
-        #endregion Public Methods
-
-        #region Protected Methods
-
         protected virtual string GetPropName(string originalName)
-            => originalName.Replace("Id", string.Empty)
-                .Replace("_Id", string.Empty);
+            => originalName == null ? originalName : originalName.Replace("Id", string.Empty, StringComparison.OrdinalIgnoreCase)
+                .Replace("_Id", string.Empty, StringComparison.OrdinalIgnoreCase);
 
         protected virtual IEnumerable<dynamic> ResolveItem(
             object value,
             ResolverPropertyInfo resolverPropertyInfo)
         {
+            if (resolverPropertyInfo is null)
+                throw new ArgumentNullException(nameof(resolverPropertyInfo));
+
             var md = GetEntitiesKeyOrSpecMethod.MakeGenericMethod(resolverPropertyInfo.Attribute.EntityType);
             var specType = resolverPropertyInfo.Attribute.SpecType;
 
             return (IEnumerable<dynamic>)md.Invoke(this, new[] { DbContext, value, specType });
         }
 
-        #endregion Protected Methods
-
-        #region Private Methods
-
         private void EnsureMapperAvailable()
         {
             if (Mapper == null) throw new InvalidOperationException($"{nameof(Mapper)} is NULL");
         }
 
-        #endregion Private Methods
+        #endregion Methods
     }
 }

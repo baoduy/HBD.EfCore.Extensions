@@ -6,12 +6,12 @@ namespace HBD.EfCore.Extensions.Configurations
     public class EntityTypeConfiguration<TEntity> : IEntityTypeConfiguration<TEntity>
         where TEntity : class
     {
-        #region Public Methods
+        #region Methods
 
         public virtual void Configure(EntityTypeBuilder<TEntity> builder)
         {
         }
 
-        #endregion Public Methods
+        #endregion Methods
     }
 }

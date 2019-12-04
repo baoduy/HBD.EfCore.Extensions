@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace HBD.EfCore.EntityResolver.Attributes
+namespace HBD.EfCore.EntityResolvers.Attributes
 {
     /// <inheritdoc />
     /// <summary>
@@ -9,6 +9,10 @@ namespace HBD.EfCore.EntityResolver.Attributes
     [AttributeUsage(AttributeTargets.Property)]
     public sealed class AlwaysIncludedAttribute : Attribute
     {
+        #region Properties
+
         public bool AlwaysIncluded { get; set; } = true;
+
+        #endregion Properties
     }
 }

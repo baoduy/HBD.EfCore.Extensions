@@ -6,7 +6,14 @@ namespace HBD.EfCore.Extensions.Abstractions
 {
     public abstract class AuditEntity<TKey> : Entity<TKey>, IAuditEntity<TKey>
     {
-        #region Protected Constructors
+        #region Fields
+
+        [NotMapped]
+        private readonly bool _loadedFromDb = false;
+
+        #endregion Fields
+
+        #region Constructors
 
         /// <inheritdoc/>
         protected AuditEntity(TKey id, string createdBy, DateTimeOffset? createdOn = null) : base(id)
@@ -16,17 +23,13 @@ namespace HBD.EfCore.Extensions.Abstractions
         }
 
         /// <inheritdoc/>
-        protected AuditEntity(TKey id) : base(id)
-        {
-        }
+        protected AuditEntity(TKey id) : base(id) { }
 
-        protected AuditEntity()
-        {
-        }
+        protected AuditEntity() => _loadedFromDb = true;
 
-        #endregion Protected Constructors
+        #endregion Constructors
 
-        #region Public Properties
+        #region Properties
 
         [MaxLength(256)]
         [Column(Order = 996)]
@@ -42,9 +45,9 @@ namespace HBD.EfCore.Extensions.Abstractions
         [Column(Order = 999)]
         public DateTimeOffset? UpdatedOn { get; private set; }
 
-        #endregion Public Properties
+        #endregion Properties
 
-        #region Protected Methods
+        #region Methods
 
         /// <summary>
         /// Update UpdatedBy UserName info.
@@ -54,7 +57,7 @@ namespace HBD.EfCore.Extensions.Abstractions
         {
             //If ID is default means the entity is not saved yet.
             //Only Set the value if Id >=0
-            if (KeyComparer.Equals(Id, default))
+            if (!_loadedFromDb)
             {
                 CreatedBy = userName ?? throw new ArgumentNullException(nameof(userName));
                 CreatedOn = DateTimeOffset.Now;
@@ -65,12 +68,12 @@ namespace HBD.EfCore.Extensions.Abstractions
             UpdatedOn = DateTimeOffset.Now;
         }
 
-        #endregion Protected Methods
+        #endregion Methods
     }
 
     public abstract class AuditEntity : AuditEntity<int>, IAuditEntity
     {
-        #region Protected Constructors
+        #region Constructors
 
         protected AuditEntity(int id, string createdBy, DateTimeOffset? createdOn = null) : base(id, createdBy, createdOn)
         {
@@ -86,12 +89,12 @@ namespace HBD.EfCore.Extensions.Abstractions
         {
         }
 
-        #endregion Protected Constructors
+        #endregion Constructors
     }
 
     public abstract class AuditEntityGuid : AuditEntity<Guid>, IAuditEntity<Guid>
     {
-        #region Protected Constructors
+        #region Constructors
 
         protected AuditEntityGuid(Guid id, string createdBy, DateTimeOffset? createdOn = null)
             : base(id, createdBy, createdOn)
@@ -108,6 +111,6 @@ namespace HBD.EfCore.Extensions.Abstractions
         {
         }
 
-        #endregion Protected Constructors
+        #endregion Constructors
     }
 }

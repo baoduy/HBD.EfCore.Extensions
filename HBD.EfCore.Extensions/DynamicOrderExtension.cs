@@ -7,7 +7,30 @@ namespace HBD.EfCore.Extensions
 {
     public static class DynamicOrderExtension
     {
-        #region Private Methods
+        #region Methods
+
+        public static IOrderedQueryable<T> OrderByDescendingDynamic<T>(this IQueryable<T> source, string[] properties)
+            =>
+                properties.Aggregate<string, IOrderedQueryable<T>>(null,
+                    (current, p) =>
+                        current == null ? source.OrderByDescendingDynamic(p) : current.ThenByDescendingDynamic(p));
+
+        public static IOrderedQueryable<T> OrderByDescendingDynamic<T>(this IQueryable<T> source, string property)
+            => ApplyOrder(source, property, "OrderByDescending");
+
+        public static IOrderedQueryable<T> OrderByDynamic<T>(this IQueryable<T> source, string[] properties)
+            =>
+                properties.Aggregate<string, IOrderedQueryable<T>>(null,
+                    (current, p) => current == null ? source.OrderByDynamic(p) : current.ThenByDynamic(p));
+
+        public static IOrderedQueryable<T> OrderByDynamic<T>(this IQueryable<T> source, string property)
+            => ApplyOrder(source, property, "OrderBy");
+
+        public static IOrderedQueryable<T> ThenByDescendingDynamic<T>(this IOrderedQueryable<T> source, string property)
+            => ApplyOrder(source, property, "ThenByDescending");
+
+        public static IOrderedQueryable<T> ThenByDynamic<T>(this IOrderedQueryable<T> source, string property)
+            => ApplyOrder(source, property, "ThenBy");
 
         private static IOrderedQueryable<T> ApplyOrder<T>(IQueryable<T> source, string property, string methodName)
         {
@@ -38,38 +61,11 @@ namespace HBD.EfCore.Extensions
                               && method.GetGenericArguments().Length == 2
                               && method.GetParameters().Length == 2)
                 .MakeGenericMethod(typeof(T), type)
-                .Invoke(null, new object[] {source, lambda});
+                .Invoke(null, new object[] { source, lambda });
 
-            return (IOrderedQueryable<T>) result;
+            return (IOrderedQueryable<T>)result;
         }
 
-        #endregion Private Methods
-
-        #region Public Methods
-
-        public static IOrderedQueryable<T> OrderByDescendingDynamic<T>(this IQueryable<T> source, string[] properties)
-            =>
-                properties.Aggregate<string, IOrderedQueryable<T>>(null,
-                    (current, p) =>
-                        current == null ? source.OrderByDescendingDynamic(p) : current.ThenByDescendingDynamic(p));
-
-        public static IOrderedQueryable<T> OrderByDescendingDynamic<T>(this IQueryable<T> source, string property)
-            => ApplyOrder(source, property, "OrderByDescending");
-
-        public static IOrderedQueryable<T> OrderByDynamic<T>(this IQueryable<T> source, string[] properties)
-            =>
-                properties.Aggregate<string, IOrderedQueryable<T>>(null,
-                    (current, p) => current == null ? source.OrderByDynamic(p) : current.ThenByDynamic(p));
-
-        public static IOrderedQueryable<T> OrderByDynamic<T>(this IQueryable<T> source, string property)
-            => ApplyOrder(source, property, "OrderBy");
-
-        public static IOrderedQueryable<T> ThenByDescendingDynamic<T>(this IOrderedQueryable<T> source, string property)
-            => ApplyOrder(source, property, "ThenByDescending");
-
-        public static IOrderedQueryable<T> ThenByDynamic<T>(this IOrderedQueryable<T> source, string property)
-            => ApplyOrder(source, property, "ThenBy");
-
-        #endregion Public Methods
+        #endregion Methods
     }
 }

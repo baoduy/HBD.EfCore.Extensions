@@ -2,14 +2,15 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Debug;
+using System;
 
 namespace HBD.TestHelper
 {
     public static class SqliteMemory
     {
-        #region Public Properties
+        #region Properties
 
-        private static LoggerFactory DebugLoggerFactory =>
+        public static LoggerFactory DebugLoggerFactory =>
              new LoggerFactory(new[]
             {
                new DebugLoggerProvider()
@@ -18,17 +19,21 @@ namespace HBD.TestHelper
                 Rules =
                 {
                     new LoggerFilterRule("EfCoreDebugger", string.Empty,
-                        LogLevel.Trace, (m, n, l) => m.Contains("Query"))
+                        LogLevel.Trace, (m, n, l) => m.Contains("Query",StringComparison.OrdinalIgnoreCase))
                 }
             });
 
-        #endregion Public Properties
+        #endregion Properties
 
-        #region Public Methods
+        #region Methods
 
         public static DbContextOptionsBuilder UseDebugLogger(this DbContextOptionsBuilder @this)
-            => @this.UseLoggerFactory(DebugLoggerFactory);
+        {
+            if (@this is null)
+                throw new ArgumentNullException(nameof(@this));
 
+            return @this.UseLoggerFactory(DebugLoggerFactory);
+        }
 
         public static DbContextOptionsBuilder UseSqliteMemory(this DbContextOptionsBuilder @this)
         {
@@ -40,6 +45,6 @@ namespace HBD.TestHelper
             return @this;
         }
 
-        #endregion Public Methods
+        #endregion Methods
     }
 }

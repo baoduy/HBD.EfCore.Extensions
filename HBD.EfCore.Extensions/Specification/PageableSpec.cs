@@ -1,19 +1,13 @@
-﻿using System;
+﻿using HBD.EfCore.Extensions.Utilities;
+using System;
 using System.Linq;
 using System.Linq.Expressions;
-using Remotion.Linq.Clauses;
 
 namespace HBD.EfCore.Extensions.Specification
 {
     public class PageableSpec<T> : Spec<T>
     {
-        #region Private Fields
-
-        public Spec<T> InternalSpec { get; }
-
-        #endregion Private Fields
-
-        #region Public Constructors
+        #region Constructors
 
         public PageableSpec(int pageIndex, int pageSize, Expression<Func<T, object>> orderBy, OrderingDirection direction = OrderingDirection.Asc, Spec<T> spec = null)
         {
@@ -24,9 +18,11 @@ namespace HBD.EfCore.Extensions.Specification
             InternalSpec = spec;
         }
 
-        #endregion Public Constructors
+        #endregion Constructors
 
-        #region Public Properties
+        #region Properties
+
+        public Spec<T> InternalSpec { get; }
 
         public Expression<Func<T, object>> OrderBy { get; }
 
@@ -36,16 +32,16 @@ namespace HBD.EfCore.Extensions.Specification
 
         public int PageSize { get; }
 
-        #endregion Public Properties
+        #endregion Properties
 
-        #region Public Methods
+        #region Methods
 
-        public override IQueryable<T> Includes(IQueryable<T> query) 
+        public override IQueryable<T> Includes(IQueryable<T> query)
             => InternalSpec == null ? query : InternalSpec.Includes(query);
 
-        public override Expression<Func<T, bool>> ToExpression() 
+        public override Expression<Func<T, bool>> ToExpression()
             => InternalSpec == null ? All.ToExpression() : InternalSpec.ToExpression();
 
-        #endregion Public Methods
+        #endregion Methods
     }
 }

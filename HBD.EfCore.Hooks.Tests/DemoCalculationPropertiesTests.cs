@@ -10,7 +10,7 @@ namespace HBD.EfCore.Hooks.Tests
     [TestClass]
     public class DemoCalculationPropertiesTests : TestBase
     {
-        #region Public Methods
+        #region Methods
 
         [TestMethod]
         public async Task TotalAmount_GotCalCalculated_PaymentChanges()
@@ -24,7 +24,7 @@ namespace HBD.EfCore.Hooks.Tests
             };
 
             db.Add(user);
-            await db.SaveChangesAsync();
+            await db.SaveChangesAsync().ConfigureAwait(false);
 
             user.TotalPaymentCalculated.Should().BeTrue();
             user.TotalPayment.Should().Be(user.Payments.Sum(i => i.Amount));
@@ -34,10 +34,10 @@ namespace HBD.EfCore.Hooks.Tests
         [TestMethod]
         public async Task TotalAmount_NotCalCalculated_When_PaymentNotChanges()
         {
-            await TotalAmount_GotCalCalculated_PaymentChanges();
+            await TotalAmount_GotCalCalculated_PaymentChanges().ConfigureAwait(false);
             var db = GetService<TestHookDbContext>();
 
-            var user = db.Set<User>().Last();
+            var user = db.Set<User>().First();
 
             //Reset Checking state of User
             user.Reset();
@@ -47,7 +47,7 @@ namespace HBD.EfCore.Hooks.Tests
             user.TotalPayment.Should().Be(100);
 
             //Save changes
-            await db.SaveChangesAsync();
+            await db.SaveChangesAsync().ConfigureAwait(false);
 
             //the calculation of TotalPayment should not be performed.
             user.TotalPaymentCalculated.Should().BeFalse();
@@ -57,10 +57,10 @@ namespace HBD.EfCore.Hooks.Tests
         [TestMethod]
         public async Task TotalAmount_ReCalCalculated_When_PaymentChanges()
         {
-            await TotalAmount_GotCalCalculated_PaymentChanges();
+            await TotalAmount_GotCalCalculated_PaymentChanges().ConfigureAwait(false);
             var db = GetService<TestHookDbContext>();
 
-            var user = db.Set<User>().Include(u => u.Payments).Last();
+            var user = db.Set<User>().Include(u => u.Payments).First();
 
             user.Reset();
 
@@ -72,13 +72,13 @@ namespace HBD.EfCore.Hooks.Tests
             user.AddPayment(new Payment { Amount = 100 });
 
             //Save changes
-            await db.SaveChangesAsync();
+            await db.SaveChangesAsync().ConfigureAwait(false);
 
             //the calculation of TotalPayment should not be performed.
             user.TotalPayment.Should().Be(user.Payments.Sum(i => i.Amount));
             user.TotalPaymentCalculated.Should().BeTrue();
         }
 
-        #endregion Public Methods
+        #endregion Methods
     }
 }

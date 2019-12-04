@@ -12,7 +12,7 @@ namespace HBD.EfCore.Extensions.Tests
     [TestClass]
     public class TypeExtractorExtensionsTests
     {
-        #region Public Methods
+        #region Methods
 
         [TestMethod]
         [Benchmark]
@@ -127,6 +127,6 @@ namespace HBD.EfCore.Extensions.Tests
                 .Count().Should().BeGreaterOrEqualTo(1);
         }
 
-        #endregion Public Methods
+        #endregion Methods
     }
 }

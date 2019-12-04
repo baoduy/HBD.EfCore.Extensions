@@ -9,8 +9,14 @@ namespace HBD.EfCore.EntityResolver.Tests.Specs
 {
     internal sealed class AccountSpec : Spec<Account>
     {
+        #region Fields
+
         private readonly int _accountId;
         private readonly string _userName;
+
+        #endregion Fields
+
+        #region Constructors
 
         public AccountSpec(int accountId) => _accountId = accountId;
 
@@ -20,6 +26,10 @@ namespace HBD.EfCore.EntityResolver.Tests.Specs
             _userName = accountModel.UserName;
         }
 
+        #endregion Constructors
+
+        #region Methods
+
         public override Expression<Func<Account, bool>> ToExpression()
         {
             if (_userName.IsNullOrEmpty())
@@ -27,5 +37,7 @@ namespace HBD.EfCore.EntityResolver.Tests.Specs
 
             return a => a.Id == _accountId && a.UserName == _userName;
         }
+
+        #endregion Methods
     }
 }

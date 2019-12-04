@@ -1,9 +1,9 @@
-﻿using System;
+﻿using HBD.EfCore.Extensions.Attributes;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
-using HBD.EfCore.Extensions.Attributes;
 
 [assembly: InternalsVisibleTo("HBD.EfCore.Extensions.Tests")]
 
@@ -59,6 +59,7 @@ namespace HBD.EfCore.Extensions.Abstractions
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
 
         // ReSharper disable once UnusedAutoPropertyAccessor.Local
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "<Pending>")]
         public byte[] RowVersion { get; private set; }
 
         #endregion Properties
@@ -89,7 +90,7 @@ namespace HBD.EfCore.Extensions.Abstractions
             return KeyComparer.Equals(Id, other.Id);
         }
 
-        public override int GetHashCode() => (_internalId != null ? _internalId.GetHashCode() : 0);
+        public override int GetHashCode() => (_internalId != null ? _internalId.GetHashCode(StringComparison.Ordinal) : 0);
 
         /// <summary>
         /// Set Id to the primary key

@@ -14,54 +14,50 @@ namespace HBD.EfCore.Extensions.Specification
     /// <typeparam name="T"></typeparam>
     public abstract class Spec<T>
     {
-        #region Public Fields
+        #region Fields
 
         public static readonly Spec<T> All = new TrueSpec<T>();
 
-        #endregion Public Fields
-
-        #region Private Fields
-
         private Func<T, bool> _compiledFunc;
 
-        #endregion Private Fields
-
-        #region Public Methods
+        #endregion Fields
 
         /// <summary>
         ///     And condition with the other spec
         /// </summary>
         /// <param name="otherSpec"></param>
         /// <returns></returns>
-        public virtual Spec<T> And(Spec<T> otherSpec)
-        {
-            if (otherSpec == null) throw new ArgumentNullException(nameof(otherSpec));
+        //public virtual Spec<T> And(Spec<T> otherSpec)
+        //{
+        //    if (otherSpec == null) throw new ArgumentNullException(nameof(otherSpec));
 
-            if (this == All)
-                return otherSpec;
+        //    if (this == All)
+        //        return otherSpec;
 
-            if (otherSpec == All)
-                return this;
+        //    if (otherSpec == All)
+        //        return this;
 
-            return new AndSpec<T>(this, otherSpec);
-        }
+        //    return new AndSpec<T>(this, otherSpec);
+        //}
 
         /// <summary>
         /// </summary>
         /// <param name="otherSpec"></param>
         /// <returns></returns>
-        public virtual Spec<T> ButNot(Spec<T> otherSpec)
-        {
-            if (otherSpec == null) throw new ArgumentNullException(nameof(otherSpec));
+        //public virtual Spec<T> ButNot(Spec<T> otherSpec)
+        //{
+        //    if (otherSpec == null) throw new ArgumentNullException(nameof(otherSpec));
 
-            if (this == All)
-                return new NotSpec<T>(otherSpec);
+        //    if (this == All)
+        //        return new NotSpec<T>(otherSpec);
 
-            if (otherSpec == All)
-                return this;
+        //    if (otherSpec == All)
+        //        return this;
 
-            return new AndSpec<T>(this, otherSpec.NotMe());
-        }
+        //    return new AndSpec<T>(this, otherSpec.NotMe());
+        //}
+
+        #region Methods
 
         /// <summary>
         ///     The specification of including navigation properties of query
@@ -86,22 +82,22 @@ namespace HBD.EfCore.Extensions.Specification
         ///     Opposite the spec.
         /// </summary>
         /// <returns></returns>
-        public virtual Spec<T> NotMe() => new NotSpec<T>(this);
+        //public virtual Spec<T> NotMe() => new NotSpec<T>(this);
 
         /// <summary>
         ///     Or condition with the other spec
         /// </summary>
         /// <param name="otherSpec"></param>
         /// <returns></returns>
-        public virtual Spec<T> Or(Spec<T> otherSpec)
-        {
-            if (otherSpec == null) throw new ArgumentNullException(nameof(otherSpec));
+        //public virtual Spec<T> Or(Spec<T> otherSpec)
+        //{
+        //    if (otherSpec == null) throw new ArgumentNullException(nameof(otherSpec));
 
-            if (this == All || otherSpec == All)
-                return All;
+        //    if (this == All || otherSpec == All)
+        //        return All;
 
-            return new OrSpec<T>(this, otherSpec);
-        }
+        //    return new OrSpec<T>(this, otherSpec);
+        //}
 
         /// <summary>
         /// Provides condition expression for <see cref="IQueryable{T}"/>
@@ -109,6 +105,6 @@ namespace HBD.EfCore.Extensions.Specification
         /// <returns></returns>
         public abstract Expression<Func<T, bool>> ToExpression();
 
-        #endregion Public Methods
+        #endregion Methods
     }
 }

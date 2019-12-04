@@ -1,16 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using HBD.EfCore.Extensions.Attributes;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using HBD.EfCore.Extensions.Attributes;
 
 namespace HBD.EfCore.Extensions.Abstractions
 {
     public interface IEntity<out TKey>
     {
-        #region Public Properties
+        #region Properties
 
         [Key, Column(Order = 1)] [IgnoreFromUpdate] TKey Id { get; }
 
-        #endregion Public Properties
+        #endregion Properties
     }
 
     public interface IEntity : IEntity<int>

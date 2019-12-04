@@ -4,11 +4,14 @@ namespace HBD.EfCore.Extensions.Abstractions
 {
     public interface IConcurrencyEntity<out TKey> : IEntity<TKey>
     {
-        #region Public Properties
+        #region Properties
 
-        [Timestamp] [ConcurrencyCheck] byte[] RowVersion { get; }
+        [Timestamp]
+        [ConcurrencyCheck]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "<Pending>")]
+        byte[] RowVersion { get; }
 
-        #endregion Public Properties
+        #endregion Properties
     }
 
     public interface IConcurrencyEntity : IConcurrencyEntity<int>, IEntity

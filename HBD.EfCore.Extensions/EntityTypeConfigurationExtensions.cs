@@ -6,7 +6,6 @@ using HBD.Framework.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 
 // ReSharper disable CheckNamespace
@@ -14,45 +13,32 @@ namespace Microsoft.EntityFrameworkCore
 {
     public static class EntityTypeConfigurationExtensions
     {
-        #region Private Fields
+        #region Fields
 
         private static readonly MethodInfo Method = typeof(EntityTypeConfigurationExtensions)
                     .GetMethod(nameof(RegisterMapping), BindingFlags.Static | BindingFlags.NonPublic);
 
-        #endregion Private Fields
+        #endregion Fields
 
-        #region Public Methods
+        #region Methods
 
         /// <summary>
         /// Register EntityTypeConfiguration from RegistrationInfos <see cref="RegistrationInfo"/>
         /// </summary>
         /// <param name="modelBuilder"></param>
         /// <param name="registrations"></param>
-        internal static void RegisterEntityMappingFrom(this ModelBuilder modelBuilder,
-            IEnumerable<RegistrationInfo> registrations)
+        internal static void RegisterEntityMappingFrom(this ModelBuilder modelBuilder, IEnumerable<RegistrationInfo> registrations)
         {
-            foreach (var type in registrations.SelectMany(GetMappers))
-                modelBuilder.RegisterMappingFromType(type);
+            foreach (var type in registrations)
+                modelBuilder.RegisterEntityMappingFrom(type);
         }
 
-        #endregion Public Methods
-
-        #region Private Methods
-
-        private static Type[] GetEntityMappingTypes(this Assembly[] assemblies)
-            => assemblies.Extract().Class().NotAbstract().NotGeneric().NotInterface()
-                .IsInstanceOf(typeof(IEntityTypeConfiguration<>)).Distinct().ToArray();
-
-        private static IEnumerable<Type> GetEntityTypes(this Assembly[] assemblies, Expression<Func<Type, bool>> predicate = null)
-            => assemblies.Extract().Class().NotAbstract().NotGeneric().NotInterface()
-                .IsInstanceOf(typeof(IEntity<>)).Where(predicate).Where(t => !t.HasAttribute<IgnoreMapperAttribute>(true)).ToArray();
-
-        private static Type GetGenericMapper(Type entityType, IEnumerable<Type> mapperTypes)
+        private static Type CreateMapperFromGeneric(Type entityType, IEnumerable<Type> mapperTypes)
         {
             foreach (var mapperType in mapperTypes)
             {
                 //The generic type should have 1 GenericTypeParameters only
-                var gtype = mapperType.GetTypeInfo().GenericTypeParameters.First();
+                var gtype = mapperType.GetTypeInfo().GenericTypeParameters.Single();
 
                 if (gtype.GetGenericParameterConstraints().Any(c => c.IsAssignableFrom(entityType))
                     || gtype.IsAssignableFrom(entityType)
@@ -65,28 +51,55 @@ namespace Microsoft.EntityFrameworkCore
         }
 
         /// <summary>
-        /// Scan and Load IEntityTypeConfiguration <see cref="IEntityTypeConfiguration{TEntity}"/>
-        /// from Assemblies
+        /// Get all Class and Abstract class without Interface or Generic
         /// </summary>
+        /// <param name="registration"></param>
         /// <returns></returns>
-        private static IEnumerable<Type> GetMappers(this RegistrationInfo registration)
-        {
-            var genericMapperFromAssemblies = registration.EntityAssemblies.Extract().Generic().Class()
-                .IsInstanceOf(typeof(IEntityTypeConfiguration<>)).Distinct().ToArray();
+        private static IEnumerable<Type> GetAllEntityTypes(this RegistrationInfo registration)
+                    => registration.EntityAssemblies.Extract().Class().NotGeneric().IsInstanceOf(typeof(IEntity<>))
+                .Where(t => !t.HasAttribute<IgnoreMapperAttribute>(true));
 
-            //There is no DefaultEntityMapperTypes then use the default one.
-            if (registration.DefaultEntityMapperTypes == null || !registration.DefaultEntityMapperTypes.Any())
+        private static IEnumerable<Type> GetDefinedMappers(this RegistrationInfo registration)
+                    => registration.EntityAssemblies.Extract().Class().NotAbstract().NotGeneric()
+                        .IsInstanceOf(typeof(IEntityTypeConfiguration<>)).Distinct();
+
+        private static IEnumerable<Type> GetGenericMappers(this RegistrationInfo registration)
+                   => registration.EntityAssemblies.Extract().Generic().Class().NotAbstract()
+                       .IsInstanceOf(typeof(IEntityTypeConfiguration<>)).Distinct();
+
+        private static void RegisterEntityMappingFrom(this ModelBuilder modelBuilder, RegistrationInfo registration)
+        {
+            //modelBuilder.RegisterMappingFromType(type);
+            if (registration.DefaultEntityMapperTypes == null)
                 registration.WithDefaultMappersType(typeof(EntityTypeConfiguration<>));
 
-            var mappingTypes = registration.EntityAssemblies.GetEntityMappingTypes();
+            var allDefinedMappers = registration.GetDefinedMappers().ToList();
+            var entityTypes = registration.GetAllEntityTypes().ToList();
 
-            var missingEntityTypes = registration.EntityAssemblies.GetEntityTypes(registration.Predicate)
-                .Where(t => mappingTypes.All(m => m.GetInterfaces()
-                    .All(i => i.GenericTypeArguments.First() != t)));
+            var requiredEntityTypes = registration.Predicate == null
+                ? entityTypes
+                : entityTypes.Where(registration.Predicate.Compile()).ToList();
 
-            return mappingTypes.Concat(missingEntityTypes.Select(t =>
-                GetGenericMapper(t,
-                    genericMapperFromAssemblies.Union(registration.DefaultEntityMapperTypes).ToArray())));
+            var generiMappers = registration.GetGenericMappers().Concat(registration.DefaultEntityMapperTypes).ToList();
+
+            //Map Entities to ModelBuilder
+            foreach (var entityType in requiredEntityTypes)
+            {
+                var mapper = allDefinedMappers.FirstOrDefault(m => m.BaseType?.GenericTypeArguments.FirstOrDefault() == entityType);
+
+                if (mapper == null && !entityType.IsAbstract)
+                    mapper = CreateMapperFromGeneric(entityType, generiMappers);
+
+                if (mapper != null)
+                    modelBuilder.RegisterMappingFromType(mapper);
+            }
+
+            //Ignore Others
+            if (registration.IgnoreOtherEntities)
+            {
+                foreach (var entityType in entityTypes.Except(requiredEntityTypes))
+                    modelBuilder.Ignore(entityType);
+            }
         }
 
         /// <summary>
@@ -109,7 +122,7 @@ namespace Microsoft.EntityFrameworkCore
         {
             if (mapperType == null) throw new ArgumentNullException(nameof(mapperType));
 
-            var eType = HBD.EfCore.Extensions.Extensions.GetEntityType(mapperType);
+            var eType = HBD.EfCore.Extensions.EfCoreExtensions.GetEntityType(mapperType);
 
             if (Method == null || eType == null)
                 throw new ArgumentException($"The {nameof(RegisterMapping)} or EntityType are not found");
@@ -118,6 +131,6 @@ namespace Microsoft.EntityFrameworkCore
             md.Invoke(null, new object[] { modelBuilder });
         }
 
-        #endregion Private Methods
+        #endregion Methods
     }
 }

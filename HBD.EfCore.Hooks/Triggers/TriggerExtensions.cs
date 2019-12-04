@@ -5,16 +5,71 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using HBD.Framework.Extensions;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.DependencyInjection;
 
 [assembly: InternalsVisibleTo("HBD.EfCore.Hooks.Tests")]
+
 namespace HBD.EfCore.Hooks.Triggers
 {
     public static class TriggerExtensions
     {
-        internal static IEnumerable<Type> GetProfileTypes(Assembly[] fromAssemblies, Type interfaceType)
-            => fromAssemblies.Extract().Class().NotAbstract().IsInstanceOf(interfaceType).Distinct();
+        #region Fields
+
+        private static readonly MethodInfo Method = typeof(TriggerExtensions)
+            .GetMethod(nameof(ToTriggerEntity), BindingFlags.Static | BindingFlags.Public);
+
+        #endregion Fields
+
+        #region Methods
+
+        /// <summary>
+        /// Check whether the property has changed or not.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="entity"></param>
+        /// <param name="selector"></param>
+        /// <returns></returns>
+        public static bool HasChangedOn<T>(this TriggerEntityState<T> entity, Expression<Func<T, object>> selector) where T : class
+        {
+            if (entity is null)
+            {
+                throw new ArgumentNullException(nameof(entity));
+            }
+
+            var p = selector.GetPropertyAccess();
+            return entity.ModifiedProperties.Any(i => i.EqualsIgnoreCase(p.Name));
+        }
+
+        /// <summary>
+        /// Convert to Generic <see cref="TriggerEntityState"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        public static IEnumerable<TriggerEntityState<T>> ToTriggerEntity<T>(
+            this IEnumerable<TriggerEntityState> entities)
+            where T : class =>
+            from entity in entities
+            where entity.Entity is T
+            select new TriggerEntityState<T>((T)entity.Entity, entity.ModifiedProperties, entity.State);
+
+        internal static IEnumerable<Type> GetProfileTypes(ICollection<Assembly> fromAssemblies, Type interfaceType)
+                                    => fromAssemblies.Extract().Class().NotAbstract().IsInstanceOf(interfaceType).Distinct();
+
+        /// <summary>
+        /// Get Generic TriggerEntityState from collection based on EntityType
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <param name="entityType"></param>
+        /// <returns></returns>
+        internal static IEnumerable<dynamic> GetTriggerEntity(this IEnumerable<TriggerEntityState> entities,
+            Type entityType)
+        {
+            var result = Method.MakeGenericMethod(entityType).Invoke(null, new object[] { entities });
+            return (IEnumerable<dynamic>)result;
+        }
 
         /// <summary>
         /// Passing the Service Provider to Trigger Context
@@ -41,46 +96,6 @@ namespace HBD.EfCore.Hooks.Triggers
             return service;
         }
 
-        /// <summary>
-        /// Convert to Generic <see cref="TriggerEntityState"/>
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="entities"></param>
-        /// <returns></returns>
-        public static IEnumerable<TriggerEntityState<T>> ToTriggerEntity<T>(
-            this IEnumerable<TriggerEntityState> entities)
-            where T : class =>
-            from entity in entities
-            where entity.Entity is T
-            select new TriggerEntityState<T>((T)entity.Entity, entity.ModifiedProperties, entity.State);
-
-        private static readonly MethodInfo Method = typeof(TriggerExtensions)
-            .GetMethod(nameof(ToTriggerEntity), BindingFlags.Static | BindingFlags.Public);
-
-        /// <summary>
-        /// Get Generic TriggerEntityState from collection based on EntityType
-        /// </summary>
-        /// <param name="entities"></param>
-        /// <param name="entityType"></param>
-        /// <returns></returns>
-        internal static IEnumerable<dynamic> GetTriggerEntity(this IEnumerable<TriggerEntityState> entities,
-            Type entityType)
-        {
-            var result = Method.MakeGenericMethod(entityType).Invoke(null, new object[] { entities });
-            return (IEnumerable<dynamic>)result;
-        }
-
-        /// <summary>
-        /// Check whether the property has changed or not.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="entity"></param>
-        /// <param name="selector"></param>
-        /// <returns></returns>
-        public static bool HasChangedOn<T>(this TriggerEntityState<T> entity, Expression<Func<T, object>> selector) where T : class
-        {
-            var p = selector.GetPropertyAccess();
-            return entity.ModifiedProperties.Any(i => i.EqualsIgnoreCase(p.Name));
-        }
+        #endregion Methods
     }
 }

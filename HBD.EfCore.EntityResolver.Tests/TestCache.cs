@@ -1,13 +1,15 @@
 ﻿using FluentAssertions;
-using HBD.EfCore.EntityResolver.Internal;
+using HBD.EfCore.EntityResolvers.Internal;
 using HBD.EfCore.EntityResolver.Tests.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace HBD.EfCore.EntityResolver.Tests
 {
     [TestClass]
-   public class TestCache
+    public class TestCache
     {
+        #region Methods
+
         [TestMethod]
         public void TestPropertyInfoCache()
         {
@@ -16,5 +18,7 @@ namespace HBD.EfCore.EntityResolver.Tests
 
             p.Should().BeSameAs(p2);
         }
+
+        #endregion Methods
     }
 }

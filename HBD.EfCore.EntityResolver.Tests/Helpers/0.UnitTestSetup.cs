@@ -1,5 +1,6 @@
 ﻿using System;
 using AutoMapper;
+using HBD.TestHelper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -7,10 +8,23 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace HBD.EfCore.EntityResolver.Tests.Helpers
 {
     [TestClass]
-    public class UnitTestSetup
+    public class ResolverTestSetup
     {
+        #region Properties
+
         public static MyDbContext Db { get; private set; }
+
         public static IServiceProvider Provider { get; private set; }
+
+        #endregion Properties
+
+        #region Methods
+
+        [AssemblyCleanup]
+        public static void TestCleanup()
+        {
+            Db?.Dispose();
+        }
 
         [AssemblyInitialize]
         public static void TestSetup(TestContext _)
@@ -20,7 +34,7 @@ namespace HBD.EfCore.EntityResolver.Tests.Helpers
                     .UseLoggerFactory(SqliteMemory.DebugLoggerFactory)
                     .UseAutoConfigModel(i => i.ScanFrom(typeof(MyDbContext).Assembly)))
                 .AddEntityResolver()
-                .AddAutoMapper()
+                .AddAutoMapper(typeof(MyDbContext).Assembly)
                 .AddScoped<DbContext>(op => op.GetService<MyDbContext>())
                 .BuildServiceProvider();
 
@@ -28,10 +42,6 @@ namespace HBD.EfCore.EntityResolver.Tests.Helpers
             Db.Database.EnsureCreated();
         }
 
-        [AssemblyCleanup]
-        public static void TestCleanup()
-        {
-            Db?.Dispose();
-        }
+        #endregion Methods
     }
 }

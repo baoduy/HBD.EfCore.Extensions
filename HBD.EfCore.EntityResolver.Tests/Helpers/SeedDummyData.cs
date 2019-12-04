@@ -14,8 +14,8 @@ namespace HBD.EfCore.EntityResolver.Tests.Helpers
         {
             if (!force && @this.Set<User>().Count() >= number) return;
 
-            await @this.Set<User>().AddRangeAsync(GenerateUsers(number));
-            await @this.SaveChangesAsync();
+            await @this.Set<User>().AddRangeAsync(GenerateUsers(number)).ConfigureAwait(false);
+            await @this.SaveChangesAsync().ConfigureAwait(false);
         }
 
         #endregion Public Methods

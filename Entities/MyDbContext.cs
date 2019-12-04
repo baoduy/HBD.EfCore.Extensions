@@ -4,12 +4,12 @@ namespace DataLayer
 {
     public class MyDbContext : DbContext
     {
-        #region Public Constructors
+        #region Constructors
 
         public MyDbContext(DbContextOptions options) : base(options)
         {
         }
 
-        #endregion Public Constructors
+        #endregion Constructors
     }
 }

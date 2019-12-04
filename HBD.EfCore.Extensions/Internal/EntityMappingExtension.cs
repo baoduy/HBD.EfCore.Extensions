@@ -1,59 +1,59 @@
-﻿using System.Collections.Generic;
-using System.Reflection;
-using HBD.EfCore.Extensions.Options;
+﻿using HBD.EfCore.Extensions.Options;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace HBD.EfCore.Extensions.Internal
 {
     internal class EntityMappingExtension : IDbContextOptionsExtension, IEntityMappingExtension
     {
-        #region Public Properties
+        #region Fields
 
-        public string LogFragment => $"using {nameof(EntityMappingExtension)}";
+        private DbContextOptionsExtensionInfo info;
 
-        #endregion Public Properties
+        #endregion Fields
 
-        #region Internal Properties
+        #region Properties
+
+        public DbContextOptionsExtensionInfo Info => info ??= new EntityMappingExtensionInfo(this);
 
         internal ICollection<RegistrationInfo> Registrations { get; } = new List<RegistrationInfo>();
 
-        #endregion Internal Properties
+        #endregion Properties
 
-        #region Public Methods
+        #region Methods
 
-        public bool ApplyServices(IServiceCollection services)
+        public void ApplyServices(IServiceCollection services)
         {
             services.AddSingleton(new EntityMappingService(this));
 
-            using (var provider = services.BuildServiceProvider())
-            {
-                var originalModelCustomizer = provider.GetService<IModelCustomizer>();
+            using var provider = services.BuildServiceProvider();
+            var originalModelCustomizer = provider.GetService<IModelCustomizer>();
 
-                services.Replace(new ServiceDescriptor(
-                    typeof(IModelCustomizer),
-                    new ExtraModelCustomizer(originalModelCustomizer)
-                ));
-            }
-
-            return false;
+            services.Replace(new ServiceDescriptor(
+                typeof(IModelCustomizer),
+                new ExtraModelCustomizer(originalModelCustomizer)
+            ));
         }
 
         /// <inheritdoc />
         /// <summary>
         /// The Assemblies will be scan
         /// </summary>
-        /// <param name="entityAssemblies"></param>
+        /// <param name="assembliesToScans"></param>
         /// <returns></returns>
-        public RegistrationInfo ScanFrom(params Assembly[] entityAssemblies)
+        public RegistrationInfo ScanFrom(params Assembly[] assembliesToScans)
         {
-            var register = new RegistrationInfo(entityAssemblies);
+            if (!assembliesToScans.Any())
+                assembliesToScans = new[] { Assembly.GetCallingAssembly() };
+
+            var register = new RegistrationInfo(assembliesToScans);
             Registrations.Add(register);
             return register;
         }
-
-        public long GetServiceProviderHashCode() => nameof(EntityMappingExtension).GetHashCode();
 
         public void Validate(IDbContextOptions options)
         {
@@ -61,6 +61,6 @@ namespace HBD.EfCore.Extensions.Internal
                 info.Validate();
         }
 
-        #endregion Public Methods
+        #endregion Methods
     }
 }

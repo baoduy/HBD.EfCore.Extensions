@@ -1,4 +1,4 @@
-﻿using HBD.EfCore.EntityResolver;
+﻿using HBD.EfCore.EntityResolvers;
 using Microsoft.Extensions.DependencyInjection;
 
 // ReSharper disable CheckNamespace
@@ -6,7 +6,7 @@ namespace Microsoft.EntityFrameworkCore
 {
     public static class SetupServiceExtensions
     {
-        #region Public Methods
+        #region Methods
 
         public static IServiceCollection AddEntityResolver(this IServiceCollection service)
             => service
@@ -15,6 +15,6 @@ namespace Microsoft.EntityFrameworkCore
                 .AddScoped(typeof(IEntityResolver<>), typeof(EntityResolver<>))
                 .AddScoped<IEntityResolver, EntityResolver>();
 
-        #endregion Public Methods
+        #endregion Methods
     }
 }

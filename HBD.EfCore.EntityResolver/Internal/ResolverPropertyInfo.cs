@@ -1,10 +1,12 @@
-﻿using HBD.EfCore.EntityResolver.Attributes;
+﻿using HBD.EfCore.EntityResolvers.Attributes;
 using System.Reflection;
 
-namespace HBD.EfCore.EntityResolver.Internal
+namespace HBD.EfCore.EntityResolvers.Internal
 {
     public sealed class ResolverPropertyInfo
     {
+        #region Constructors
+
         internal ResolverPropertyInfo(PropertyInfo property, AutoResolveAttribute attribute)
         {
             Property = property;
@@ -17,10 +19,16 @@ namespace HBD.EfCore.EntityResolver.Internal
             AlwaysIncluded = attribute?.AlwaysIncluded ?? false;
         }
 
-        public PropertyInfo Property { get; }
+        #endregion Constructors
+
+        #region Properties
+
+        public bool AlwaysIncluded { get; private set; }
 
         public AutoResolveAttribute Attribute { get; }
 
-        public bool AlwaysIncluded { get; private set; }
+        public PropertyInfo Property { get; }
+
+        #endregion Properties
     }
 }
