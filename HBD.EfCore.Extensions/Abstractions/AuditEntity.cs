@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -44,6 +44,12 @@ namespace HBD.EfCore.Extensions.Abstractions
 
         [Column(Order = 999)]
         public DateTimeOffset? UpdatedOn { get; private set; }
+
+        [NotMapped]
+        public string LastModifiedBy => UpdatedBy ?? CreatedBy;
+
+        [NotMapped]
+        public DateTimeOffset LastModifiedOn => UpdatedOn ?? CreatedOn;
 
         #endregion Properties
 

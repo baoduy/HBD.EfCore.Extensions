@@ -1,11 +1,11 @@
-﻿using GenericEventRunner.ForEntities;
-using HBD.EfCore.Extensions.Abstractions;
+using GenericEventRunner.ForEntities;
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HBD.EfCore.DDD.Domains
 {
-    public abstract class AggregateRoot : EntityEvents, IAuditEntity<Guid>
+
+    public abstract class AggregateRoot : EntityEvents, IAggregateRoot
     {
         #region Fields
 

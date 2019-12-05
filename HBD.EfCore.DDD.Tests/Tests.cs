@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using HBD.Actions.Runner;
 using HBD.EfCore.DDD.Internals;
 using HBD.EfCore.DDD.Tests.Infra;
@@ -61,7 +61,7 @@ namespace HBD.EfCore.DDD.Tests
             AccountAfterSaveEventHandler.Reset();
             var db = Initialize.Provider.GetService<ProfileContext>();
 
-            var p = await db.Set<Profile>().Include(i => i.Accounts).FirstAsync();
+            var p = await db.Set<Profile>().Include(i => i.Accounts).OrderByDescending(i => i.Id).FirstAsync();
 
             runner.Run(p, new AccountDto
             {

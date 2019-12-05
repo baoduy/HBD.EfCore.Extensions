@@ -1,4 +1,4 @@
-﻿using HBD.EfCore.DDD.Attributes;
+using HBD.EfCore.DDD.Attributes;
 using HBD.EfCore.DDD.Domains;
 using System;
 using System.Collections.Generic;
@@ -37,11 +37,21 @@ namespace HBD.EfCore.DDD.Tests.Infra
         public void AddAccount(string accountName, string userId)
         {
             var acc = new Account(this.Id, accountName, userId);
+            AddAccount(acc);
+        }
 
-            this.accounts.Add(acc);
-            AddEvent(new AccountEvent { Id = acc.Id, Name = acc.Name }, GenericEventRunner.ForEntities.EventToSend.BeforeAndAfterSave);
+        internal void AddAccount(Account account)
+        {
+            this.accounts.Add(account);
+            AddEvent(new AccountEvent { Id = account.Id, Name = account.Name }, GenericEventRunner.ForEntities.EventToSend.BeforeAndAfterSave);
 
-            SetUpdatedBy(userId);
+            SetUpdatedBy(account.LastModifiedBy);
+        }
+
+        internal void AddAccounts(IEnumerable<Account> accounts)
+        {
+            foreach (var acc in accounts)
+                AddAccount(acc);
         }
 
         [Event(typeof(AccountEvent))]

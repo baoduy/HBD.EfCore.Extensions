@@ -1,6 +1,9 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.EntityFrameworkCore;
 using FluentAssertions;
+using HBD.EfCore.DDD.Repositories;
+using HBD.EfCore.DDD.Tests.Infra;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace HBD.EfCore.DDD.Tests
 {
@@ -12,70 +15,61 @@ namespace HBD.EfCore.DDD.Tests
         [TestMethod]
         public async System.Threading.Tasks.Task ReadAsync()
         {
-            await UnitTestSetup.Db.SeedData().ConfigureAwait(false);
-            var repo = new ReadOnlyRepository<User>(UnitTestSetup.Db);
+            var db = Initialize.Provider.GetRequiredService<ProfileContext>();
+            var repo = Initialize.Provider.GetRequiredService<IReadOnlyRepository<Profile>>();
 
-            var users = await repo.ReadAsync().ToList();
+            var users = await repo.ReadAsync().ToListAsync();
             users.Should().HaveCountGreaterOrEqualTo(1);
         }
 
         [TestMethod]
         public async System.Threading.Tasks.Task ReadConditionAsync()
         {
-            await UnitTestSetup.Db.SeedData().ConfigureAwait(false);
-            var repo = new ReadOnlyRepository<User>(UnitTestSetup.Db);
+            var db = Initialize.Provider.GetRequiredService<ProfileContext>();
+          var repo = Initialize.Provider.GetRequiredService<IReadOnlyRepository<Profile>>();
 
-            var users = await repo.ReadAsync(u => u.FirstName.StartsWith("D")).ToList();
+            var users = await repo.ReadAsync(u => u.Name.Contains("D")).ToListAsync();
             users.Should().HaveCountGreaterOrEqualTo(1);
         }
 
         [TestMethod]
         public async System.Threading.Tasks.Task ReadPageAsync()
         {
-            await UnitTestSetup.Db.SeedData().ConfigureAwait(false);
-            var repo = new ReadOnlyRepository<User>(UnitTestSetup.Db);
+            var db = Initialize.Provider.GetRequiredService<ProfileContext>();
+          var repo = Initialize.Provider.GetRequiredService<IReadOnlyRepository<Profile>>();
 
-            var users = await repo.ReadPageAsync(0, 10, u => u.FirstName);
+            var users = await repo.ReadPageAsync(0, 10, u => u.Name);
             users.Items.Should().HaveCountGreaterOrEqualTo(1);
         }
 
         [TestMethod]
         public async System.Threading.Tasks.Task ReadPageWithoutFiltersAsync()
         {
-            await UnitTestSetup.Db.SeedData().ConfigureAwait(false);
-            var repo = new ReadOnlyRepository<User>(UnitTestSetup.Db);
+            var db = Initialize.Provider.GetRequiredService<ProfileContext>();
+            var repo = Initialize.Provider.GetRequiredService<IReadOnlyRepository<Profile>>();
 
-            var users = await repo.ReadPageIgnoreFildersAsync(0, 10, u => u.FirstName);
+            var users = await repo.ReadPageIgnoreFiltersAsync(0, 10, u => u.Name);
             users.Items.Should().HaveCountGreaterOrEqualTo(1);
         }
 
         [TestMethod]
         public async System.Threading.Tasks.Task ReadSingleAsync()
         {
-            await UnitTestSetup.Db.SeedData().ConfigureAwait(false);
-            var repo = new ReadOnlyRepository<User>(UnitTestSetup.Db);
+            var db = Initialize.Provider.GetRequiredService<ProfileContext>();
+            var repo = Initialize.Provider.GetRequiredService<IReadOnlyRepository<Profile>>();
 
-            var u = await repo.ReadSingleAsync(1);
+            var p = await db.Set<Profile>().FirstAsync();
+            var u = await repo.ReadSingleAsync(p.Id);
             u.Should().NotBeNull();
-        }
-
-        [TestMethod]
-        public async System.Threading.Tasks.Task ReadSpecAsync()
-        {
-            await UnitTestSetup.Db.SeedData().ConfigureAwait(false);
-            var repo = new ReadOnlyRepository<User>(UnitTestSetup.Db);
-
-            var users = await repo.ReadSpecAsync(new UserIdGreaterThan10Spec(), OrderBuilder.CreateBuilder<User>(o => o.LastName)).ToList();
-            users.Should().HaveCountGreaterOrEqualTo(1);
         }
 
         [TestMethod]
         public async System.Threading.Tasks.Task ReadWithoutFiltersAsync()
         {
-            await UnitTestSetup.Db.SeedData().ConfigureAwait(false);
-            var repo = new ReadOnlyRepository<User>(UnitTestSetup.Db);
+            var db = Initialize.Provider.GetRequiredService<ProfileContext>();
+            var repo = Initialize.Provider.GetRequiredService<IReadOnlyRepository<Profile>>();
 
-            var users = await repo.ReadIgnoreFildersAsync().ToList();
+            var users = await repo.ReadIgnoreFiltersAsync().ToListAsync();
             users.Should().HaveCountGreaterOrEqualTo(1);
         }
 

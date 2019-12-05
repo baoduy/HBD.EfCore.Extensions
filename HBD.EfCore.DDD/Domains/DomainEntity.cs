@@ -1,12 +1,13 @@
-﻿using System;
+using System;
 using HBD.EfCore.Extensions.Abstractions;
 
 namespace HBD.EfCore.DDD.Domains
 {
+
     /// <summary>
     /// Domain Entity
     /// </summary>
-    public abstract class DomainEntity : AuditEntityGuid
+    public abstract class DomainEntity : AuditEntityGuid, IDomainEntity
     {
         #region Constructors
 

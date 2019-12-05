@@ -1,9 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.0-preview001</Version>
+    <Version>1.0.0-preview002</Version>
     <Authors>Duy Hoang</Authors>
     <Description>The DDD implementation with EfCore</Description>
     <Copyright>@drunkcoding.net 2020</Copyright>
@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="9.0.0" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="HBD.Actions.Runner" Version="1.0.0-preview005" />
     <PackageReference Include="HBD.EfCore.GenericEventRunner" Version="1.1.2" />
   </ItemGroup>

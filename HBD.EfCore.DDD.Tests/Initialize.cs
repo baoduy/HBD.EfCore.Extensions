@@ -1,9 +1,13 @@
-using AutoMapper;
+using AutoBogus;
+using AutoBogus.Conventions;
 using HBD.EfCore.DDD.Tests.Infra;
 using HBD.TestHelper;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Linq;
+using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 
 namespace HBD.EfCore.DDD.Tests
 {
@@ -21,9 +25,13 @@ namespace HBD.EfCore.DDD.Tests
         [AssemblyInitialize]
         public static void Setup(TestContext _)
         {
+            AutoFaker.Configure(builder =>
+            {
+                builder.WithConventions();
+            });
+
             Provider = new ServiceCollection()
                 .AddLogging()
-                .AddAutoMapper(typeof(Initialize).Assembly)
                 .AddDomainWithSingleBoundedContext<ProfileContext>(b =>
                 {
                     b.UseSqliteMemory();
@@ -31,12 +39,22 @@ namespace HBD.EfCore.DDD.Tests
 
                 //eventConfig: new GenericEventRunnerConfig { NotUsingAfterSaveHandlers = false },
                 assembliesToScans: typeof(Initialize).Assembly)
+                .AddScoped<DbContext>(p => p.GetRequiredService<ProfileContext>())
                 .BuildServiceProvider();
 
             var db = Provider.GetRequiredService<ProfileContext>();
             db.Database.EnsureCreated();
+            db.Generate().GetAwaiter().GetResult();
         }
 
         #endregion Methods
+
+        [TestMethod]
+        public void TestInitialize()
+        {
+            var db = Initialize.Provider.GetService<ProfileContext>();
+            db.Set<Infra.Profile>().All(p => p.Accounts.Count == 100)
+                .Should().BeTrue();
+        }
     }
 }

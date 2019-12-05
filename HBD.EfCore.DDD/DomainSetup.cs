@@ -1,4 +1,4 @@
-﻿using GenericEventRunner.ForSetup;
+using GenericEventRunner.ForSetup;
 using HBD.Actions.Runner;
 using HBD.EfCore.DDD.Internals;
 using HBD.EfCore.DDD.Repositories;
@@ -10,6 +10,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using AutoMapper;
 
 [assembly: InternalsVisibleTo("HBD.EfCore.DDD.Tests")]
 
@@ -42,7 +43,8 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddDomainServices(this IServiceCollection services, IGenericEventRunnerConfig eventConfig = null, params Assembly[] assembliesToScans)
         {
             services.AddRepositories()
-                .AddDomainActionRunner();
+                .AddDomainActionRunner()
+                .AddAutoMapper(assembliesToScans);
 
             if (eventConfig == null)
                 services.RegisterGenericEventRunner(assembliesToScans);
@@ -85,7 +87,9 @@ namespace Microsoft.Extensions.DependencyInjection
             .Replace(new ServiceDescriptor(typeof(IActionRunnerService), typeof(EventActionRunner), ServiceLifetime.Singleton));
 
         private static IServiceCollection AddRepositories(this IServiceCollection services)
-            => services.AddScoped(typeof(IReadOnlyRepository<>), typeof(ReadOnlyRepository<>));
+            => services
+                .AddScoped(typeof(IReadOnlyRepository<>), typeof(ReadOnlyRepository<>))
+                .AddScoped(typeof(IDtoReadOnlyRepository<>), typeof(DtoReadOnlyRepository<>));
 
         #endregion Methods
     }

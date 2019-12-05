@@ -1,4 +1,4 @@
-﻿using HBD.EfCore.Extensions.Specification;
+using HBD.EfCore.Extensions.Specification;
 using HBD.EfCore.Extensions.Utilities;
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ namespace Microsoft.EntityFrameworkCore
     {
         #region Methods
 
-        public static async ValueTask<List<TEntity>> ToList<TEntity>(this IAsyncEnumerable<TEntity> entities)
+        public static async ValueTask<List<TEntity>> ToListAsync<TEntity>(this IAsyncEnumerable<TEntity> entities)
         {
             if (entities is null)
             {
